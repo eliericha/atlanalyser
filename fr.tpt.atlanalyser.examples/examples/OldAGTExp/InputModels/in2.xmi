@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ASCII"?>
+<systemmodel:SystemModel
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:systemmodel="http://systemmodel/1.0"
+    xsi:schemaLocation="http://systemmodel/1.0 ../InputMM/systemmodel.ecore"
+    name="bla">
+  <blocks xsi:type="systemmodel:UnitDelay"
+      name="b3">
+    <inports
+        inSignal="//@signals.2"/>
+    <outports/>
+  </blocks>
+  <blocks xsi:type="systemmodel:SrcBlock"
+      name="b1">
+    <outports
+        name=""
+        outSignals="//@signals.0 //@signals.1 //@signals.2"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:UnitDelay"
+      name="b4">
+    <inports/>
+    <outports/>
+  </blocks>
+  <blocks xsi:type="systemmodel:Sum"
+      name="b2">
+    <inports
+        inSignal="//@signals.0"/>
+    <inports
+        inSignal="//@signals.1"/>
+    <outports/>
+  </blocks>
+  <blocks xsi:type="systemmodel:SrcBlock"
+      name="b1">
+    <outports
+        name=""/>
+  </blocks>
+  <blocks xsi:type="systemmodel:SrcBlock"
+      name="b1">
+    <outports
+        name=""/>
+  </blocks>
+  <signals name="sig1"
+      srcPort="//@blocks.1/@outports.0"
+      dstPort="//@blocks.3/@inports.0"/>
+  <signals name="sig2"
+      srcPort="//@blocks.1/@outports.0"
+      dstPort="//@blocks.3/@inports.1"/>
+  <signals name="sig3"
+      srcPort="//@blocks.1/@outports.0"
+      dstPort="//@blocks.0/@inports.0"/>
+</systemmodel:SystemModel>

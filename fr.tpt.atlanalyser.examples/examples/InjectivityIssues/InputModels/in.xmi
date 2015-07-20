@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ASCII"?>
+<in:RootContainer
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:in="http://in/1.0"
+    xsi:schemaLocation="http://in/1.0 ../InputMM/in.ecore">
+  <elements
+      xsi:type="in:A"
+      name="a1">
+    <refB name="Jon"/>
+    <refB name="Jon"/>
+    <refB name="Jon"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a2">
+    <refB name="Jon"/>
+    <refB name="Hodor"/>
+    <refB name="Arya"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a3">
+    <refB name="Hodor"/>
+    <refB name="Hodor"/>
+    <refB name="Arya"/>
+    <refB name="Jon"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a4">
+    <refB name="Hodor"/>
+    <refB name="Hodor"/>
+    <refB name="Jon"/>
+    <refB name="Hodor"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a1">
+    <refB name="Jon"/>
+    <refB name="Jon"/>
+    <refB name="Jon"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a2">
+    <refB name="Jon"/>
+    <refB name="Hodor"/>
+    <refB name="Arya"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a3">
+    <refB name="Hodor"/>
+    <refB name="Hodor"/>
+    <refB name="Arya"/>
+    <refB name="Jon"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a4">
+    <refB name="Hodor"/>
+    <refB name="Hodor"/>
+    <refB name="Jon"/>
+    <refB name="Hodor"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a1">
+    <refB name="Jon"/>
+    <refB name="Jon"/>
+    <refB name="Jon"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a2">
+    <refB name="Jon"/>
+    <refB name="Hodor"/>
+    <refB name="Arya"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a3">
+    <refB name="Hodor"/>
+    <refB name="Hodor"/>
+    <refB name="Arya"/>
+    <refB name="Jon"/>
+  </elements>
+  <elements
+      xsi:type="in:A"
+      name="a4">
+    <refB name="Hodor"/>
+    <refB name="Hodor"/>
+    <refB name="Jon"/>
+    <refB name="Hodor"/>
+  </elements>
+</in:RootContainer>

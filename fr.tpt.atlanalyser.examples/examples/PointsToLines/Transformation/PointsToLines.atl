@@ -1,0 +1,46 @@
+-- @path IN_MM=/fr.tpt.atlanalyzer.examples/examples/PointsToLines/InputMM/PointsMM.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyzer.examples/examples/PointsToLines/OutputMM/LinesMM.ecore
+-- @atlcompiler emftvm
+
+module PointsToLines;
+create OUT: OUT_MM from IN: IN_MM;
+
+rule PointSetToLineSet
+{
+	from
+		ps_in: IN_MM!PointsSet
+	to
+		ls_out: OUT_MM!LinesSet
+		(
+			lines <- ps_in.points->collect(e1 | 
+				ps_in.points->select(e2 | e2 <> e1)
+				->collect (e2 | 
+					thisModule.resolveTemp(Sequence{e1,e2}, 'line_out')
+				)
+			)->flatten()->asSet(),
+			crosses <- ps_in.points
+		)
+}
+
+rule PointToCross
+{
+	from
+		p_in: IN_MM!Point
+	to
+		p_out: OUT_MM!Cross
+}
+
+
+rule PointsToLine
+{
+	from
+		p_in1: IN_MM!Point,
+		p_in2: IN_MM!Point
+		(p_in1 <> p_in2)
+	to
+		line_out: OUT_MM!Line
+		(
+			end1 <- p_in1,
+			end2 <- p_in2
+		)
+}

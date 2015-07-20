@@ -1,0 +1,90 @@
+-- @path IN_MM=/fr.tpt.atlanalyzer.examples/examples/SimpleCMG/InputMM/systemmodel.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyzer.examples/examples/SimpleCMG/OutputMM/codemodel.ecore
+-- @atlcompiler emftvm
+
+module SimpleCMG;
+create OUT: OUT_MM from IN: IN_MM;
+
+helper context IN_MM!SystemModel def: getName : String =
+    self.name;
+
+rule SM2CM {
+  from sm : IN_MM!SystemModel
+  to   cm : OUT_MM!CodeModel (
+         name  <- sm.getName + '_codemodel_',
+         stmts <- sm.blocks->select(b | not b.oclIsTypeOf(IN_MM!UnitDelay))
+                  ->union(sm.blocks->select(b | b.oclIsTypeOf(IN_MM!UnitDelay))
+                  ->collect(b | thisModule.resolveTemp(
+                      Sequence{b, b.outports->at(1)}, 'compStmt'))),
+         vars  <- sm.blocks
+                 ->collect(b | b.outports->at(1))
+                   ->flatten()
+                   ->union(sm.blocks
+                   ->select(b | b.oclIsTypeOf(IN_MM!UnitDelay))
+                   ->collect(b |
+                       thisModule.resolveTemp(Sequence{b, b.outports->at(1)},
+                                              'memVar'))
+                   )
+                   ) }
+
+rule O2Var {
+  from oport : IN_MM!Outport
+  to   var   : OUT_MM!Variable (
+      name <- oport.parentBlock.name + '_out')}
+
+rule S2VExp {
+  from sig    : IN_MM!Signal
+  to   varExp : OUT_MM!VarExp (
+  		 name <- 'VarExp to ' + sig.srcPort.parentBlock.name + '_out from ' + sig.name,
+         variable <- sig.srcPort)}
+
+rule UDel {
+  from block     : IN_MM!UnitDelay,
+       oport     : IN_MM!Outport
+         (block.outports->includes(oport)
+             and block = block)
+  to   compStmt  : OUT_MM!CompStmt (
+  		 name <- 'CompStmt for ' + block.name,
+         statements <- Sequence{assgnStmt, memAssgnStmt}),
+  	   assgnStmt : OUT_MM!AsgnStmt (
+  	     name     <- 'assgnStmt',
+         leftExp  <- outVarExp,
+         rightExp <- memVarExp1),
+       memAssgnStmt : OUT_MM!AsgnStmt(
+  	     name     <- 'memAssgnStmt',
+         leftExp  <- memVarExp2,
+         rightExp <- block.inports->at(1).inSignal),
+       memVar : OUT_MM!Variable (
+         name      <- block.name + '_mem'),
+       outVarExp : OUT_MM!VarExp(
+       	 name     <- 'VarExp to ' + block.name + '_out',
+         variable <- block.outports->at(1)),
+       memVarExp1 : OUT_MM!VarExp(
+       	 name     <- 'VarExp to ' + block.name + '_mem',
+         variable <- memVar),
+       memVarExp2 : OUT_MM!VarExp(
+       	 name     <- 'VarExp to ' + block.name + '_mem',
+         variable <- memVar)
+}
+
+rule Sum {
+  from block : IN_MM!Sum
+  to   assgnStmt : OUT_MM!AsgnStmt (
+  		 name     <- 'AsgnStmt for ' + block.name,
+         leftExp  <- outVarExp,
+         rightExp <- binExp),
+       binExp : OUT_MM!BinExp (
+         operator <- '+',
+         left <- block.inports->at(1).inSignal,
+         right <- block.inports->at(2).inSignal),
+       outVarExp : OUT_MM!VarExp(
+       	 name     <- 'VarExp to ' + block.name + '_out',
+         variable <- block.outports->at(1))
+}
+
+rule SrcBlock {
+  from block : IN_MM!SrcBlock
+  to   stmt : OUT_MM!AsgnStmt (
+  		 name <- 'dummy stmt for ' + block.name
+  	)
+}

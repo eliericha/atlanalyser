@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?p2f version='1.0.0'?>
+<p2f version='1.0.0'>
+  <ius size='5'>
+    <iu id='org.eclipse.m2m.atl.feature.group' name='ATL - ATL Transformation Language' version='3.5.0.v201409290811'>
+      <repositories size='1'>
+        <repository location='https://hudson.eclipse.org/hudson/job/m2m-atl-master/lastSuccessfulBuild/artifact/releng/org.eclipse.m2m.atl.update/target/repository/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.m2m.atl.emftvm.feature.group' name='ATL EMFTVM' version='3.5.0.v201409290811'>
+      <repositories size='1'>
+        <repository location='https://hudson.eclipse.org/hudson/job/m2m-atl-master/lastSuccessfulBuild/artifact/releng/org.eclipse.m2m.atl.update/target/repository/'/>
+      </repositories>
+    </iu>
+    <iu id='epp.package.modeling' name='Eclipse Modeling Tools' version='2.0.2.20140224-0000'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/releases/kepler/'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.zest.sdk.feature.group' name='Graphical Editing Framework Zest Visualization Toolkit SDK' version='1.5.1.201308190730'>
+      <repositories size='2'>
+        <repository location='http://download.eclipse.org/releases/kepler/'/>
+        <repository location='http://download.eclipse.org/releases/kepler/201402280900'/>
+      </repositories>
+    </iu>
+    <iu id='org.eclipse.emf.henshin.sdk.feature.group' name='Henshin SDK (Incubation)' version='1.0.0.201408281831'>
+      <repositories size='1'>
+        <repository location='http://download.eclipse.org/modeling/emft/henshin/updates/release'/>
+      </repositories>
+    </iu>
+  </ius>
+</p2f>

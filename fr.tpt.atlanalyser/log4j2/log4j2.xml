@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="10">
+  <Appenders>
+    <File name="LogFile" fileName="atlanalyzer.log" append="false">
+      <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+    <File name="Rs" fileName="atlanalyzer.rs.log" append="false">
+      <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+    <File name="Manager" fileName="atlanalyzer.mgr.log" append="false">
+      <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+    <File name="QueueLogFile" fileName="atlanalyzer.queue.log">
+      <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{1} - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="ConcurrentResource" level="debug" additivity="false">
+      <AppenderRef ref="Rs"/>
+    </Logger>
+    <Logger name="OptimisingTransformer" level="debug" additivity="true"/>
+    <Logger name="LeftNCValidation" level="debug" additivity="false"/>
+    <Logger name="RightNCValidation" level="debug" additivity="false"/>
+    <Logger name="Post2Pre" level="debug" additivity="true"/>
+    <Logger name="Post2PreManager" level="debug" additivity="false">
+      <AppenderRef ref="Manager"/>
+    </Logger>
+    <Logger name="GraphOverlapTask" level="debug" additivity="true"/>
+    <Root level="debug">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="LogFile"/>
+    </Root>
+  </Loggers>
+</Configuration>

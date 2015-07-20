@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ASCII"?>
+<er:ERSchema
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:er="http://er/1.0"
+    xsi:schemaLocation="http://er/1.0 ../InputMM/ER.ecore">
+  <entities
+      name="Person"
+      ends="//@relships.0/@ends.0">
+    <attrs name="age"
+        isKey="false"/>
+    <attrs name="name"
+        isKey="true"/>
+  </entities>
+  <entities
+      name="Company"
+      ends="//@relships.0/@ends.1">
+    <attrs name="taxId"
+        isKey="true"/>
+  </entities>
+  <relships
+      name="WorksFor">
+    <attrs name="salary"
+        isKey="false"/>
+    <ends name="employee"
+        entity="//@entities.0"/>
+    <ends name="employer"
+        entity="//@entities.1"/>
+  </relships>
+</er:ERSchema>

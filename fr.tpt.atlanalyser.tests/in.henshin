@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_DFTboJzhEeSbSvzMkn_GJA">
+  <imports href="http://www.eclipse.org/emf/2002/Ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_E1JooJzhEeSbSvzMkn_GJA" name="Post">
+    <lhs xmi:id="_E2PNwJzhEeSbSvzMkn_GJA" name="Lhs">
+      <formula xsi:type="henshin:Not" xmi:id="_SDkxwJzhEeSbSvzMkn_GJA">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_TFN08JzhEeSbSvzMkn_GJA">
+          <conclusion xmi:id="_TibVYJzhEeSbSvzMkn_GJA" name="C11">
+            <nodes xmi:id="_XNsGMJzhEeSbSvzMkn_GJA" name="p11" description="">
+              <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_bzSYUJzhEeSbSvzMkn_GJA">
+              <child xsi:type="henshin:NestedCondition" xmi:id="_agkzQJzhEeSbSvzMkn_GJA">
+                <conclusion xmi:id="_agkzQZzhEeSbSvzMkn_GJA" name="C21">
+                  <nodes xmi:id="_agkzQpzhEeSbSvzMkn_GJA" name="p21" outgoing="_dq-SsJzhEeSbSvzMkn_GJA">
+                    <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage"/>
+                  </nodes>
+                  <nodes xmi:id="_dq-SsZzhEeSbSvzMkn_GJA" name="c21" incoming="_dq-SsJzhEeSbSvzMkn_GJA">
+                    <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+                  </nodes>
+                  <edges xmi:id="_dq-SsJzhEeSbSvzMkn_GJA" source="_agkzQpzhEeSbSvzMkn_GJA" target="_dq-SsZzhEeSbSvzMkn_GJA">
+                    <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/eClassifiers"/>
+                  </edges>
+                  <formula xsi:type="henshin:Not" xmi:id="_lI9HMJzhEeSbSvzMkn_GJA">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_j8OOUJzhEeSbSvzMkn_GJA">
+                      <conclusion xmi:id="_j8OOUZzhEeSbSvzMkn_GJA" name="C31">
+                        <nodes xmi:id="_j8OOUpzhEeSbSvzMkn_GJA" name="p31" outgoing="_nNH-YJzhEeSbSvzMkn_GJA _FIecsKCkEeScd_02dF9Kcg">
+                          <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage"/>
+                        </nodes>
+                        <nodes xmi:id="_nNIlcJzhEeSbSvzMkn_GJA" name="c32" incoming="_nNH-YJzhEeSbSvzMkn_GJA">
+                          <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+                        </nodes>
+                        <nodes xmi:id="_B_VhgKCkEeScd_02dF9Kcg" name="c31" incoming="_FIecsKCkEeScd_02dF9Kcg">
+                          <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+                        </nodes>
+                        <edges xmi:id="_nNH-YJzhEeSbSvzMkn_GJA" source="_j8OOUpzhEeSbSvzMkn_GJA" target="_nNIlcJzhEeSbSvzMkn_GJA">
+                          <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/eClassifiers"/>
+                        </edges>
+                        <edges xmi:id="_FIecsKCkEeScd_02dF9Kcg" source="_j8OOUpzhEeSbSvzMkn_GJA" target="_B_VhgKCkEeScd_02dF9Kcg">
+                          <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/eClassifiers"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_j8OOU5zhEeSbSvzMkn_GJA" origin="_agkzQpzhEeSbSvzMkn_GJA" image="_j8OOUpzhEeSbSvzMkn_GJA"/>
+                      <mappings xmi:id="_B_WIkKCkEeScd_02dF9Kcg" origin="_dq-SsZzhEeSbSvzMkn_GJA" image="_B_VhgKCkEeScd_02dF9Kcg"/>
+                    </child>
+                  </formula>
+                </conclusion>
+                <mappings xmi:id="_agkzQ5zhEeSbSvzMkn_GJA" origin="_XNsGMJzhEeSbSvzMkn_GJA" image="_agkzQpzhEeSbSvzMkn_GJA"/>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_E2PNwZzhEeSbSvzMkn_GJA" name="Rhs"/>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_F18XQJzhEeSbSvzMkn_GJA" name="Rule">
+    <lhs xmi:id="_F1-zgJzhEeSbSvzMkn_GJA" name="Lhs">
+      <nodes xmi:id="_HKr8oJzhEeSbSvzMkn_GJA" name="p">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage"/>
+      </nodes>
+    </lhs>
+    <rhs xmi:id="_F1-zgZzhEeSbSvzMkn_GJA" name="Rhs">
+      <nodes xmi:id="_HKr8oZzhEeSbSvzMkn_GJA" name="p" outgoing="_L950AJzhEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage"/>
+      </nodes>
+      <nodes xmi:id="_LEHsUJzhEeSbSvzMkn_GJA" name="c" incoming="_L950AJzhEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+      </nodes>
+      <edges xmi:id="_L950AJzhEeSbSvzMkn_GJA" source="_HKr8oZzhEeSbSvzMkn_GJA" target="_LEHsUJzhEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EPackage/eClassifiers"/>
+      </edges>
+    </rhs>
+    <mappings xmi:id="_HKr8opzhEeSbSvzMkn_GJA" origin="_HKr8oJzhEeSbSvzMkn_GJA" image="_HKr8oZzhEeSbSvzMkn_GJA"/>
+  </units>
+  <units xsi:type="henshin:SequentialUnit" xmi:id="_AbhDoKF7EeScd_02dF9Kcg" name="Main" subUnits="_DZKggKF7EeScd_02dF9Kcg _KO5CMKF7EeScd_02dF9Kcg"/>
+  <units xsi:type="henshin:IteratedUnit" xmi:id="_DZKggKF7EeScd_02dF9Kcg" name="RuleIt" subUnit="_F18XQJzhEeSbSvzMkn_GJA" iterations="2"/>
+  <units xsi:type="henshin:LoopUnit" xmi:id="_KO5CMKF7EeScd_02dF9Kcg" name="RuleLoop" subUnit="_F18XQJzhEeSbSvzMkn_GJA"/>
+</henshin:Module>

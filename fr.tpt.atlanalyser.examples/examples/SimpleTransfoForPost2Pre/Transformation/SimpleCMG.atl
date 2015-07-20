@@ -1,0 +1,42 @@
+-- @path IN_MM=/fr.tpt.atlanalyzer.examples/examples/SimpleTransfoForPost2Pre/InputMM/systemmodel.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyzer.examples/examples/SimpleTransfoForPost2Pre/OutputMM/codemodel.ecore
+-- @atlcompiler emftvm
+
+module SimpleCMG;
+create OUT: OUT_MM from IN: IN_MM;
+
+rule SM2CM {
+  from sm : IN_MM!SystemModel
+  to   cm : OUT_MM!CodeModel (
+         stmts <- sm.blocks,
+         vars  <- sm.blocks
+                 ->collect(b | b.outports->at(1))
+				 )
+				 }
+
+rule O2Var {
+  from oport : IN_MM!Outport
+  to   var   : OUT_MM!Variable }
+
+rule S2VExp {
+  from sig    : IN_MM!Signal
+  to   varExp : OUT_MM!VarExp (
+         variable <- sig.srcPort)}
+
+rule Sum {
+  from block : IN_MM!Sum
+  to   assgnStmt : OUT_MM!AsgnStmt (
+         leftExp  <- outVarExp,
+         rightExp <- binExp),
+       binExp : OUT_MM!BinExp (
+         operator <- '+',
+         left <- block.inports->at(1).inSignal,
+         right <- block.inports->at(2).inSignal),
+       outVarExp : OUT_MM!VarExp(
+         variable <- block.outports->at(1))
+}
+
+rule SrcBlock {
+  from block : IN_MM!SrcBlock
+  to   stmt : OUT_MM!AsgnStmt
+}

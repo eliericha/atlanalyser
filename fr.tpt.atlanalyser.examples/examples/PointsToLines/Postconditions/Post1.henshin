@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_kaTo8H_LEeSrh8_Q_wq49A" name="Postconditions">
+  <imports href="../InputMM/PointsMM.ecore#/"/>
+  <imports href="../OutputMM/LinesMM.ecore#/"/>
+  <imports href="../Transformation/PointsToLines.traces.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_r6xIIKGVEeScd_02dF9Kcg">
+    <lhs xmi:id="_r60LcKGVEeScd_02dF9Kcg" name="Lhs">
+      <formula xsi:type="henshin:NestedCondition" xmi:id="_ztig4KGVEeScd_02dF9Kcg">
+        <conclusion xmi:id="_ztig4aGVEeScd_02dF9Kcg">
+          <nodes xmi:id="_DLXJQOjxEeSTp8hOAeFYzg" name="l1" incoming="_Mz3UkOjxEeSTp8hOAeFYzg" outgoing="_UDaSIOm6EeSaQ7E3OG1rnw _TEHYUOm6EeSaQ7E3OG1rnw">
+            <type href="../OutputMM/LinesMM.ecore#//Line"/>
+          </nodes>
+          <nodes xmi:id="_I600IOm6EeSaQ7E3OG1rnw" name="l2" incoming="_FZliAOm6EeSaQ7E3OG1rnw" outgoing="_NCD9AOm_EeSaQ7E3OG1rnw _NrbDEOm_EeSaQ7E3OG1rnw">
+            <type href="../OutputMM/LinesMM.ecore#//Line"/>
+          </nodes>
+          <nodes xmi:id="_I7fU0OjxEeSTp8hOAeFYzg" name="n1" incoming="_xxuxoOm5EeSaQ7E3OG1rnw _UDaSIOm6EeSaQ7E3OG1rnw _NCD9AOm_EeSaQ7E3OG1rnw">
+            <type href="../OutputMM/LinesMM.ecore#//Cross"/>
+          </nodes>
+          <nodes xmi:id="_LL9ioOjxEeSTp8hOAeFYzg" name="n2" incoming="_8zo_4Om5EeSaQ7E3OG1rnw _TEHYUOm6EeSaQ7E3OG1rnw _NrbDEOm_EeSaQ7E3OG1rnw">
+            <type href="../OutputMM/LinesMM.ecore#//Cross"/>
+          </nodes>
+          <nodes xmi:id="_n8KasOm5EeSaQ7E3OG1rnw" name="root" outgoing="_Mz3UkOjxEeSTp8hOAeFYzg _xxuxoOm5EeSaQ7E3OG1rnw _8zo_4Om5EeSaQ7E3OG1rnw _FZliAOm6EeSaQ7E3OG1rnw">
+            <type href="../OutputMM/LinesMM.ecore#//LinesSet"/>
+          </nodes>
+          <edges xmi:id="_Mz3UkOjxEeSTp8hOAeFYzg" source="_n8KasOm5EeSaQ7E3OG1rnw" target="_DLXJQOjxEeSTp8hOAeFYzg" index="">
+            <type href="../OutputMM/LinesMM.ecore#//LinesSet/lines"/>
+          </edges>
+          <edges xmi:id="_FZliAOm6EeSaQ7E3OG1rnw" source="_n8KasOm5EeSaQ7E3OG1rnw" target="_I600IOm6EeSaQ7E3OG1rnw">
+            <type href="../OutputMM/LinesMM.ecore#//LinesSet/lines"/>
+          </edges>
+          <edges xmi:id="_xxuxoOm5EeSaQ7E3OG1rnw" source="_n8KasOm5EeSaQ7E3OG1rnw" target="_I7fU0OjxEeSTp8hOAeFYzg">
+            <type href="../OutputMM/LinesMM.ecore#//LinesSet/crosses"/>
+          </edges>
+          <edges xmi:id="_8zo_4Om5EeSaQ7E3OG1rnw" source="_n8KasOm5EeSaQ7E3OG1rnw" target="_LL9ioOjxEeSTp8hOAeFYzg">
+            <type href="../OutputMM/LinesMM.ecore#//LinesSet/crosses"/>
+          </edges>
+          <edges xmi:id="_UDaSIOm6EeSaQ7E3OG1rnw" source="_DLXJQOjxEeSTp8hOAeFYzg" target="_I7fU0OjxEeSTp8hOAeFYzg">
+            <type href="../OutputMM/LinesMM.ecore#//Line/end1"/>
+          </edges>
+          <edges xmi:id="_TEHYUOm6EeSaQ7E3OG1rnw" source="_DLXJQOjxEeSTp8hOAeFYzg" target="_LL9ioOjxEeSTp8hOAeFYzg">
+            <type href="../OutputMM/LinesMM.ecore#//Line/end2"/>
+          </edges>
+          <edges xmi:id="_NCD9AOm_EeSaQ7E3OG1rnw" source="_I600IOm6EeSaQ7E3OG1rnw" target="_I7fU0OjxEeSTp8hOAeFYzg">
+            <type href="../OutputMM/LinesMM.ecore#//Line/end1"/>
+          </edges>
+          <edges xmi:id="_NrbDEOm_EeSaQ7E3OG1rnw" source="_I600IOm6EeSaQ7E3OG1rnw" target="_LL9ioOjxEeSTp8hOAeFYzg">
+            <type href="../OutputMM/LinesMM.ecore#//Line/end2"/>
+          </edges>
+        </conclusion>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_r60LcaGVEeScd_02dF9Kcg" name="Rhs"/>
+  </units>
+</henshin:Module>

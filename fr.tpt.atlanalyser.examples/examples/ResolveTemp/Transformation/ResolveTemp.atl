@@ -1,0 +1,33 @@
+-- @path  IN=/fr.tpt.atlanalyzer.examples/examples/ResolveTemp/InputMM/in.ecore
+-- @path OUT=/fr.tpt.atlanalyzer.examples/examples/ResolveTemp/OutputMM/out.ecore
+-- @atlcompiler emftvm
+
+module Test;
+create O : OUT from I : IN;
+
+rule R1 {
+from s  : IN!A
+   (s.refB->exists(b | b.name = 'Hodor'))
+to t1 : OUT!D
+     (name <- s.name + ' R1',
+      refD <- t2,
+      refE <- s.refB),
+   t2 : OUT!D
+     (name <- 'created by R1 from ' + s.name) }
+
+rule R2 {
+from s  : IN!A
+   (not s.refB->exists(b | b.name = 'Hodor'))
+to t1 : OUT!D
+     (name <- s.name + ' R2',
+      refD <- t2,
+      refE <- s.refB),
+   t2 : OUT!D
+     (name <- 'created by R2 from ' + s.name) }
+
+
+rule R3 {
+from s : IN!B
+to t : OUT!E
+     (refD <- thisModule.resolveTemp(s.refA, 't2'),
+      name <- s.name) }

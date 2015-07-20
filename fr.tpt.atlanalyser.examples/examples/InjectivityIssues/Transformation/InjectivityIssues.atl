@@ -1,0 +1,108 @@
+-- @path  IN=/fr.tpt.atlanalyzer.examples/examples/InjectivityIssues/InputMM/in.ecore
+-- @path OUT=/fr.tpt.atlanalyzer.examples/examples/InjectivityIssues/OutputMM/out.ecore
+-- @atlcompiler emftvm
+
+module InjectivityIssues;
+create O : OUT from I : IN;
+
+rule Root {
+from s : IN!RootContainer
+to   t : OUT!RootContainer (
+		elements <- s.elements
+	)
+}
+
+helper context IN!A def: has3Different() : Boolean =
+	self.refB->exists(e1 |
+	self.refB->exists(e2 |
+	self.refB->exists(e3 |
+		e1.name <> e2.name and e2.name <> e3.name and e1.name <> e3.name)));
+
+helper context IN!A def: allNamesEqual() : Boolean =
+   	self.refB->forAll(e1 |
+   	self.refB->forAll(e2 |
+   		e1 <> e2 implies e1.name = e2.name));
+
+helper context IN!A def: allNamesEqual2() : Boolean =
+   	self.refB->forAll(e1 |
+   	self.refB->forAll(e2 |
+   		e1.name = e2.name));
+
+helper context IN!A def: allNamesDifferent() : Boolean =
+    self.refB->forAll(e1 |
+    self.refB->forAll(e2 |
+    	e1 = e2 or e1.name <> e2.name));
+
+helper context IN!A def: allNamesDifferent2() : Boolean =
+    self.refB->forAll(e1 |
+    self.refB->forAll(e2 |
+    	e1 <> e2 implies e1.name <> e2.name));
+
+helper context IN!A def: someNamesDifferent() : Boolean =
+    self.refB->exists(e1 |
+    self.refB->exists(e2 |
+    	e1 <> e2 and e1.name <> e2.name));
+
+helper context IN!A def: someNamesDifferent2() : Boolean =
+    self.refB->exists(e1 |
+    self.refB->exists(e2 |
+    	e1.name <> e2.name));
+
+-- This is always true because when e1 and e2 iterate over the same object,
+-- we have e1 = e2
+helper context IN!A def: alwaysTrue() : Boolean =
+    self.refB->exists(e1 |
+    self.refB->exists(e2 |
+    	e1 = e2));
+
+-- This is always true because when e1 and e2 iterate over the same object,
+-- we have e1.name = e2.name
+helper context IN!A def: alwaysTrue2() : Boolean =
+    self.refB->exists(e1 |
+    self.refB->exists(e2 |
+    	e1.name = e2.name));
+
+rule R0 {
+from s : IN!A
+	(not s.alwaysTrue() and not s.alwaysTrue2())
+to t1 : OUT!D (
+	name <- s.name + ' R0 - should never trigger!',
+	refE <- s.refB)
+}
+
+rule R1 {
+from s  : IN!A
+   (
+	s.refB->exists(e1 | s.refB->exists(e2 | e1 = e2))
+   	and
+	s.allNamesEqual() and s.allNamesEqual2()
+   	)
+to t1 : OUT!D
+     (name <- s.name + ' R1 - all names equal',
+      refE <- if not s.refB.oclIsUndefined() then s.refB else s.refB endif)
+}
+
+rule R2 {
+from s  : IN!A
+	(s.allNamesDifferent() and s.allNamesDifferent2())
+to t1 : OUT!D
+     (name <- s.name + ' R2 - all names different (unique)',
+      refE <- s.refB)
+}
+
+rule R3 {
+from s  : IN!A
+   (s.someNamesDifferent() and s.someNamesDifferent2()
+   	and not s.allNamesDifferent()
+   )
+   -- (s.refB->exists(e1 | s.refB->exists(e2 | e1 <> e2 and e1.name <> e2.name))
+   -- 	and not s.refB->forAll(e1 | s.refB->forAll(e2 | e1 <> e2 implies e1.name <> e2.name)))
+to t1 : OUT!D
+     (name <- s.name + ' R3 - some names equal',
+      refE <- s.refB)
+}
+
+rule B2E {
+from s : IN!B
+to t : OUT!E
+     (name <- s.name) }

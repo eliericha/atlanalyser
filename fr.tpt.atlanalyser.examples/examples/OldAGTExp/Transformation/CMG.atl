@@ -1,0 +1,54 @@
+-- @path IN_MM=/fr.tpt.atlanalyzer.examples/examples/OldAGTExp/InputMM/systemmodel.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyzer.examples/examples/OldAGTExp/OutputMM/codemodel.ecore
+-- @atlcompiler emftvm
+
+module CMG;
+create OUT: OUT_MM from IN: IN_MM;
+
+helper context IN_MM!SystemModel def: getName : String =
+    self.name;
+
+rule SM2CM {
+  from sm : IN_MM!SystemModel
+  to   cm : OUT_MM!CodeModel (
+--         name  <- sm.getName + '_codemodel_',
+         stmts <- sm.blocks,
+         vars  <- sm.blocks
+                 ->collect(b | b.outports->at(1))
+                   ->flatten()) }
+
+rule O2Var {
+  from oport : IN_MM!Outport
+  to   var   : OUT_MM!Variable (
+--      name <- oport.parentBlock.name + '_out'
+      )}
+
+rule S2VExp {
+  from sig    : IN_MM!Signal
+  to   varExp : OUT_MM!VarExp (
+--  		 name <- 'VarExp to ' + sig.srcPort.parentBlock.name + '_out from ' + sig.name,
+         variable <- sig.srcPort)}
+
+rule UDel {
+  from block     : IN_MM!UnitDelay
+  to   assgnStmt : OUT_MM!AsgnStmt (
+--  	     name     <- 'assgnStmt',
+         leftExp  <- outVarExp,
+         rightExp <- memVarExp1),
+       memAssgnStmt : OUT_MM!AsgnStmt(
+--  	     name     <- 'memAssgnStmt',
+         leftExp  <- memVarExp2,
+         rightExp <- block.inports->at(1).inSignal),
+       memVar : OUT_MM!Variable (
+--         name      <- block.name + '_mem'
+           ),
+       outVarExp : OUT_MM!VarExp(
+--       	 name     <- 'VarExp to ' + block.name + '_out',
+         variable <- block.outports->at(1)),
+       memVarExp1 : OUT_MM!VarExp(
+--       	 name     <- 'VarExp to ' + block.name + '_mem',
+         variable <- memVar),
+       memVarExp2 : OUT_MM!VarExp(
+--       	 name     <- 'VarExp to ' + block.name + '_mem',
+         variable <- memVar)
+}

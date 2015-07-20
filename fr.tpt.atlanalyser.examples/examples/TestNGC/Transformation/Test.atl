@@ -1,0 +1,21 @@
+-- @path  IN=/fr.tpt.atlanalyzer.examples/examples/TestNGC/InputMM/systemmodel.ecore
+-- @path OUT=/fr.tpt.atlanalyzer.examples/examples/TestNGC/InputMM/systemmodel.ecore
+-- @atlcompiler emftvm
+
+module Test;
+create O : OUT from I : IN;
+
+rule R1 {
+from s  : IN!A
+  (s.refB->exists(b |
+            b.name = 'Hodor') and
+			s.refB->forAll(b | b.name <> 'Arya'))
+to   t1 : OUT!D
+  (name <- s.name + '1',
+   refE <- s.refB), -- Resolve
+     t2 : OUT!D
+  (name <- s.name + '2') }
+
+rule R2 {
+from s : IN!B
+to   t : OUT!E }

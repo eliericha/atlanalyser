@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ATL -->
+      <package
+            uri="http://www.eclipse.org/gmt/2005/ATL"
+            class="fr.tpt.atlanalyser.atl.ATL.ATLPackage"
+            genModel="model/ATL.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ATL -->
+      <package
+            uri="http://www.eclipse.org/gmt/2005/OCL"
+            class="fr.tpt.atlanalyser.atl.OCL.OCLPackage"
+            genModel="model/ATL.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ATL -->
+      <package
+            uri="http://www.eclipse.org/gmt/2005/ATL-PrimitiveTypes"
+            class="fr.tpt.atlanalyser.atl.PrimitiveTypes.PrimitiveTypesPackage"
+            genModel="model/ATL.genmodel"/>
+   </extension>
+
+</plugin>

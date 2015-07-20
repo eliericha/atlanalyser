@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ASCII"?>
+<systemmodel:SystemModel
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:systemmodel="http://systemmodel/1.0"
+    xsi:schemaLocation="http://systemmodel/1.0 ../InputMM/systemmodel.ecore">
+  <blocks xsi:type="systemmodel:Sum"/>
+  <blocks xsi:type="systemmodel:Sum"
+      name="b1">
+    <outports
+        name="out1"/>
+    <outports
+        name="out1"/>
+    <outports/>
+  </blocks>
+  <blocks xsi:type="systemmodel:Sum1"/>
+  <blocks xsi:type="systemmodel:Sum2"
+      name="b2">
+    <outports
+        name="out1"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:Test"
+      nonUniqueOrderedRef="//@blocks.2"/>
+  <blocks xsi:type="systemmodel:A"
+      name="">
+    <multiValAtt>bla</multiValAtt>
+  </blocks>
+</systemmodel:SystemModel>

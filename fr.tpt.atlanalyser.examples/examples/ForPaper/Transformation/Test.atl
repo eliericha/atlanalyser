@@ -1,0 +1,24 @@
+-- @path  IN=/fr.tpt.atlanalyzer.examples/examples/ForPaper/InputMM/in.ecore
+-- @path OUT=/fr.tpt.atlanalyzer.examples/examples/ForPaper/OutputMM/out.ecore
+-- @atlcompiler emftvm
+
+module Test;
+create O : OUT from I : IN;
+
+rule R1 {
+from s  : IN!A
+   (s.refB->exists(b | b.name = 'Hodor'))
+to t1 : OUT!D
+     (
+--      name <- s.name + '1',
+      refD <- t2,
+      refE <- s.refB),
+   t2 : OUT!D
+--     (name <- s.name + '2')
+     }
+
+
+rule R2 {
+from s : IN!B
+to t : OUT!E
+     (refD <- thisModule.resolveTemp(s.refA, 't2') ) }

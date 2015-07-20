@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_axJYMCwjEeWGyYjddd1R5A">
+  <imports href="Test.traces.manual.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_bhDLICwjEeWGyYjddd1R5A" name="R_Hodor">
+    <lhs xmi:id="_bhFAUCwjEeWGyYjddd1R5A" name="Lhs">
+      <nodes xmi:id="_cfnsMCwjEeWGyYjddd1R5A" name="a" outgoing="_hwnEsCwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//A"/>
+      </nodes>
+      <nodes xmi:id="_hwnrwCwjEeWGyYjddd1R5A" name="b" incoming="_hwnEsCwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//B"/>
+        <attributes xmi:id="_01_aICwjEeWGyYjddd1R5A" value="&quot;Hodor&quot;">
+          <type href="Test.traces.manual.ecore#//B/name"/>
+        </attributes>
+      </nodes>
+      <edges xmi:id="_hwnEsCwjEeWGyYjddd1R5A" source="_cfnsMCwjEeWGyYjddd1R5A" target="_hwnrwCwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//A/refB"/>
+      </edges>
+      <formula xsi:type="henshin:Not" xmi:id="_xCyOQCwjEeWGyYjddd1R5A">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_tM9zQCwjEeWGyYjddd1R5A">
+          <conclusion xmi:id="_tM9zQSwjEeWGyYjddd1R5A">
+            <nodes xmi:id="_tM9zQiwjEeWGyYjddd1R5A" name="a" incoming="_v51pMCwjEeWGyYjddd1R5A">
+              <type href="Test.traces.manual.ecore#//A"/>
+            </nodes>
+            <nodes xmi:id="_uSVf4CwjEeWGyYjddd1R5A" name="b" outgoing="_v51pMCwjEeWGyYjddd1R5A">
+              <type href="Test.traces.manual.ecore#//B"/>
+            </nodes>
+            <edges xmi:id="_v51pMCwjEeWGyYjddd1R5A" source="_uSVf4CwjEeWGyYjddd1R5A" target="_tM9zQiwjEeWGyYjddd1R5A">
+              <type href="Test.traces.manual.ecore#//B/refA"/>
+            </edges>
+          </conclusion>
+          <mappings xmi:id="_tM9zQywjEeWGyYjddd1R5A" origin="_cfnsMCwjEeWGyYjddd1R5A" image="_tM9zQiwjEeWGyYjddd1R5A"/>
+          <mappings xmi:id="_uSVf4SwjEeWGyYjddd1R5A" origin="_hwnrwCwjEeWGyYjddd1R5A" image="_uSVf4CwjEeWGyYjddd1R5A"/>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_bhFAUSwjEeWGyYjddd1R5A" name="Rhs">
+      <nodes xmi:id="_cfnsMSwjEeWGyYjddd1R5A" name="a" incoming="_9fRkICwjEeWGyYjddd1R5A" outgoing="_lbZUYCwjEeWGyYjddd1R5A __DoS0CwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//A"/>
+      </nodes>
+      <nodes xmi:id="_ikIMUCwjEeWGyYjddd1R5A" name="b" incoming="_lbZUYCwjEeWGyYjddd1R5A" outgoing="_9fRkICwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//B"/>
+        <attributes xmi:id="_40srYCwjEeWGyYjddd1R5A" value="&quot;Hodor&quot;">
+          <type href="Test.traces.manual.ecore#//B/name"/>
+        </attributes>
+      </nodes>
+      <nodes xmi:id="__DoS0SwjEeWGyYjddd1R5A" name="b1" incoming="__DoS0CwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//B"/>
+        <attributes xmi:id="_B5qr0CwkEeWGyYjddd1R5A" value="&quot;Hodor1&quot;">
+          <type href="Test.traces.manual.ecore#//B/name"/>
+        </attributes>
+      </nodes>
+      <edges xmi:id="_lbZUYCwjEeWGyYjddd1R5A" source="_cfnsMSwjEeWGyYjddd1R5A" target="_ikIMUCwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//A/refB"/>
+      </edges>
+      <edges xmi:id="_9fRkICwjEeWGyYjddd1R5A" source="_ikIMUCwjEeWGyYjddd1R5A" target="_cfnsMSwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//B/refA"/>
+      </edges>
+      <edges xmi:id="__DoS0CwjEeWGyYjddd1R5A" source="_cfnsMSwjEeWGyYjddd1R5A" target="__DoS0SwjEeWGyYjddd1R5A">
+        <type href="Test.traces.manual.ecore#//A/refB"/>
+      </edges>
+    </rhs>
+    <mappings xmi:id="_cfnsMiwjEeWGyYjddd1R5A" origin="_cfnsMCwjEeWGyYjddd1R5A" image="_cfnsMSwjEeWGyYjddd1R5A"/>
+    <mappings xmi:id="_ikIMUSwjEeWGyYjddd1R5A" origin="_hwnrwCwjEeWGyYjddd1R5A" image="_ikIMUCwjEeWGyYjddd1R5A"/>
+  </units>
+</henshin:Module>

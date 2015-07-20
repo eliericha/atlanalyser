@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_pQ1ZwJ1pEeSbSvzMkn_GJA">
+  <imports href="http://www.eclipse.org/emf/2011/Henshin#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_qFwPkJ1pEeSbSvzMkn_GJA" name="notNot">
+    <lhs xmi:id="_qF0hAJ1pEeSbSvzMkn_GJA" name="Lhs">
+      <nodes xmi:id="_FHD5wJ1qEeSbSvzMkn_GJA" incoming="_wa86QJ1tEeScd_02dF9Kcg" outgoing="_JksisJ1qEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Not"/>
+      </nodes>
+      <nodes xmi:id="_I36VMJ1qEeSbSvzMkn_GJA" name="" incoming="_JksisJ1qEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Formula"/>
+      </nodes>
+      <nodes xmi:id="_vYA2kJ1tEeScd_02dF9Kcg" incoming="_2G_3EJ1tEeScd_02dF9Kcg" outgoing="_wa86QJ1tEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Not"/>
+      </nodes>
+      <nodes xmi:id="_1fQhoJ1tEeScd_02dF9Kcg" outgoing="_2G_3EJ1tEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph"/>
+      </nodes>
+      <edges xmi:id="_JksisJ1qEeSbSvzMkn_GJA" source="_FHD5wJ1qEeSbSvzMkn_GJA" target="_I36VMJ1qEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//UnaryFormula/child"/>
+      </edges>
+      <edges xmi:id="_wa86QJ1tEeScd_02dF9Kcg" source="_vYA2kJ1tEeScd_02dF9Kcg" target="_FHD5wJ1qEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//UnaryFormula/child"/>
+      </edges>
+      <edges xmi:id="_2G_3EJ1tEeScd_02dF9Kcg" source="_1fQhoJ1tEeScd_02dF9Kcg" target="_vYA2kJ1tEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph/formula"/>
+      </edges>
+    </lhs>
+    <rhs xmi:id="_qF0hAZ1pEeSbSvzMkn_GJA" name="Rhs">
+      <nodes xmi:id="_I36VMZ1qEeSbSvzMkn_GJA" name="" incoming="_9F0DUJ1tEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Formula"/>
+      </nodes>
+      <nodes xmi:id="_1fRIsJ1tEeScd_02dF9Kcg" outgoing="_9F0DUJ1tEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph"/>
+      </nodes>
+      <edges xmi:id="_9F0DUJ1tEeScd_02dF9Kcg" source="_1fRIsJ1tEeScd_02dF9Kcg" target="_I36VMZ1qEeSbSvzMkn_GJA">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph/formula"/>
+      </edges>
+    </rhs>
+    <mappings xmi:id="_I36VMp1qEeSbSvzMkn_GJA" origin="_I36VMJ1qEeSbSvzMkn_GJA" image="_I36VMZ1qEeSbSvzMkn_GJA"/>
+    <mappings xmi:id="_1fRIsZ1tEeScd_02dF9Kcg" origin="_1fQhoJ1tEeScd_02dF9Kcg" image="_1fRIsJ1tEeScd_02dF9Kcg"/>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_tJ_DUJ1uEeScd_02dF9Kcg" name="andFalse">
+    <parameters xmi:id="_7OYLIJ1uEeScd_02dF9Kcg" name="f"/>
+    <lhs xmi:id="_tKFJ8J1uEeScd_02dF9Kcg" name="Lhs">
+      <nodes xmi:id="_yg-WIJ1uEeScd_02dF9Kcg" outgoing="_Xkj9kJ1vEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph"/>
+      </nodes>
+      <nodes xmi:id="_1E984J1uEeScd_02dF9Kcg" incoming="_Xkj9kJ1vEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//And"/>
+      </nodes>
+      <nodes xmi:id="_2W10cJ1uEeScd_02dF9Kcg" name="f">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Formula"/>
+      </nodes>
+      <edges xmi:id="_Xkj9kJ1vEeScd_02dF9Kcg" source="_yg-WIJ1uEeScd_02dF9Kcg" target="_1E984J1uEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph/formula"/>
+      </edges>
+      <formula xsi:type="henshin:Or" xmi:id="_Gkl1cJ1vEeScd_02dF9Kcg">
+        <left xsi:type="henshin:NestedCondition" xmi:id="_CrjHUJ1vEeScd_02dF9Kcg">
+          <conclusion xmi:id="_CrjHUZ1vEeScd_02dF9Kcg" name="Left">
+            <nodes xmi:id="_CrjHUp1vEeScd_02dF9Kcg" outgoing="_QSNKQJ1vEeScd_02dF9Kcg">
+              <type href="http://www.eclipse.org/emf/2011/Henshin#//And"/>
+            </nodes>
+            <nodes xmi:id="_Fza3MJ1vEeScd_02dF9Kcg" name="f" incoming="_QSNKQJ1vEeScd_02dF9Kcg">
+              <type href="http://www.eclipse.org/emf/2011/Henshin#//Formula"/>
+            </nodes>
+            <edges xmi:id="_QSNKQJ1vEeScd_02dF9Kcg" source="_CrjHUp1vEeScd_02dF9Kcg" target="_Fza3MJ1vEeScd_02dF9Kcg">
+              <type href="http://www.eclipse.org/emf/2011/Henshin#//BinaryFormula/left"/>
+            </edges>
+          </conclusion>
+          <mappings xmi:id="_CrjHU51vEeScd_02dF9Kcg" origin="_1E984J1uEeScd_02dF9Kcg" image="_CrjHUp1vEeScd_02dF9Kcg"/>
+          <mappings xmi:id="_Fza3MZ1vEeScd_02dF9Kcg" origin="_2W10cJ1uEeScd_02dF9Kcg" image="_Fza3MJ1vEeScd_02dF9Kcg"/>
+        </left>
+        <right xsi:type="henshin:NestedCondition" xmi:id="_KY7pwJ1vEeScd_02dF9Kcg">
+          <conclusion xmi:id="_K_1RsJ1vEeScd_02dF9Kcg" name="Right">
+            <nodes xmi:id="_OCl4EJ1vEeScd_02dF9Kcg" outgoing="_SnBFgJ1vEeScd_02dF9Kcg">
+              <type href="http://www.eclipse.org/emf/2011/Henshin#//And"/>
+            </nodes>
+            <nodes xmi:id="_O0VeEJ1vEeScd_02dF9Kcg" name="f" incoming="_SnBFgJ1vEeScd_02dF9Kcg">
+              <type href="http://www.eclipse.org/emf/2011/Henshin#//Formula"/>
+            </nodes>
+            <edges xmi:id="_SnBFgJ1vEeScd_02dF9Kcg" source="_OCl4EJ1vEeScd_02dF9Kcg" target="_O0VeEJ1vEeScd_02dF9Kcg">
+              <type href="http://www.eclipse.org/emf/2011/Henshin#//BinaryFormula/right"/>
+            </edges>
+          </conclusion>
+          <mappings xmi:id="_OCl4EZ1vEeScd_02dF9Kcg" origin="_1E984J1uEeScd_02dF9Kcg" image="_OCl4EJ1vEeScd_02dF9Kcg"/>
+          <mappings xmi:id="_O0VeEZ1vEeScd_02dF9Kcg" origin="_2W10cJ1uEeScd_02dF9Kcg" image="_O0VeEJ1vEeScd_02dF9Kcg"/>
+        </right>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_tKFxAJ1uEeScd_02dF9Kcg" name="Rhs">
+      <nodes xmi:id="_yg-WIZ1uEeScd_02dF9Kcg" outgoing="_bPtZoJ1vEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph"/>
+      </nodes>
+      <nodes xmi:id="_2W10cZ1uEeScd_02dF9Kcg" name="f" incoming="_bPtZoJ1vEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Formula"/>
+      </nodes>
+      <edges xmi:id="_bPtZoJ1vEeScd_02dF9Kcg" source="_yg-WIZ1uEeScd_02dF9Kcg" target="_2W10cZ1uEeScd_02dF9Kcg">
+        <type href="http://www.eclipse.org/emf/2011/Henshin#//Graph/formula"/>
+      </edges>
+    </rhs>
+    <attributeConditions xmi:id="_9ipT0J1uEeScd_02dF9Kcg" conditionText="f.isFalse()"/>
+    <mappings xmi:id="_yg-9MJ1uEeScd_02dF9Kcg" origin="_yg-WIJ1uEeScd_02dF9Kcg" image="_yg-WIZ1uEeScd_02dF9Kcg"/>
+    <mappings xmi:id="_2W10cp1uEeScd_02dF9Kcg" origin="_2W10cJ1uEeScd_02dF9Kcg" image="_2W10cZ1uEeScd_02dF9Kcg"/>
+  </units>
+</henshin:Module>

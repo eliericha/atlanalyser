@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_NOisIBToEeW78q0glJux3A">
+  <imports href="../OutputMM/Relational.ecore#/0"/>
+  <units xsi:type="henshin:Rule" xmi:id="_Tkh90BToEeW78q0glJux3A" name="Post">
+    <lhs xmi:id="_Tldx8BToEeW78q0glJux3A" name="Lhs">
+      <formula xsi:type="henshin:Not" xmi:id="_QwYlwBTpEeW78q0glJux3A">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_VS_DsBToEeW78q0glJux3A">
+          <conclusion xmi:id="_VS_qwBToEeW78q0glJux3A">
+            <nodes xmi:id="_enFFQBToEeW78q0glJux3A" name="t">
+              <type href="../OutputMM/Relational.ecore#/0/Table"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_w-HRgBTpEeW78q0glJux3A">
+              <child xsi:type="henshin:NestedCondition" xmi:id="_eBIqIBTpEeW78q0glJux3A">
+                <conclusion xmi:id="_eBIqIRTpEeW78q0glJux3A">
+                  <nodes xmi:id="_eBIqIhTpEeW78q0glJux3A" name="t" outgoing="_lqMGMBTpEeW78q0glJux3A">
+                    <type href="../OutputMM/Relational.ecore#/0/Table"/>
+                  </nodes>
+                  <nodes xmi:id="_lqMGMRTpEeW78q0glJux3A" name="c" incoming="_lqMGMBTpEeW78q0glJux3A">
+                    <type href="../OutputMM/Relational.ecore#/0/Column"/>
+                  </nodes>
+                  <edges xmi:id="_lqMGMBTpEeW78q0glJux3A" source="_eBIqIhTpEeW78q0glJux3A" target="_lqMGMRTpEeW78q0glJux3A">
+                    <type href="../OutputMM/Relational.ecore#/0/Table/col"/>
+                  </edges>
+                  <formula xsi:type="henshin:Not" xmi:id="_vyE8MBTpEeW78q0glJux3A">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_pPh1MBTpEeW78q0glJux3A">
+                      <conclusion xmi:id="_pPh1MRTpEeW78q0glJux3A">
+                        <nodes xmi:id="_pPh1MhTpEeW78q0glJux3A" name="t" outgoing="_ser40BTpEeW78q0glJux3A _uW5-sBTpEeW78q0glJux3A">
+                          <type href="../OutputMM/Relational.ecore#/0/Table"/>
+                        </nodes>
+                        <nodes xmi:id="_qIzmkBTpEeW78q0glJux3A" name="c" incoming="_ser40BTpEeW78q0glJux3A">
+                          <type href="../OutputMM/Relational.ecore#/0/Column"/>
+                        </nodes>
+                        <nodes xmi:id="_uW5-sRTpEeW78q0glJux3A" name="c1" incoming="_uW5-sBTpEeW78q0glJux3A">
+                          <type href="../OutputMM/Relational.ecore#/0/Column"/>
+                        </nodes>
+                        <edges xmi:id="_ser40BTpEeW78q0glJux3A" source="_pPh1MhTpEeW78q0glJux3A" target="_qIzmkBTpEeW78q0glJux3A">
+                          <type href="../OutputMM/Relational.ecore#/0/Table/col"/>
+                        </edges>
+                        <edges xmi:id="_uW5-sBTpEeW78q0glJux3A" source="_pPh1MhTpEeW78q0glJux3A" target="_uW5-sRTpEeW78q0glJux3A">
+                          <type href="../OutputMM/Relational.ecore#/0/Table/col"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_pPh1MxTpEeW78q0glJux3A" origin="_eBIqIhTpEeW78q0glJux3A" image="_pPh1MhTpEeW78q0glJux3A"/>
+                      <mappings xmi:id="_qI0NoBTpEeW78q0glJux3A" origin="_lqMGMRTpEeW78q0glJux3A" image="_qIzmkBTpEeW78q0glJux3A"/>
+                    </child>
+                  </formula>
+                </conclusion>
+                <mappings xmi:id="_eBIqIxTpEeW78q0glJux3A" origin="_enFFQBToEeW78q0glJux3A" image="_eBIqIhTpEeW78q0glJux3A"/>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_Tldx8RToEeW78q0glJux3A" name="Rhs"/>
+  </units>
+</henshin:Module>

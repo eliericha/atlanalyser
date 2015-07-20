@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="/fr.tpt.atlanalyser.lib/lib/javatuples-1.2/dist/javatuples-1.2.jar" sourcepath="/fr.tpt.atlanalyser.lib/lib/javatuples-1.2/dist/javatuples-1.2-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/fr.tpt.atlanalyser.lib/lib/javatuples-1.2/dist/javatuples-1.2-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/fr.tpt.atlanalyser.lib/lib/guava-18.0/guava-18.0.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://docs.guava-libraries.googlecode.com/git-history/release/javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/fr.tpt.atlanalyser.lib/lib/apache-log4j-2.1-bin/log4j-api-2.1.jar" sourcepath="/fr.tpt.atlanalyser.lib/lib/apache-log4j-2.1-bin/log4j-api-2.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/fr.tpt.atlanalyser.lib/lib/apache-log4j-2.1-bin/log4j-api-2.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/fr.tpt.atlanalyser.lib/lib/apache-log4j-2.1-bin/log4j-core-2.1.jar" sourcepath="/fr.tpt.atlanalyser.lib/lib/apache-log4j-2.1-bin/log4j-core-2.1-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/fr.tpt.atlanalyser.lib/lib/apache-log4j-2.1-bin/log4j-core-2.1-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
