@@ -29,10 +29,8 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 
 public class EPackageUtils {
 
-    private static Logger         LOGGER         = LogManager
-                                                         .getLogger(EPackageUtils.class
-                                                                 .getSimpleName());
-    private static final Registry globalRegistry = Registry.INSTANCE;
+    private static Logger LOGGER = LogManager.getLogger(EPackageUtils.class
+                                         .getSimpleName());
 
     public static EClass findEClassRecursively(EPackage pkg, String eClassName) {
         EClassifier eClassifier = pkg.getEClassifier(eClassName);
@@ -98,12 +96,10 @@ public class EPackageUtils {
     public static void registerPackage(EPackage ePkg, Registry packageRegistry,
             String[] extraKeys) {
         registerPackageAndAllSubPackages(ePkg, packageRegistry, extraKeys);
-        registerPackageAndAllSubPackages(ePkg, globalRegistry, extraKeys);
 
         if (extraKeys != null) {
             for (String key : extraKeys) {
                 packageRegistry.put(key, ePkg);
-                globalRegistry.put(key, ePkg);
             }
         }
     }
@@ -111,14 +107,13 @@ public class EPackageUtils {
     public static void registerPackageAndAllSubPackages(EPackage root,
             EPackage.Registry registry, String[] extraKeys) {
         registry.put(root.getNsURI(), root);
-        globalRegistry.put(root.getNsURI(), root);
         if (extraKeys != null) {
             for (String key : extraKeys) {
-                globalRegistry.put(key, root);
+                registry.put(key, root);
             }
         }
         for (EPackage subPackage : root.getESubpackages()) {
-            registerPackageAndAllSubPackages(subPackage, registry, extraKeys);
+            registerPackageAndAllSubPackages(subPackage, registry, null);
         }
     }
 
