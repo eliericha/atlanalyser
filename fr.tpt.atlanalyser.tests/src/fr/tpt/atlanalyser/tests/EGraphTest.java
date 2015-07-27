@@ -37,6 +37,8 @@ import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
 import org.junit.Before;
 import org.junit.Test;
 
+import fr.tpt.atlanalyser.utils.HenshinGraphASCIIRenderer;
+
 public class EGraphTest {
 
     private static final HenshinFactory HF = HenshinFactory.eINSTANCE;
@@ -82,15 +84,23 @@ public class EGraphTest {
         assertNotNull(eG1);
         assertEquals(1, eG1.getRoots().size());
 
+        System.out.println("First");
+        System.out.println(HenshinGraphASCIIRenderer.render(g1));
+
         EClass eClass = (EClass) dynamicEcore.getEClassifier("EClass");
         HF.createNode(g1, eClass, "c");
         EReference eStructuralFeatures = (EReference) eClass
                 .getEStructuralFeature("eStructuralFeatures");
         HF.createEdge(g1.getNode("c"), g1.getNode("f"), eStructuralFeatures);
+        EReference eContainingClass = eStructuralFeatures.getEOpposite();
+        HF.createEdge(g1.getNode("f"), g1.getNode("c"), eContainingClass);
 
         eG1.updateEGraph();
 
         assertEquals(2, eG1.getNode2ObjectMap().size());
+
+        System.out.println("Second");
+        System.out.println(HenshinGraphASCIIRenderer.render(g1));
 
         EObject newFeat = dynamicEcore.getEFactoryInstance()
                 .create(eStructFeat);
@@ -101,6 +111,9 @@ public class EGraphTest {
         EList<EObject> feats = (EList<EObject>) rootObj
                 .eGet(eStructuralFeatures);
         feats.add(newFeat);
+
+        System.out.println("Third");
+        System.out.println(HenshinGraphASCIIRenderer.render(g1));
 
         assertEquals(3, g1.getNodes().size());
         assertEquals(4, g1.getEdges().size());
