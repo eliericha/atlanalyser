@@ -54,6 +54,7 @@ import com.google.common.collect.Sets;
 import fr.tpt.atlanalyser.post2pre.Post2Pre;
 import fr.tpt.atlanalyser.utils.DynamicMorphism;
 import fr.tpt.atlanalyser.utils.GraphCopier;
+import fr.tpt.atlanalyser.utils.HenshinUtils;
 import fr.tpt.atlanalyser.utils.Morphism;
 import fr.tpt.atlanalyser.utils.Utils;
 
@@ -975,7 +976,7 @@ public class GraphOverlapper {
 
         public void dispose() {
             Morphism.dispose(sourceToLhs, targetToRhs);
-            g2EGraph.dispose();
+            HenshinUtils.dispose(g2EGraph);
         }
 
     }

@@ -10,6 +10,8 @@
  *******************************************************************************/
 package fr.tpt.atlanalyser.utils;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.henshin.interpreter.util.HenshinEGraph;
 import org.eclipse.emf.henshin.model.Annotation;
 import org.eclipse.emf.henshin.model.HenshinFactory;
 import org.eclipse.emf.henshin.model.ModelElement;
@@ -23,4 +25,9 @@ public class HenshinUtils {
         obj.getAnnotations().add(annotation);
     }
 
+    public static void dispose(HenshinEGraph eGraph) {
+        for (EObject o : eGraph.getObject2NodeMap().keySet()) {
+            o.eAdapters().remove(eGraph);
+        }
+    }
 }
