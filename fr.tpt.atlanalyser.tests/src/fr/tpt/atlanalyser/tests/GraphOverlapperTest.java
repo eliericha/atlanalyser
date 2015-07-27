@@ -34,7 +34,6 @@ import org.eclipse.emf.henshin.model.GraphElement;
 import org.eclipse.emf.henshin.model.HenshinFactory;
 import org.eclipse.emf.henshin.model.Node;
 import org.eclipse.emf.henshin.model.Rule;
-import org.eclipse.emf.henshin.model.util.HenshinGraphASCIIRenderer;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.junit.Test;
@@ -49,6 +48,7 @@ import fr.tpt.atlanalyser.overlapping.SubSetGenerator;
 import fr.tpt.atlanalyser.overlapping.SubSetIteratorLargerFirst;
 import fr.tpt.atlanalyser.overlapping.TraceOverlapFilter;
 import fr.tpt.atlanalyser.overlapping.GraphOverlapper.GraphOverlapGenerator;
+import fr.tpt.atlanalyser.utils.HenshinGraphASCIIRenderer;
 import fr.tpt.atlanalyser.utils.Morphism;
 
 public class GraphOverlapperTest {

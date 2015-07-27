@@ -13,8 +13,9 @@ package fr.tpt.atlanalyser.tests;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.henshin.model.Graph;
 import org.eclipse.emf.henshin.model.HenshinFactory;
-import org.eclipse.emf.henshin.model.util.HenshinGraphASCIIRenderer;
 import org.junit.Test;
+
+import fr.tpt.atlanalyser.utils.HenshinGraphASCIIRenderer;
 
 public class HenshinGraphASCIIRendererTest {
 
