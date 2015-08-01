@@ -10,12 +10,6 @@
  *******************************************************************************/
 package fr.tpt.atlanalyser.post2pre.formulas;
 
-import org.eclipse.emf.henshin.model.Formula;
-import org.eclipse.emf.henshin.model.Graph;
-import org.eclipse.emf.henshin.model.NestedCondition;
-
-import fr.tpt.atlanalyser.utils.NGCUtils;
-
 /**
  * This visitor simplifies formulas using standard logic properties, including
  * formulas nested in NestedConditions.
@@ -23,35 +17,17 @@ import fr.tpt.atlanalyser.utils.NGCUtils;
  * @author richa
  *
  */
-public class FullSimplifier extends SimplifyingTransformer {
+public class FullSimplifier extends LimitedSimplifier {
+
+    protected static final int INFINITE_NESTING = Integer.MAX_VALUE;
+
+    public FullSimplifier() {
+        super(INFINITE_NESTING);
+    }
 
     @Override
-    public Formula caseNestedCondition(NestedCondition nc) {
-        Graph conclusion = nc.getConclusion();
-        Formula formula = conclusion.getFormula();
-        if (formula != null) {
-            formula = this.transform(formula);
-            if (NGCUtils.isFalse(formula)) {
-                return formula;
-            } else if (NGCUtils.isTrue(formula)) {
-                conclusion.setFormula(null);
-            } else {
-                conclusion.setFormula(formula);
-            }
-        }
-
-        // formula might have become null after the above, so getFormula()
-        // again
-        if (conclusion.getFormula() == null) {
-            // Check with NestedCondition::isTrue which checks if the
-            // condition morphism is surjective (in which case it's always
-            // true).
-            if (nc.isTrue()) {
-                return NGCUtils.createTrue();
-            }
-        }
-
-        return nc;
+    protected LimitedSimplifier newSimplifier(int n) {
+        return new FullSimplifier();
     }
 
 }

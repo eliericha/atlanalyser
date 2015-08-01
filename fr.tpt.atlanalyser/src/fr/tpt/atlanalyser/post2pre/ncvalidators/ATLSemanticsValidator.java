@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.henshin.model.Edge;
 import org.eclipse.emf.henshin.model.Graph;
@@ -67,45 +68,12 @@ public class ATLSemanticsValidator implements NestedConditionValidator {
         };
     }
 
-    public ATLSemanticsValidator(EClass traceEClass) {
-        this.traceEClass = traceEClass;
+    public ATLSemanticsValidator(EPackage traceMM) {
+        this.traceEClass = (EClass) traceMM.getEClassifier("Trace");
         from = (EReference) traceEClass.getEStructuralFeature("from");
         rootSrcType = (EClass) from.getEType();
         to = (EReference) traceEClass.getEStructuralFeature("to");
         rootTgtType = (EClass) to.getEType();
-    }
-
-    public boolean isTraceValid(Pair<Morphism, Morphism> overlap) {
-        // TODO: deactivate trace validation because it is wrong in some
-        // situations
-        if (true)
-            return true;
-        Morphism g1ToOverlap = overlap.getValue0();
-        Morphism g2ToOverlap = overlap.getValue1();
-        Graph ovGraph = g1ToOverlap.getTarget();
-
-        List<Node> abstractTraceNodes = getAbstractTraceNodes(ovGraph);
-
-        for (Node trace : abstractTraceNodes) {
-            Node tr1 = g1ToOverlap.getOrigin(trace);
-            Node tr2 = g2ToOverlap.getOrigin(trace);
-
-            int nFrom = getAbstractFromNodes(trace).size();
-            if (tr1 != null) {
-                if (getAbstractFromNodes(tr1).size() != nFrom) {
-                    return false;
-                }
-            }
-
-            if (tr2 != null) {
-                if (getAbstractFromNodes(tr2).size() != nFrom) {
-                    return false;
-                }
-            }
-
-        }
-
-        return true;
     }
 
     @Override
@@ -198,6 +166,11 @@ public class ATLSemanticsValidator implements NestedConditionValidator {
                     }
                 }));
         return Lists.transform(concreteToEdges, edgeToTarget);
+    }
+
+    @Override
+    public String toString() {
+        return "ATLSemanticsValidator";
     }
 
 }

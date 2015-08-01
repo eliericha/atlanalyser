@@ -1,0 +1,21 @@
+-- @path  IN=/fr.tpt.atlanalyser.examples/examples/ForPhDPost2Pre/InputMM/in.ecore
+-- @path OUT=/fr.tpt.atlanalyser.examples/examples/ForPhDPost2Pre/OutputMM/out.ecore
+-- @atlcompiler emftvm
+
+module Test;
+create O : OUT from I : IN;
+
+rule R1 {
+from s  : IN!A
+   (s.refB->exists(b | true))
+to t1 : OUT!D
+     (
+      refD <- t2,
+      refE <- s.refB),
+   t2 : OUT!D
+   }
+
+rule R2 {
+from s : IN!B
+to t : OUT!E
+     (refD <- thisModule.resolveTemp(s.refA, 't2')) }

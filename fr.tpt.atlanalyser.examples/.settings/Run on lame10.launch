@@ -2,6 +2,6 @@
 <launchConfiguration type="org.eclipse.ui.externaltools.ProgramLaunchConfigurationType">
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LAUNCH_CONFIGURATION_BUILD_SCOPE" value="${none}"/>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="/bin/zsh"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="run-on-remote.sh lame10.enst.fr 'cd /infres/s3/richa/atlanalyzer/fr.tpt.atlanalyser.examples &amp;&amp; java -Xmx200g -Xms100g -classpath atlanalyzer.jar -Dcom.sun.management.jmxremote.port=9876 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n fr.tpt.atlanalyser.tests.TestPointsToLinesPost2Pre -j 70 2&gt;&amp;1 | tee atlanalyzer.out'"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="run-on-remote.sh lame10.enst.fr 'cd /infres/s3/richa/atlanalyser/fr.tpt.atlanalyser.examples &amp;&amp; java -Xmx200g -Xms100g -classpath atlanalyser.jar -Dcom.sun.management.jmxremote.port=9876 -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.authenticate=false -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n fr.tpt.atlanalyser.tests.TestPointsToLinesPost2Pre -j 70 2&gt;&amp;1 | tee atlanalyser.out'"/>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${workspace_loc:/fr.tpt.atlanalyser.examples}"/>
 </launchConfiguration>

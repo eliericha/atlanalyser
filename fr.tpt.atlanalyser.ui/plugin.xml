@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            id="fr.tpt.atlanalyser.ui.contribution1"
+            nameFilter="*.henshin"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               label="ATLAnalyser"
+               path="additions"
+               id="fr.tpt.atlanalyser.ui.menu1">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         <action
+               label="Translate Henshin Formula to LaTeX"
+               class="fr.tpt.atlanalyser.ui.popup.actions.HenshinFileToLatex"
+               menubarPath="fr.tpt.atlanalyser.ui.menu1/group1"
+               enablesFor="1"
+               id="fr.tpt.atlanalyser.ui.newAction1">
+         </action>
+      </objectContribution>
+      <objectContribution
+            id="fr.tpt.atlanalyser.ui.contribution2"
+            objectClass="org.eclipse.emf.henshin.model.Formula">
+         <menu
+               id="fr.tpt.atlanalyser.ui.menu2"
+               label="ATLAnalyser"
+               path="additions">
+            <separator
+                  name="group2">
+            </separator>
+         </menu>
+         <action
+               class="fr.tpt.atlanalyser.ui.popup.actions.FormulaToLatex"
+               enablesFor="1"
+               id="fr.tpt.atlanalyser.ui.newAction2"
+               label="Translate Formula to LaTeX"
+               menubarPath="fr.tpt.atlanalyser.ui.menu2/group2">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

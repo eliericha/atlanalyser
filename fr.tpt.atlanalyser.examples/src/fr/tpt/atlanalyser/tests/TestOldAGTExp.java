@@ -19,7 +19,7 @@ public class TestOldAGTExp extends GenericTranslateTest {
 
     public static void main(String args[]) throws IOException,
             ATLAnalyserException {
-        new TestOldAGTExp().testTransformAndCompile();
+        new TestOldAGTExp().testATL2AGT();
     }
 
     public TestOldAGTExp() {

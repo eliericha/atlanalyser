@@ -40,6 +40,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public class Morphism extends MappingListImpl {
@@ -108,6 +109,19 @@ public class Morphism extends MappingListImpl {
                 add(e, image);
             }
         }
+    }
+
+    public Morphism(HenshinEGraph eg1, HenshinEGraph eg2,
+            Map<EObject, EObject> isomorphMap) {
+        this(eg1.getHenshinGraph(), eg2.getHenshinGraph());
+
+        Map<Node, Node> nodeMap = Maps.newHashMap();
+        for (Map.Entry<EObject, EObject> e : isomorphMap.entrySet()) {
+            nodeMap.put(eg1.getObject2NodeMap().get(e.getKey()), eg2
+                    .getObject2NodeMap().get(e.getValue()));
+        }
+
+        this.add(nodeMap);
     }
 
     public Graph getSource() {
@@ -308,7 +322,10 @@ public class Morphism extends MappingListImpl {
     public void add(Map<?, ?> map) {
         for (GraphElement e : Iterables.concat(getSource().getNodes(),
                 getSource().getEdges())) {
-            add(e, (GraphElement) map.get(e));
+            GraphElement image = (GraphElement) map.get(e);
+            if (image != null) {
+                add(e, image);
+            }
         }
     }
 
@@ -556,4 +573,22 @@ public class Morphism extends MappingListImpl {
             }
         }
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof Morphism) {
+            Morphism other = (Morphism) object;
+            if (this.source == other.source && this.target == other.target
+                    && this.size == other.size) {
+                for (Mapping m : this) {
+                    if (other.get(m.getOrigin(), m.getImage()) == null) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        return super.equals(object);
+    }
+
 }

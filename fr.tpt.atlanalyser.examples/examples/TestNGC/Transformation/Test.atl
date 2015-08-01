@@ -1,5 +1,5 @@
--- @path  IN=/fr.tpt.atlanalyzer.examples/examples/TestNGC/InputMM/systemmodel.ecore
--- @path OUT=/fr.tpt.atlanalyzer.examples/examples/TestNGC/InputMM/systemmodel.ecore
+-- @path  IN=/fr.tpt.atlanalyser.examples/examples/TestNGC/InputMM/systemmodel.ecore
+-- @path OUT=/fr.tpt.atlanalyser.examples/examples/TestNGC/InputMM/systemmodel.ecore
 -- @atlcompiler emftvm
 
 module Test;

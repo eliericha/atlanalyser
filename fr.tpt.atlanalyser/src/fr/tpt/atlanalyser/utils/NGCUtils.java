@@ -195,7 +195,7 @@ public class NGCUtils {
     public static Formula createTrue() {
         NestedCondition tTrue = HF.createNestedCondition();
         tTrue.setConclusion(HF.createGraph("TRUE"));
-        HenshinUtils.annotate(tTrue, "TRUE", null);
+        // HenshinUtils.annotate(tTrue, "TRUE", null);
         return tTrue;
     }
 
@@ -219,7 +219,7 @@ public class NGCUtils {
     public static Formula createFalse() {
         Not fFalse = HF.createNot();
         fFalse.setChild(createTrue());
-        HenshinUtils.annotate(fFalse, "FALSE", null);
+        // HenshinUtils.annotate(fFalse, "FALSE", null);
         return fFalse;
     }
 
@@ -266,31 +266,31 @@ public class NGCUtils {
     public static Formula createConjunction(List<? extends Formula> formulas) {
         formulas = Lists.newArrayList(Collections2.filter(formulas,
                 Predicates.notNull()));
-        Collections.reverse(formulas);
-        Formula current = formulas.get(0);
-        List<? extends Formula> toDisjunt = formulas
-                .subList(1, formulas.size());
-        for (Formula f : toDisjunt) {
-            And and = HF.createAnd();
-            and.setLeft(f);
-            and.setRight(current);
-            current = and;
+        if (formulas.size() == 0) {
+            return createFalse();
         }
-        return current;
+
+        return formulas.stream().sequential().reduce((f1, f2) -> {
+            And and = HF.createAnd();
+            and.setLeft(f1);
+            and.setRight(f2);
+            return and;
+        }).get();
     }
 
     public static Formula createDisjunction(List<? extends Formula> formulas) {
-        Collections.reverse(formulas);
-        Formula current = formulas.get(0);
-        List<? extends Formula> toDisjunt = formulas
-                .subList(1, formulas.size());
-        for (Formula f : toDisjunt) {
-            Or or = HF.createOr();
-            or.setLeft(f);
-            or.setRight(current);
-            current = or;
+        if (formulas.size() == 0) {
+            return createFalse();
         }
-        return current;
+
+        Formula res = formulas.stream().sequential().reduce((f1, f2) -> {
+            Or or = HF.createOr();
+            or.setLeft(f1);
+            or.setRight(f2);
+            return or;
+        }).get();
+
+        return res;
     }
 
     public static Formula createConjunction(Formula... formulas) {
@@ -462,7 +462,8 @@ public class NGCUtils {
      * of 'nc' in their mappings.
      * 
      * @param nc
-     * @throws ATLAnalyserRuntimeException if an inconsistency is found.
+     * @throws ATLAnalyserRuntimeException
+     *             if an inconsistency is found.
      */
     public static void checkConsistency(NestedCondition nc) {
         Graph conclusion = nc.getConclusion();
@@ -478,5 +479,19 @@ public class NGCUtils {
                 }
             }
         }
+    }
+
+    public static boolean isForAll(Formula f2) {
+        if (f2 instanceof Not) {
+            Not not = (Not) f2;
+            if (not.getChild() instanceof NestedCondition) {
+                NestedCondition nc = (NestedCondition) not.getChild();
+                Formula formula = nc.getConclusion().getFormula();
+                if (formula != null && formula instanceof Not) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

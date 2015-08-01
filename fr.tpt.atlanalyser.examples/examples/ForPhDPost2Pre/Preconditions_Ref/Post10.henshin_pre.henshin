@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_-tuYUF54EeWddLR9bolbVA" name="Preconditions">
+  <imports href="../InputMM/in.ecore#/"/>
+  <imports href="../OutputMM/out.ecore#/"/>
+  <imports href="http://www.eclipse.org/emf/2002/Ecore#/"/>
+  <units xsi:type="henshin:ConditionalUnit" xmi:id="_-tuYUV54EeWddLR9bolbVA" name="Eval Pre" if="_-tuYWl54EeWddLR9bolbVA" then="_-tuYZl54EeWddLR9bolbVA" else="_-tuYal54EeWddLR9bolbVA"/>
+  <units xsi:type="henshin:Rule" xmi:id="_-tuYUl54EeWddLR9bolbVA" name="Post">
+    <lhs xmi:id="_-tuYU154EeWddLR9bolbVA" name="Post">
+      <formula xsi:type="henshin:NestedCondition" xmi:id="_-tuYVF54EeWddLR9bolbVA">
+        <conclusion xmi:id="_-tuYVV54EeWddLR9bolbVA">
+          <nodes xmi:id="_-tuYVl54EeWddLR9bolbVA" name="d1" outgoing="_-tuYWF54EeWddLR9bolbVA">
+            <type href="../OutputMM/out.ecore#//D"/>
+          </nodes>
+          <nodes xmi:id="_-tuYV154EeWddLR9bolbVA" name="d2" incoming="_-tuYWF54EeWddLR9bolbVA">
+            <type href="../OutputMM/out.ecore#//D"/>
+          </nodes>
+          <edges xmi:id="_-tuYWF54EeWddLR9bolbVA" source="_-tuYVl54EeWddLR9bolbVA" target="_-tuYV154EeWddLR9bolbVA">
+            <type href="../OutputMM/out.ecore#//D/refD"/>
+          </edges>
+        </conclusion>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_-tuYWV54EeWddLR9bolbVA" name="Rhs"/>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_-tuYWl54EeWddLR9bolbVA" name="Pre">
+    <lhs xmi:id="_-tuYW154EeWddLR9bolbVA">
+      <formula xsi:type="henshin:NestedCondition" xmi:id="_-tuYXF54EeWddLR9bolbVA">
+        <conclusion xmi:id="_-tuYXV54EeWddLR9bolbVA" name="R1_Inst_LHS">
+          <nodes xmi:id="_-tuYXl54EeWddLR9bolbVA" name="s">
+            <type href="../InputMM/in.ecore#//A"/>
+          </nodes>
+          <formula xsi:type="henshin:NestedCondition" xmi:id="_-tuYX154EeWddLR9bolbVA">
+            <annotations xmi:id="_-tuYYF54EeWddLR9bolbVA" key="s.refB->exists(b | true)"/>
+            <conclusion xmi:id="_-tuYYV54EeWddLR9bolbVA" name="Ov(null, Lhs)[1]">
+              <nodes xmi:id="_-tuYYl54EeWddLR9bolbVA" name="s" outgoing="_-tuYZF54EeWddLR9bolbVA">
+                <type href="../InputMM/in.ecore#//A"/>
+              </nodes>
+              <nodes xmi:id="_-tuYY154EeWddLR9bolbVA" name="b" incoming="_-tuYZF54EeWddLR9bolbVA">
+                <type href="../InputMM/in.ecore#//B"/>
+              </nodes>
+              <edges xmi:id="_-tuYZF54EeWddLR9bolbVA" source="_-tuYYl54EeWddLR9bolbVA" target="_-tuYY154EeWddLR9bolbVA">
+                <type href="../InputMM/in.ecore#//A/refB"/>
+              </edges>
+            </conclusion>
+            <mappings xmi:id="_-tuYZV54EeWddLR9bolbVA" origin="_-tuYXl54EeWddLR9bolbVA" image="_-tuYYl54EeWddLR9bolbVA"/>
+          </formula>
+        </conclusion>
+      </formula>
+    </lhs>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_-tuYZl54EeWddLR9bolbVA" name="PreSat">
+    <rhs xmi:id="_-tuYZ154EeWddLR9bolbVA" name="Rhs">
+      <nodes xmi:id="_-tuYaF54EeWddLR9bolbVA" name="eval">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+        <attributes xmi:id="_-tuYaV54EeWddLR9bolbVA" value="&quot;Pre Satisfied&quot;">
+          <type href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+        </attributes>
+      </nodes>
+    </rhs>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_-tuYal54EeWddLR9bolbVA" name="PreUnsat">
+    <rhs xmi:id="_-tuYa154EeWddLR9bolbVA" name="Rhs">
+      <nodes xmi:id="_-tuYbF54EeWddLR9bolbVA" name="eval">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+        <attributes xmi:id="_-tuYbV54EeWddLR9bolbVA" value="&quot;Pre Unsatisfied&quot;">
+          <type href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+        </attributes>
+      </nodes>
+    </rhs>
+  </units>
+</henshin:Module>

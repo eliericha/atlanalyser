@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project default="create_run_jar" name="Create Runnable Jar for Project ATLAnalyzer with Jar-in-Jar Loader">
+<project default="create_run_jar" name="Create Runnable Jar for Project atlanalyser with Jar-in-Jar Loader">
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <target name="create_run_jar">
-        <jar destfile="./fr.tpt.atlanalyzer.jar">
+        <jar destfile="./fr.tpt.atlanalyser.jar">
             <manifest>
                 <attribute name="Main-Class" value="org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader"/>
-                <attribute name="Rsrc-Main-Class" value="fr.tpt.atlanalyzer.AGGWrapper"/>
+                <attribute name="Rsrc-Main-Class" value="fr.tpt.atlanalyser.AGGWrapper"/>
                 <attribute name="Class-Path" value="."/>
                 <attribute name="Rsrc-Class-Path" value="./ org.eclipse.core.runtime_3.8.0.v20120912-155025.jar org.eclipse.osgi_3.8.2.v20130124-134944.jar org.eclipse.equinox.common_3.6.100.v20120522-1841.jar org.eclipse.core.jobs_3.5.300.v20120912-155018.jar runtime_registry_compatibility.jar org.eclipse.equinox.registry_3.5.200.v20120522-1841.jar org.eclipse.equinox.preferences_3.5.1.v20121031-182809.jar org.eclipse.core.contenttype_3.4.200.v20120523-2004.jar org.eclipse.equinox.app_1.3.100.v20120522-1841.jar org.eclipse.emf.ecore_2.9.2.v20131212-0545.jar org.eclipse.emf.common_2.9.2.v20131212-0545.jar org.eclipse.ocl_3.2.1.v20130128-1158.jar org.eclipse.ocl.ecore_3.2.0.v20130125-1817.jar org.eclipse.ocl.common_1.0.2.v20130125-1817.jar org.eclipse.emf_2.6.0.v20140203-1126.jar org.eclipse.emf.ecore.xmi_2.9.1.v20131212-0545.jar org.antlr.runtime_3.0.0.v200803061811.jar lpg.runtime.java_2.0.17.v201004271640.jar org.apache.log4j_1.2.15.v201012070815.jar junit.jar org.hamcrest.core_1.1.0.v20090501071000.jar org.eclipse.m2m.atl.core_3.5.0.v201403171842.jar org.eclipse.m2m.atl.core.emf_3.5.0.v201403171842.jar org.eclipse.m2m.atl.dsls_3.5.0.v201403171842.jar org.eclipse.m2m.atl.engine_3.5.0.v201403171842.jar org.eclipse.emf.ecore.change_2.9.0.v20131212-0545.jar org.eclipse.m2m.atl.common_3.5.0.v201403171842.jar com.google.guava_11.0.2.v201303041551.jar org.eclipse.draw2d_3.9.0.201212170307.jar org.eclipse.swt_3.100.1.v4236b.jar org.eclipse.swt.cocoa.macosx.x86_64_3.100.1.v4236b.jar org.eclipse.zest.layouts_1.1.0.201212170307.jar"/>
             </manifest>
             <zipfileset src="jar-in-jar-loader.zip"/>
-            <fileset dir="/Users/richa/adacore/work/fr.tpt.atlanalyzer/ATLAnalyzer/bin"/>
-            <fileset dir="/Users/richa/adacore/work/fr.tpt.atlanalyzer/SimpleMM/bin"/>
+            <fileset dir="/Users/richa/adacore/work/fr.tpt.atlanalyser/atlanalyser/bin"/>
+            <fileset dir="/Users/richa/adacore/work/fr.tpt.atlanalyser/SimpleMM/bin"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.eclipse.core.runtime_3.8.0.v20120912-155025.jar"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.eclipse.osgi_3.8.2.v20130124-134944.jar"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.eclipse.equinox.common_3.6.100.v20120522-1841.jar"/>
@@ -31,7 +31,7 @@
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.eclipse.emf_2.6.0.v20140203-1126.jar"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.eclipse.emf.ecore.xmi_2.9.1.v20131212-0545.jar"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.antlr.runtime_3.0.0.v200803061811.jar"/>
-            <fileset dir="/Users/richa/adacore/work/fr.tpt.atlanalyzer/ATLMM/bin"/>
+            <fileset dir="/Users/richa/adacore/work/fr.tpt.atlanalyser/ATLMM/bin"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="lpg.runtime.java_2.0.17.v201004271640.jar"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins" includes="org.apache.log4j_1.2.15.v201012070815.jar"/>
             <zipfileset dir="/Applications/eclipse-Juno/plugins/org.junit_4.10.0.v4_10_0_v20120426-0900" includes="junit.jar"/>

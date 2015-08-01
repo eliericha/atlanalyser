@@ -1,5 +1,5 @@
--- @path  IN=/fr.tpt.atlanalyzer.examples/examples/ResolveTemp/InputMM/in.ecore
--- @path OUT=/fr.tpt.atlanalyzer.examples/examples/ResolveTemp/OutputMM/out.ecore
+-- @path  IN=/fr.tpt.atlanalyser.examples/examples/ResolveTemp/InputMM/in.ecore
+-- @path OUT=/fr.tpt.atlanalyser.examples/examples/ResolveTemp/OutputMM/out.ecore
 -- @atlcompiler emftvm
 
 module Test;

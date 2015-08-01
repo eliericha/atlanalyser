@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_96sGoEAgEeWw8bZ-NsYxNA" name="Preconditions">
+  <units xsi:type="henshin:Rule" xmi:id="_96sGoUAgEeWw8bZ-NsYxNA" name="Post2">
+    <lhs xmi:id="_96sGokAgEeWw8bZ-NsYxNA">
+      <formula xsi:type="henshin:And" xmi:id="_96sGo0AgEeWw8bZ-NsYxNA">
+        <left xsi:type="henshin:Or" xmi:id="_96sGpEAgEeWw8bZ-NsYxNA">
+          <left xsi:type="henshin:NestedCondition" xmi:id="_96sGpUAgEeWw8bZ-NsYxNA">
+            <conclusion xmi:id="_96sGpkAgEeWw8bZ-NsYxNA" name="R1_Inst_LHS">
+              <nodes xmi:id="_96sGp0AgEeWw8bZ-NsYxNA" name="s">
+                <type href="in.ecore#//A"/>
+              </nodes>
+              <formula xsi:type="henshin:NestedCondition" xmi:id="_96sGqEAgEeWw8bZ-NsYxNA">
+                <annotations xmi:id="_96sGqUAgEeWw8bZ-NsYxNA" key="s.refB->exists(b | true)"/>
+                <conclusion xmi:id="_96sGqkAgEeWw8bZ-NsYxNA" name="Ov(null, Lhs)[1]">
+                  <nodes xmi:id="_96sGq0AgEeWw8bZ-NsYxNA" name="s" outgoing="_96sGrUAgEeWw8bZ-NsYxNA">
+                    <type href="in.ecore#//A"/>
+                  </nodes>
+                  <nodes xmi:id="_96sGrEAgEeWw8bZ-NsYxNA" name="b" incoming="_96sGrUAgEeWw8bZ-NsYxNA">
+                    <type href="in.ecore#//B"/>
+                  </nodes>
+                  <edges xmi:id="_96sGrUAgEeWw8bZ-NsYxNA" source="_96sGq0AgEeWw8bZ-NsYxNA" target="_96sGrEAgEeWw8bZ-NsYxNA">
+                    <type href="in.ecore#//A/refB"/>
+                  </edges>
+                </conclusion>
+                <mappings xmi:id="_96sGrkAgEeWw8bZ-NsYxNA" origin="_96sGp0AgEeWw8bZ-NsYxNA" image="_96sGq0AgEeWw8bZ-NsYxNA"/>
+              </formula>
+            </conclusion>
+          </left>
+          <right xsi:type="henshin:Not" xmi:id="_96sGr0AgEeWw8bZ-NsYxNA">
+            <child xsi:type="henshin:NestedCondition" xmi:id="_96sGsEAgEeWw8bZ-NsYxNA">
+              <conclusion xmi:id="_96sGsUAgEeWw8bZ-NsYxNA" name="R2_Inst_LHS">
+                <nodes xmi:id="_96sGskAgEeWw8bZ-NsYxNA" name="s">
+                  <type href="in.ecore#//B"/>
+                </nodes>
+                <formula xsi:type="henshin:Not" xmi:id="_96sGs0AgEeWw8bZ-NsYxNA">
+                  <child xsi:type="henshin:NestedCondition" xmi:id="_96sGtEAgEeWw8bZ-NsYxNA">
+                    <conclusion xmi:id="_96sGtUAgEeWw8bZ-NsYxNA" name="C">
+                      <nodes xmi:id="_96sGtkAgEeWw8bZ-NsYxNA" name="s">
+                        <type href="in.ecore#//B"/>
+                      </nodes>
+                      <nodes xmi:id="_96sGt0AgEeWw8bZ-NsYxNA" name="s">
+                        <type href="in.ecore#//B"/>
+                      </nodes>
+                    </conclusion>
+                    <mappings xmi:id="_96sGuEAgEeWw8bZ-NsYxNA" origin="_96sGskAgEeWw8bZ-NsYxNA" image="_96sGtkAgEeWw8bZ-NsYxNA"/>
+                  </child>
+                </formula>
+              </conclusion>
+            </child>
+          </right>
+        </left>
+        <right xsi:type="henshin:Not" xmi:id="_96sGuUAgEeWw8bZ-NsYxNA">
+          <child xsi:type="henshin:NestedCondition" xmi:id="_96sGukAgEeWw8bZ-NsYxNA">
+            <conclusion xmi:id="_96sGu0AgEeWw8bZ-NsYxNA" name="R1_Inst_LHS">
+              <nodes xmi:id="_96sGvEAgEeWw8bZ-NsYxNA" name="s">
+                <type href="in.ecore#//A"/>
+              </nodes>
+              <formula xsi:type="henshin:Not" xmi:id="_96sGvUAgEeWw8bZ-NsYxNA">
+                <child xsi:type="henshin:Or" xmi:id="_96sGvkAgEeWw8bZ-NsYxNA">
+                  <left xsi:type="henshin:Not" xmi:id="_96sGv0AgEeWw8bZ-NsYxNA">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_96sGwEAgEeWw8bZ-NsYxNA">
+                      <annotations xmi:id="_96sGwUAgEeWw8bZ-NsYxNA" key="s.refB->exists(b | true)"/>
+                      <conclusion xmi:id="_96sGwkAgEeWw8bZ-NsYxNA" name="Ov(null, Lhs)[1]">
+                        <nodes xmi:id="_96sGw0AgEeWw8bZ-NsYxNA" name="s" outgoing="_96sGxUAgEeWw8bZ-NsYxNA">
+                          <type href="in.ecore#//A"/>
+                        </nodes>
+                        <nodes xmi:id="_96sGxEAgEeWw8bZ-NsYxNA" name="b" incoming="_96sGxUAgEeWw8bZ-NsYxNA">
+                          <type href="in.ecore#//B"/>
+                        </nodes>
+                        <edges xmi:id="_96sGxUAgEeWw8bZ-NsYxNA" source="_96sGw0AgEeWw8bZ-NsYxNA" target="_96sGxEAgEeWw8bZ-NsYxNA">
+                          <type href="in.ecore#//A/refB"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_96sGxkAgEeWw8bZ-NsYxNA" origin="_96sGvEAgEeWw8bZ-NsYxNA" image="_96sGw0AgEeWw8bZ-NsYxNA"/>
+                    </child>
+                  </left>
+                  <right xsi:type="henshin:Or" xmi:id="_96sGx0AgEeWw8bZ-NsYxNA">
+                    <left xsi:type="henshin:NestedCondition" xmi:id="_96sGyEAgEeWw8bZ-NsYxNA">
+                      <conclusion xmi:id="_96sGyUAgEeWw8bZ-NsYxNA" name="C">
+                        <nodes xmi:id="_96sGykAgEeWw8bZ-NsYxNA" name="s">
+                          <type href="in.ecore#//A"/>
+                        </nodes>
+                        <nodes xmi:id="_96sGy0AgEeWw8bZ-NsYxNA" name="s">
+                          <type href="in.ecore#//A"/>
+                        </nodes>
+                        <formula xsi:type="henshin:NestedCondition" xmi:id="_96sGzEAgEeWw8bZ-NsYxNA">
+                          <conclusion xmi:id="_96sGzUAgEeWw8bZ-NsYxNA" name="C">
+                            <nodes xmi:id="_96sGzkAgEeWw8bZ-NsYxNA" name="s">
+                              <type href="in.ecore#//A"/>
+                            </nodes>
+                            <nodes xmi:id="_96sGz0AgEeWw8bZ-NsYxNA" name="s" outgoing="_96sG0UAgEeWw8bZ-NsYxNA">
+                              <type href="in.ecore#//A"/>
+                            </nodes>
+                            <nodes xmi:id="_96sG0EAgEeWw8bZ-NsYxNA" name="b" incoming="_96sG0UAgEeWw8bZ-NsYxNA">
+                              <type href="in.ecore#//B"/>
+                            </nodes>
+                            <edges xmi:id="_96sG0UAgEeWw8bZ-NsYxNA" source="_96sGz0AgEeWw8bZ-NsYxNA" target="_96sG0EAgEeWw8bZ-NsYxNA">
+                              <type href="in.ecore#//A/refB"/>
+                            </edges>
+                          </conclusion>
+                          <mappings xmi:id="_96sG0kAgEeWw8bZ-NsYxNA" origin="_96sGykAgEeWw8bZ-NsYxNA" image="_96sGzkAgEeWw8bZ-NsYxNA"/>
+                          <mappings xmi:id="_96sG00AgEeWw8bZ-NsYxNA" origin="_96sGy0AgEeWw8bZ-NsYxNA" image="_96sGz0AgEeWw8bZ-NsYxNA"/>
+                        </formula>
+                      </conclusion>
+                      <mappings xmi:id="_96sG1EAgEeWw8bZ-NsYxNA" origin="_96sGvEAgEeWw8bZ-NsYxNA" image="_96sGykAgEeWw8bZ-NsYxNA"/>
+                    </left>
+                    <right xsi:type="henshin:Not" xmi:id="_96sG1UAgEeWw8bZ-NsYxNA">
+                      <child xsi:type="henshin:NestedCondition" xmi:id="_96stsEAgEeWw8bZ-NsYxNA">
+                        <conclusion xmi:id="_96stsUAgEeWw8bZ-NsYxNA" name="C">
+                          <nodes xmi:id="_96stskAgEeWw8bZ-NsYxNA" name="s">
+                            <type href="in.ecore#//A"/>
+                          </nodes>
+                          <nodes xmi:id="_96sts0AgEeWw8bZ-NsYxNA" name="s">
+                            <type href="in.ecore#//B"/>
+                          </nodes>
+                          <formula xsi:type="henshin:Not" xmi:id="_96sttEAgEeWw8bZ-NsYxNA">
+                            <child xsi:type="henshin:Or" xmi:id="_96sttUAgEeWw8bZ-NsYxNA">
+                              <left xsi:type="henshin:NestedCondition" xmi:id="_96sttkAgEeWw8bZ-NsYxNA">
+                                <conclusion xmi:id="_96stt0AgEeWw8bZ-NsYxNA" name="C">
+                                  <nodes xmi:id="_96stuEAgEeWw8bZ-NsYxNA" name="s">
+                                    <type href="in.ecore#//A"/>
+                                  </nodes>
+                                  <nodes xmi:id="_96stuUAgEeWw8bZ-NsYxNA" name="s">
+                                    <type href="in.ecore#//B"/>
+                                  </nodes>
+                                  <nodes xmi:id="_96stukAgEeWw8bZ-NsYxNA" name="s">
+                                    <type href="in.ecore#//B"/>
+                                  </nodes>
+                                </conclusion>
+                                <mappings xmi:id="_96stu0AgEeWw8bZ-NsYxNA" origin="_96stskAgEeWw8bZ-NsYxNA" image="_96stuEAgEeWw8bZ-NsYxNA"/>
+                                <mappings xmi:id="_96stvEAgEeWw8bZ-NsYxNA" origin="_96sts0AgEeWw8bZ-NsYxNA" image="_96stuUAgEeWw8bZ-NsYxNA"/>
+                              </left>
+                              <right xsi:type="henshin:Or" xmi:id="_96stvUAgEeWw8bZ-NsYxNA">
+                                <left xsi:type="henshin:NestedCondition" xmi:id="_96stvkAgEeWw8bZ-NsYxNA">
+                                  <conclusion xmi:id="_96stv0AgEeWw8bZ-NsYxNA" name="C">
+                                    <nodes xmi:id="_96stwEAgEeWw8bZ-NsYxNA" name="s" incoming="_96stwkAgEeWw8bZ-NsYxNA">
+                                      <type href="in.ecore#//A"/>
+                                    </nodes>
+                                    <nodes xmi:id="_96stwUAgEeWw8bZ-NsYxNA" name="s" outgoing="_96stwkAgEeWw8bZ-NsYxNA">
+                                      <type href="in.ecore#//B"/>
+                                    </nodes>
+                                    <edges xmi:id="_96stwkAgEeWw8bZ-NsYxNA" source="_96stwUAgEeWw8bZ-NsYxNA" target="_96stwEAgEeWw8bZ-NsYxNA">
+                                      <type href="in.ecore#//B/refA"/>
+                                    </edges>
+                                  </conclusion>
+                                  <mappings xmi:id="_96stw0AgEeWw8bZ-NsYxNA" origin="_96stskAgEeWw8bZ-NsYxNA" image="_96stwEAgEeWw8bZ-NsYxNA"/>
+                                  <mappings xmi:id="_96stxEAgEeWw8bZ-NsYxNA" origin="_96sts0AgEeWw8bZ-NsYxNA" image="_96stwUAgEeWw8bZ-NsYxNA"/>
+                                </left>
+                                <right xsi:type="henshin:Not" xmi:id="_96stxUAgEeWw8bZ-NsYxNA">
+                                  <child xsi:type="henshin:NestedCondition" xmi:id="_96stxkAgEeWw8bZ-NsYxNA">
+                                    <conclusion xmi:id="_96stx0AgEeWw8bZ-NsYxNA" name="C">
+                                      <nodes xmi:id="_96styEAgEeWw8bZ-NsYxNA" name="s">
+                                        <type href="in.ecore#//A"/>
+                                      </nodes>
+                                      <nodes xmi:id="_96styUAgEeWw8bZ-NsYxNA" name="s">
+                                        <type href="in.ecore#//B"/>
+                                      </nodes>
+                                      <formula xsi:type="henshin:Not" xmi:id="_96stykAgEeWw8bZ-NsYxNA">
+                                        <child xsi:type="henshin:And" xmi:id="_96sty0AgEeWw8bZ-NsYxNA">
+                                          <left xsi:type="henshin:NestedCondition" xmi:id="_96stzEAgEeWw8bZ-NsYxNA">
+                                            <conclusion xmi:id="_96stzUAgEeWw8bZ-NsYxNA" name="C">
+                                              <nodes xmi:id="_96stzkAgEeWw8bZ-NsYxNA" name="s" outgoing="_96st0EAgEeWw8bZ-NsYxNA">
+                                                <type href="in.ecore#//A"/>
+                                              </nodes>
+                                              <nodes xmi:id="_96stz0AgEeWw8bZ-NsYxNA" name="s" incoming="_96st0EAgEeWw8bZ-NsYxNA">
+                                                <type href="in.ecore#//B"/>
+                                              </nodes>
+                                              <edges xmi:id="_96st0EAgEeWw8bZ-NsYxNA" source="_96stzkAgEeWw8bZ-NsYxNA" target="_96stz0AgEeWw8bZ-NsYxNA">
+                                                <type href="in.ecore#//A/refB"/>
+                                              </edges>
+                                            </conclusion>
+                                            <mappings xmi:id="_96st0UAgEeWw8bZ-NsYxNA" origin="_96styEAgEeWw8bZ-NsYxNA" image="_96stzkAgEeWw8bZ-NsYxNA"/>
+                                            <mappings xmi:id="_96st0kAgEeWw8bZ-NsYxNA" origin="_96styUAgEeWw8bZ-NsYxNA" image="_96stz0AgEeWw8bZ-NsYxNA"/>
+                                          </left>
+                                          <right xsi:type="henshin:Not" xmi:id="_96st00AgEeWw8bZ-NsYxNA">
+                                            <child xsi:type="henshin:NestedCondition" xmi:id="_96st1EAgEeWw8bZ-NsYxNA">
+                                              <conclusion xmi:id="_96st1UAgEeWw8bZ-NsYxNA" name="C">
+                                                <nodes xmi:id="_96st1kAgEeWw8bZ-NsYxNA" name="s" outgoing="_96st2EAgEeWw8bZ-NsYxNA">
+                                                  <type href="in.ecore#//A"/>
+                                                </nodes>
+                                                <nodes xmi:id="_96st10AgEeWw8bZ-NsYxNA" name="s" incoming="_96st2EAgEeWw8bZ-NsYxNA">
+                                                  <type href="in.ecore#//B"/>
+                                                </nodes>
+                                                <edges xmi:id="_96st2EAgEeWw8bZ-NsYxNA" source="_96st1kAgEeWw8bZ-NsYxNA" target="_96st10AgEeWw8bZ-NsYxNA">
+                                                  <type href="in.ecore#//A/refB"/>
+                                                </edges>
+                                              </conclusion>
+                                              <mappings xmi:id="_96st2UAgEeWw8bZ-NsYxNA" origin="_96styEAgEeWw8bZ-NsYxNA" image="_96st1kAgEeWw8bZ-NsYxNA"/>
+                                              <mappings xmi:id="_96st2kAgEeWw8bZ-NsYxNA" origin="_96styUAgEeWw8bZ-NsYxNA" image="_96st10AgEeWw8bZ-NsYxNA"/>
+                                            </child>
+                                          </right>
+                                        </child>
+                                      </formula>
+                                    </conclusion>
+                                    <mappings xmi:id="_96st20AgEeWw8bZ-NsYxNA" origin="_96stskAgEeWw8bZ-NsYxNA" image="_96styEAgEeWw8bZ-NsYxNA"/>
+                                    <mappings xmi:id="_96st3EAgEeWw8bZ-NsYxNA" origin="_96sts0AgEeWw8bZ-NsYxNA" image="_96styUAgEeWw8bZ-NsYxNA"/>
+                                  </child>
+                                </right>
+                              </right>
+                            </child>
+                          </formula>
+                        </conclusion>
+                        <mappings xmi:id="_96st3UAgEeWw8bZ-NsYxNA" origin="_96sGvEAgEeWw8bZ-NsYxNA" image="_96stskAgEeWw8bZ-NsYxNA"/>
+                      </child>
+                    </right>
+                  </right>
+                </child>
+              </formula>
+            </conclusion>
+          </child>
+        </right>
+      </formula>
+    </lhs>
+  </units>
+</henshin:Module>

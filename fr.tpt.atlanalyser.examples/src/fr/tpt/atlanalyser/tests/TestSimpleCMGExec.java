@@ -32,4 +32,5 @@ public class TestSimpleCMGExec extends GenericExecTest {
     public static Collection<File[]> models() {
         return enumerateModels(BASEDIR);
     }
+
 }

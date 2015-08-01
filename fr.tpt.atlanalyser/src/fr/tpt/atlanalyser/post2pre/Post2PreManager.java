@@ -13,66 +13,132 @@ package fr.tpt.atlanalyser.post2pre;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Maps;
 
 public class Post2PreManager implements Post2PreManagerMBean {
 
-    private static final double      SMOOTHING_FACTOR  = 0.3;
-    private static final int         NUM_NCS_TO_DUMP   = 1000;
-    private static final double      LOW_MEMORY_THRES  = 0.5;
-    private static final double      STOP_DUMP_AT      = 0.2;
+    private static final double         SMOOTHING_FACTOR = 0.3;
+    private static final int            NUM_NCS_TO_DUMP  = 1000;
+    private static final double         LOW_MEMORY_THRES = 0.5;
+    private static final double         STOP_DUMP_AT     = 0.2;
 
-    private static final Logger      LOGGER            = LogManager
-                                                               .getLogger(Post2PreManager.class
-                                                                       .getSimpleName());
-    private final MemoryMXBean       memoryBean        = ManagementFactory
-                                                               .getMemoryMXBean();
-    private int                      queueSize         = 0;
-    private int                      prevQueueSize     = 0;
-    private long                     lastReadTime      = 1;
-    private int                      threadPoolSize    = Runtime
-                                                               .getRuntime()
-                                                               .availableProcessors();
-    private ThreadPoolExecutor       executor          = null;
+    private static final Logger         LOGGER           = LogManager
+                                                                 .getLogger(Post2PreManager.class
+                                                                         .getSimpleName());
+
+    public static final Post2PreManager INSTANCE         = new Post2PreManager();
+
+    private Post2PreManager() {
+    }
+
+    static {
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = null;
+        try {
+            name = new ObjectName(
+                    "fr.tpt.atlanalyser.post2pre:type=Post2PreManager");
+        } catch (MalformedObjectNameException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        try {
+            mbs.registerMBean(INSTANCE, name);
+        } catch (InstanceAlreadyExistsException e) {
+            e.printStackTrace();
+        } catch (MBeanRegistrationException e) {
+            e.printStackTrace();
+        } catch (NotCompliantMBeanException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private final MemoryMXBean       memoryBean         = ManagementFactory
+                                                                .getMemoryMXBean();
+    private int                      queueSize          = 0;
+    private int                      prevQueueSize      = 0;
+    private long                     lastReadTime       = 1;
+    private int                      threadPoolSize     = Runtime
+                                                                .getRuntime()
+                                                                .availableProcessors();
+    private ThreadPoolExecutor       executor           = null;
     private double                   rate;
-    private double                   memUsageRate      = 0;
-    private double                   lowMemThresh      = LOW_MEMORY_THRES;
-    private double                   stopDumpThresh    = STOP_DUMP_AT;
-    private int                      numNCsToDump      = NUM_NCS_TO_DUMP;
+    private double                   memUsageRate       = 0;
+    private double                   lowMemThresh       = LOW_MEMORY_THRES;
+    private double                   stopDumpThresh     = STOP_DUMP_AT;
+    private int                      numNCsToDump       = NUM_NCS_TO_DUMP;
     // smoothing factor
-    private double                   smoothingFactor   = SMOOTHING_FACTOR;
+    private double                   smoothingFactor    = SMOOTHING_FACTOR;
     private ScheduledExecutorService backgroundMonitor;
     private ResourceSet              resourceSet;
     private int                      numLoadedResources;
     private int                      numResources;
-    public final AtomicInteger       allOverlaps       = new AtomicInteger(0);
-    public final AtomicInteger       performedOverlaps = new AtomicInteger(0);
 
-    public Post2PreManager() {
-        // backgroundMonitor = Executors.newSingleThreadScheduledExecutor();
-        // backgroundMonitor.scheduleAtFixedRate(new Runnable() {
-        //
-        // @Override
-        // public void run() {
-        // try {
-        // memUsageRate = getCurrentMemUsage();
-        // } catch (Throwable ex) {
-        // LOGGER.error("", ex);
-        // }
-        //
-        // }
-        //
-        // }, 0, 3, TimeUnit.SECONDS);
+    private int                      secondsOldResource = 40;
+
+    public final Map<String, Object> metrics            = Collections
+                                                                .synchronizedMap(Maps
+                                                                        .newLinkedHashMap());
+
+    private Logger                   METRICS            = LogManager
+                                                                .getLogger("Metrics");
+    private AtomicBoolean            headerChanged      = new AtomicBoolean(
+                                                                false);
+
+    public void resetCounters() {
+        for (Object o : metrics.values()) {
+            if (o instanceof AtomicInteger) {
+                AtomicInteger cInt = (AtomicInteger) o;
+                cInt.set(0);
+            } else if (o instanceof AtomicLong) {
+                AtomicLong cLong = (AtomicLong) o;
+                cLong.set(0);
+            }
+        }
+    }
+
+    public AtomicLong getIntCounter(String name) {
+        Object object = metrics.get(name);
+        if (object == null) {
+            object = new AtomicLong(0);
+            metrics.put(name, object);
+            headerChanged.set(true);
+        }
+        if (object instanceof AtomicLong) {
+            return (AtomicLong) object;
+        } else {
+            return null;
+        }
+    }
+
+    public void dumpMetrics() {
+        if (headerChanged.getAndSet(false)) {
+            METRICS.info(Joiner.on(", ").join(metrics.keySet()));
+        }
+        METRICS.info(Joiner.on(", ").join(metrics.values()));
     }
 
     public double getCurrentMemUsage() {
@@ -224,12 +290,12 @@ public class Post2PreManager implements Post2PreManagerMBean {
 
     @Override
     public int getAllOverlaps() {
-        return allOverlaps.get();
+        return getIntCounter("AllOverlaps").intValue();
     }
 
     @Override
     public int getPerformedOverlaps() {
-        return performedOverlaps.get();
+        return getIntCounter("PerformedOverlaps").intValue();
     }
 
     @Override
@@ -241,6 +307,18 @@ public class Post2PreManager implements Post2PreManagerMBean {
     public void setStopDumpThreshold(double v) {
         if (v >= 0 && v <= 1) {
             stopDumpThresh = v;
+        }
+    }
+
+    @Override
+    public int getSecondsOldResource() {
+        return secondsOldResource;
+    }
+
+    @Override
+    public void setSecondsOldResource(int v) {
+        if (v >= 0) {
+            secondsOldResource = v;
         }
     }
 }

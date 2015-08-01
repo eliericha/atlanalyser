@@ -1,5 +1,5 @@
--- @path Families=/fr.tpt.atlanalyzer.examples/examples/Families2Persons/InputMM/Families.ecore
--- @path Persons=/fr.tpt.atlanalyzer.examples/examples/Families2Persons/OutputMM/Persons.ecore
+-- @path Families=/fr.tpt.atlanalyser.examples/examples/Families2Persons/InputMM/Families.ecore
+-- @path Persons=/fr.tpt.atlanalyser.examples/examples/Families2Persons/OutputMM/Persons.ecore
 -- @atlcompiler emftvm
 
 module Families2Persons;

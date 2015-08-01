@@ -45,4 +45,9 @@ public interface Post2PreManagerMBean {
     public int getAllOverlaps();
 
     public int getPerformedOverlaps();
+
+    public int getSecondsOldResource();
+
+    public void setSecondsOldResource(int v);
+
 }

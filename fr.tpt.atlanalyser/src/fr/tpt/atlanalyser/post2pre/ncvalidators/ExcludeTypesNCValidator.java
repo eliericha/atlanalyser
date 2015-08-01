@@ -10,41 +10,50 @@
  *******************************************************************************/
 package fr.tpt.atlanalyser.post2pre.ncvalidators;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+import java.util.stream.Collectors;
 
-import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.ENamedElement;
+import org.eclipse.emf.henshin.model.Edge;
 import org.eclipse.emf.henshin.model.Graph;
 import org.eclipse.emf.henshin.model.NestedCondition;
 import org.eclipse.emf.henshin.model.Node;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Sets.SetView;
 
-public class ExcludeEClassesNCValidator implements NestedConditionValidator {
+public class ExcludeTypesNCValidator implements NestedConditionValidator {
 
-    private HashSet<EClass> excludedEClasses;
+    private HashSet<ENamedElement> excludedTypes;
 
-    public ExcludeEClassesNCValidator(List<EClass> toExclude) {
-        this.excludedEClasses = Sets.newHashSet(toExclude);
+    public ExcludeTypesNCValidator(Collection<? extends ENamedElement> toExclude) {
+        this.excludedTypes = Sets.newHashSet(toExclude);
     }
 
     @Override
     public boolean isValid(NestedCondition nc) {
         Graph conclusion = nc.getConclusion();
-        for (Node n : conclusion.getNodes()) {
-            if (excludedEClasses.contains(n.getType())) {
-                return false;
-            }
+
+        SetView<ENamedElement> graphTypes = Sets.union(
+                conclusion.getNodes().stream().map(Node::getType)
+                        .collect(Collectors.toSet()),
+                conclusion.getEdges().stream().map(Edge::getType)
+                        .collect(Collectors.toSet()));
+
+        if (graphTypes.stream().anyMatch(t1 -> excludedTypes.contains(t1))) {
+            return false;
         }
+
         return true;
     }
 
     @Override
     public String toString() {
-        return "Exclude EClasses: ["
+        return "Exclude Types: ["
                 + Joiner.on(", ").join(
-                        excludedEClasses.stream().map(c -> c.getName())
+                        excludedTypes.stream().map(c -> c.getName())
                                 .toArray(String[]::new)) + "]";
     }
 }

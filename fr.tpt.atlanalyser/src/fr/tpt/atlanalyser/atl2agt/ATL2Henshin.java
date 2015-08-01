@@ -100,7 +100,8 @@ import fr.tpt.atlanalyser.utils.NGCUtils;
 
 public class ATL2Henshin {
 
-    private static final boolean WITHOUT_NACS = false;
+    private static final boolean WITHOUT_NACS         = false;
+    static final boolean         DISABLE_ORDERED_REFS = true;
 
     public static void main(String[] args) throws Exception {
         /*
@@ -207,8 +208,7 @@ public class ATL2Henshin {
         inputMM = pkg;
         String[] extraURIs = {};
         EPackageUtils.registerPackageAndAllSubPackages(pkg,
-                resourceSet.getPackageRegistry(),
-                extraURIs);
+                resourceSet.getPackageRegistry(), extraURIs);
         sourceBaseType = findRootMetaclass(pkg);
         if (sourceBaseType == null) {
             throw new ATLAnalyserException("Could not find root metaclass.");
@@ -221,8 +221,7 @@ public class ATL2Henshin {
         outputMM = pkg;
         String[] extraURIs = {};
         EPackageUtils.registerPackageAndAllSubPackages(pkg,
-                resourceSet.getPackageRegistry(),
-                extraURIs);
+                resourceSet.getPackageRegistry(), extraURIs);
         targetBaseType = findRootMetaclass(pkg);
         if (targetBaseType == null) {
             throw new ATLAnalyserException("Could not find root metaclass.");
@@ -338,7 +337,7 @@ public class ATL2Henshin {
         henshinModule = henshinFactory.createModule();
         henshinModule.getImports().addAll(ePackages);
         henshinModule.getImports().add(traceEPkg);
-        henshinModule.setName("MyHenshinModule");
+        henshinModule.setName(atlModules.get(0).getName());
 
         for (Module module : atlModules) {
             analyzeAtlTransformation(module);

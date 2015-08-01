@@ -23,7 +23,7 @@ public class TestClass2Relational extends GenericTranslateTest {
 
     public static void main(String[] args) throws IOException,
             ATLAnalyserException {
-        (new TestClass2Relational()).testTransformAndCompile();
+        (new TestClass2Relational()).testATL2AGT();
     }
 
 }

@@ -28,6 +28,10 @@ public class ConcurrentResourceSet extends HenshinResourceSet {
         getResources().addAll(resourceSet.getResources());
     }
 
+    public ConcurrentResourceSet() {
+        super();
+    }
+
     @Override
     public Resource getResource(URI uri, boolean loadOnDemand) {
         lock.readLock().lock();

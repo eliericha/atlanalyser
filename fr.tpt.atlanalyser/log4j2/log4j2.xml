@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" monitorInterval="10">
   <Appenders>
-    <File name="LogFile" fileName="atlanalyzer.log" append="false">
+    <File name="LogFile" fileName="atlanalyser.log" append="false">
       <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
-    <File name="Rs" fileName="atlanalyzer.rs.log" append="false">
+    <File name="Metrics" fileName="atlanalyser.metrics.csv" append="false">
+      <PatternLayout pattern="%msg%n"/>
+    </File>
+    <File name="Rs" fileName="atlanalyser.rs.log" append="false">
       <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
-    <File name="Manager" fileName="atlanalyzer.mgr.log" append="false">
+    <File name="Manager" fileName="atlanalyser.mgr.log" append="false">
       <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
-    <File name="QueueLogFile" fileName="atlanalyzer.queue.log">
+    <File name="QueueLogFile" fileName="atlanalyser.queue.log">
       <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
     <Console name="Console" target="SYSTEM_OUT">
@@ -18,6 +21,9 @@
     </Console>
   </Appenders>
   <Loggers>
+    <Logger name="Metrics" level="info" additivity="false">
+      <AppenderRef ref="Metrics"/>
+    </Logger>
     <Logger name="ConcurrentResource" level="debug" additivity="false">
       <AppenderRef ref="Rs"/>
     </Logger>

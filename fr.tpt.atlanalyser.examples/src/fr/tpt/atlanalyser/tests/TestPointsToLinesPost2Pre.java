@@ -68,17 +68,13 @@ public class TestPointsToLinesPost2Pre extends GenericPost2PreTest {
             System.exit(1);
         }
 
-        new TestPointsToLinesPost2Pre(models().get(1)[0], jobs).testPost2Pre();
+        new TestPointsToLinesPost2Pre(models().get(1)[0]).testPost2Pre();
     }
 
     private static final String BASEDIR = "examples/PointsToLines";
 
-    public TestPointsToLinesPost2Pre(File inputModel, int jobs) {
-        super(BASEDIR, inputModel, jobs);
-    }
-
     public TestPointsToLinesPost2Pre(File inputModel) {
-        this(inputModel, 2);
+        super(BASEDIR, inputModel, 2);
     }
 
     @Parameters(name = "{index}: {0}")
@@ -88,7 +84,7 @@ public class TestPointsToLinesPost2Pre extends GenericPost2PreTest {
 
     @Override
     public void testPost2Pre() throws IOException {
-        executePost2Pre(inputPost, 2);
+        executePost2Pre(inputPost, 1);
     }
 
 }

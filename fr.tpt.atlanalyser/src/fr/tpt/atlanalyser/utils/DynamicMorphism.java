@@ -154,8 +154,12 @@ public class DynamicMorphism extends Morphism implements Adapter {
     @Override
     public void dispose() {
         super.dispose();
+        // synchronized (source) {
         source.eAdapters().remove(this);
+        // }
+        // synchronized (target) {
         target.eAdapters().remove(this);
+        // }
     }
 
     @Override

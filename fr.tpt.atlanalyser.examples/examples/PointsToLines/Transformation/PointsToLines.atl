@@ -1,5 +1,5 @@
--- @path IN_MM=/fr.tpt.atlanalyzer.examples/examples/PointsToLines/InputMM/PointsMM.ecore
--- @path OUT_MM=/fr.tpt.atlanalyzer.examples/examples/PointsToLines/OutputMM/LinesMM.ecore
+-- @path IN_MM=/fr.tpt.atlanalyser.examples/examples/PointsToLines/InputMM/PointsMM.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyser.examples/examples/PointsToLines/OutputMM/LinesMM.ecore
 -- @atlcompiler emftvm
 
 module PointsToLines;

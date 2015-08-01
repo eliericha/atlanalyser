@@ -68,7 +68,7 @@ public class TestForPaperPost2Pre extends GenericPost2PreTest {
             System.exit(1);
         }
 
-        new TestForPaperPost2Pre(models().get(0)[0], jobs).testPost2Pre();
+        new TestForPaperPost2Pre(models().get(1)[0], jobs).testPost2Pre();
     }
 
     private static final String BASEDIR = "examples/ForPaper";
@@ -88,7 +88,7 @@ public class TestForPaperPost2Pre extends GenericPost2PreTest {
 
     @Override
     public void testPost2Pre() throws IOException {
-        executePost2Pre(inputPost, 2);
+        executePost2Pre(inputPost, 1);
     }
 
 }

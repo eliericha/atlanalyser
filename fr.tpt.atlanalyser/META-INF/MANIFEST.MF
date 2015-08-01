@@ -8,6 +8,7 @@ Export-Package: fr.tpt.atlanalyser,
  fr.tpt.atlanalyser.overlapping,
  fr.tpt.atlanalyser.post2pre,
  fr.tpt.atlanalyser.post2pre.formulas,
+ fr.tpt.atlanalyser.post2pre.ncvalidators,
  fr.tpt.atlanalyser.post2pre.resources,
  fr.tpt.atlanalyser.utils
 Require-Bundle: org.eclipse.emf.henshin.interpreter;bundle-version="1.0.0",
@@ -19,4 +20,7 @@ Require-Bundle: org.eclipse.emf.henshin.interpreter;bundle-version="1.0.0",
  org.eclipse.m2m.atl.engine.emfvm.launch;bundle-version="3.5.0",
  org.junit,
  fr.tpt.atlanalyser.atl;bundle-version="0.1.0",
- org.eclipse.m2m.atl.dsls;bundle-version="3.5.0"
+ org.eclipse.m2m.atl.dsls;bundle-version="3.5.0",
+ fr.tpt.atlanalyser.lib;bundle-version="1.0.0",
+ org.eclipse.emf.ecore
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

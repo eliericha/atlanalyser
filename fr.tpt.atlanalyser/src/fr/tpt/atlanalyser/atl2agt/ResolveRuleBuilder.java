@@ -83,27 +83,26 @@ import fr.tpt.atlanalyser.utils.NGCUtils;
 
 public class ResolveRuleBuilder extends OCLSwitch<Node> {
 
-    private static final boolean                                                           DISABLE_ORDERED_REFS = false;
     private final ATL2Henshin                                                              atl2Henshin;
     Graph                                                                                  lhs;
     Map<VariableDeclaration, Node>                                                         varDeclToNode;
     Edge                                                                                   lastCreatedEdge;
     private org.eclipse.emf.henshin.model.Rule                                             rule;
     private Binding                                                                        currentBinding;
-    private int                                                                            itCounter            = 1;
+    private int                                                                            itCounter           = 1;
     private final Set<org.eclipse.emf.henshin.model.Rule>                                  additionalRules;
-    private int                                                                            paramCounter         = 1;
-    private Stack<String>                                                                  attExpStack          = new Stack<String>();
+    private int                                                                            paramCounter        = 1;
+    private Stack<String>                                                                  attExpStack         = new Stack<String>();
     private Node                                                                           selfNode;
     private Rule                                                                           atlRule;
-    private static final Logger                                                            LOGGER               = LogManager
-                                                                                                                        .getLogger(ResolveRuleBuilder.class
-                                                                                                                                .getSimpleName());
-    private static final HenshinFactory                                                    HF                   = HenshinFactory.eINSTANCE;
+    private static final Logger                                                            LOGGER              = LogManager
+                                                                                                                       .getLogger(ResolveRuleBuilder.class
+                                                                                                                               .getSimpleName());
+    private static final HenshinFactory                                                    HF                  = HenshinFactory.eINSTANCE;
     private ATLEnvironment                                                                 env;
-    private int                                                                            nodeCounter          = 0;
-    private Map<GraphElement, List<GraphElement>>                                          elemToOrderNacElems  = new HashMap<GraphElement, List<GraphElement>>();
-    private Map<Edge, Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition>> edgeToOrderingNac    = new HashMap<Edge, Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition>>();
+    private int                                                                            nodeCounter         = 0;
+    private Map<GraphElement, List<GraphElement>>                                          elemToOrderNacElems = new HashMap<GraphElement, List<GraphElement>>();
+    private Map<Edge, Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition>> edgeToOrderingNac   = new HashMap<Edge, Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition>>();
     private EObject                                                                        currentObj;
 
     public ResolveRuleBuilder(ATL2Henshin atl2Henshin, Rule atlRule,
@@ -219,7 +218,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                             eRef), new Pair<Edge, Node>(newEdgeInRhs,
                             targetNodeInRhs));
 
-                    if (!DISABLE_ORDERED_REFS) {
+                    if (!ATL2Henshin.DISABLE_ORDERED_REFS) {
                         // Replicate the navigation in nacs, if any
                         List<Node> nacNodes = getOrderNacElems(lastNodeInRhs);
                         for (Node lastNodeInNac : nacNodes) {
@@ -244,7 +243,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                         }
                     }
 
-                    if (!DISABLE_ORDERED_REFS && eRef.isMany()
+                    if (!ATL2Henshin.DISABLE_ORDERED_REFS && eRef.isMany()
                             && !isInIndexingExp
                             && !elemToOrderNacElems.containsKey(lastNodeInRhs)) {
                         int counter = paramCounter++;
@@ -533,6 +532,11 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
             List<Node> nacNodes = getOrderNacElems(lastNode);
             for (Node lastNodeInNac : nacNodes) {
                 varNameToNode = Maps.newHashMap();
+                for (Map.Entry<VariableDeclaration, Node> entry : varDeclToNode
+                        .entrySet()) {
+                    varNameToNode.put(entry.getKey().getVarName(),
+                            toLhs(entry.getValue()));
+                }
                 varNameToNode.put("self", lastNodeInNac);
                 varNameToNode.put(iterator.getVarName(), lastNodeInNac);
                 Graph nacGraph = lastNodeInNac.getGraph();
@@ -580,7 +584,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                 rule.getMappings().getOrigin(lastCreatedEdge)
                         .setIndex(strIndex);
 
-                if (!DISABLE_ORDERED_REFS) {
+                if (!ATL2Henshin.DISABLE_ORDERED_REFS) {
                     // Remove any associated ordering NAC since we are forcing a
                     // specific index
                     Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition> triplet = edgeToOrderingNac
@@ -798,7 +802,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
             Node resolvedNode = nonDefaultResolveSourceNodes(nodesToResolve,
                     targetType, outPatName);
 
-            if (!DISABLE_ORDERED_REFS) {
+            if (!ATL2Henshin.DISABLE_ORDERED_REFS) {
                 // Resolve same nodes in ordering NACs
                 ArrayList<List<Node>> nacNodes = Lists.newArrayList(Lists
                         .transform(nodesToResolve,

@@ -25,6 +25,12 @@ public class HenshinUtils {
         obj.getAnnotations().add(annotation);
     }
 
+    /**
+     * HenshinEGraph registers itself as an eAdapter of the nodes of the
+     * original graph. This method unregisters the HenshinEGraph from all nodes.
+     *
+     * @param eGraph
+     */
     public static void dispose(HenshinEGraph eGraph) {
         for (EObject o : eGraph.getObject2NodeMap().keySet()) {
             o.eAdapters().remove(eGraph);

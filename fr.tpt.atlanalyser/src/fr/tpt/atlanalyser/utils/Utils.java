@@ -10,7 +10,13 @@
  *******************************************************************************/
 package fr.tpt.atlanalyser.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,6 +42,7 @@ import org.javatuples.Triplet;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 import fr.tpt.atlanalyser.ATLAnalyserRuntimeException;
@@ -284,6 +291,53 @@ public class Utils {
         if (eDirectResource != null) {
             eDirectResource.getContents().remove(obj);
         }
+    }
+
+    public static File findExecOnPath(String execName) {
+        String pathVar = System.getenv("PATH");
+        List<String> pathDirs = Lists.newArrayList(Splitter.on(
+                File.pathSeparator).split(pathVar));
+
+        pathDirs.add("/usr/local/bin");
+
+        File res = null;
+        for (String dir : pathDirs) {
+            File candidate = new File(dir, execName);
+            if (candidate.canExecute()) {
+                res = candidate;
+                break;
+            }
+        }
+
+        return res;
+    }
+
+    public static String executeCommand(String[] cmd, String stdin) {
+        ProcessBuilder procBuilder = new ProcessBuilder(cmd);
+        procBuilder.redirectErrorStream(true);
+
+        String output = null;
+        try {
+            Process process = procBuilder.start();
+            OutputStream outputStream = process.getOutputStream();
+            outputStream.write(stdin.getBytes());
+            outputStream.flush();
+            outputStream.close();
+            InputStream inputStream = process.getInputStream();
+            InputStreamReader isReader = new InputStreamReader(inputStream);
+
+            StringBuilder out = new StringBuilder();
+            int x;
+            while ((x = isReader.read()) >= 0) {
+                out.appendCodePoint(x);
+            }
+            output = out.toString();
+        } catch (IOException e) {
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(buffer));
+            output = buffer.toString();
+        }
+        return output;
     }
 
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_lRg2ULZIEeSyppxYUZ_STg" name="MyHenshinModule">
+  <imports href="../OutputMM/out.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_-CYFQD9rEeWhT9PZIGBGcQ" name="Post2">
+    <lhs xmi:id="_-CYFQT9rEeWhT9PZIGBGcQ" name="Post2">
+      <formula xsi:type="henshin:Not" xmi:id="_-CYFQj9rEeWhT9PZIGBGcQ">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_-CYFQz9rEeWhT9PZIGBGcQ">
+          <conclusion xmi:id="_-CYFRD9rEeWhT9PZIGBGcQ">
+            <nodes xmi:id="_-CYFRT9rEeWhT9PZIGBGcQ" name="e">
+              <type href="../OutputMM/out.ecore#//E"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_qtb1MEGtEeW_JpD9NFLReQ">
+              <child xsi:type="henshin:NestedCondition" xmi:id="_-CYFRz9rEeWhT9PZIGBGcQ">
+                <conclusion xmi:id="_-CYFSD9rEeWhT9PZIGBGcQ">
+                  <nodes xmi:id="_-CYFSj9rEeWhT9PZIGBGcQ" name="e" incoming="_9eyVUEKzEeWLeL3vtp3fLg">
+                    <type href="../OutputMM/out.ecore#//E"/>
+                  </nodes>
+                  <nodes xmi:id="_-CYFST9rEeWhT9PZIGBGcQ" name="d" outgoing="_9eyVUEKzEeWLeL3vtp3fLg">
+                    <type href="../OutputMM/out.ecore#//D"/>
+                  </nodes>
+                  <edges xmi:id="_9eyVUEKzEeWLeL3vtp3fLg" source="_-CYFST9rEeWhT9PZIGBGcQ" target="_-CYFSj9rEeWhT9PZIGBGcQ">
+                    <type href="../OutputMM/out.ecore#//D/refE"/>
+                  </edges>
+                  <formula xsi:type="henshin:Not" xmi:id="_FAd-EEK0EeWLeL3vtp3fLg">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_Ah9LYEK0EeWLeL3vtp3fLg">
+                      <conclusion xmi:id="_Ah9LYUK0EeWLeL3vtp3fLg">
+                        <nodes xmi:id="_Ah9LYkK0EeWLeL3vtp3fLg" name="e" incoming="_GWFGIEK0EeWLeL3vtp3fLg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_BoxpgEK0EeWLeL3vtp3fLg" name="d">
+                          <type href="../OutputMM/out.ecore#//D"/>
+                        </nodes>
+                        <nodes xmi:id="_CyIeQEK0EeWLeL3vtp3fLg" name="d1" outgoing="_GWFGIEK0EeWLeL3vtp3fLg">
+                          <type href="../OutputMM/out.ecore#//D"/>
+                        </nodes>
+                        <edges xmi:id="_GWFGIEK0EeWLeL3vtp3fLg" source="_CyIeQEK0EeWLeL3vtp3fLg" target="_Ah9LYkK0EeWLeL3vtp3fLg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_Ah9LY0K0EeWLeL3vtp3fLg" origin="_-CYFSj9rEeWhT9PZIGBGcQ" image="_Ah9LYkK0EeWLeL3vtp3fLg"/>
+                      <mappings xmi:id="_BoxpgUK0EeWLeL3vtp3fLg" origin="_-CYFST9rEeWhT9PZIGBGcQ" image="_BoxpgEK0EeWLeL3vtp3fLg"/>
+                    </child>
+                  </formula>
+                </conclusion>
+                <mappings xmi:id="_-CYFTD9rEeWhT9PZIGBGcQ" origin="_-CYFRT9rEeWhT9PZIGBGcQ" image="_-CYFSj9rEeWhT9PZIGBGcQ"/>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_-CYFTT9rEeWhT9PZIGBGcQ" name="Rhs"/>
+  </units>
+</henshin:Module>

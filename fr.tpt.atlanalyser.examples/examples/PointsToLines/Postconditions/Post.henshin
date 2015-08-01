@@ -30,4 +30,7 @@
     </lhs>
     <rhs xmi:id="_r60LcaGVEeScd_02dF9Kcg" name="Rhs"/>
   </units>
+  <units xsi:type="henshin:IteratedUnit" xmi:id="_sRhQYEaKEeWHoN-8Zk3zlg" iterations="2">
+    <subUnit xsi:type="henshin:LoopUnit" href="../Transformation/PointsToLines.henshin#_L0eho_MPEeSddcl-Te37xA"/>
+  </units>
 </henshin:Module>

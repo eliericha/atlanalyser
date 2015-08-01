@@ -1,5 +1,5 @@
--- @path IN_MM=/fr.tpt.atlanalyzer.examples/examples/SimpleCMG/InputMM/systemmodel.ecore
--- @path OUT_MM=/fr.tpt.atlanalyzer.examples/examples/SimpleCMG/OutputMM/codemodel.ecore
+-- @path IN_MM=/fr.tpt.atlanalyser.examples/examples/SimpleCMG/InputMM/systemmodel.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyser.examples/examples/SimpleCMG/OutputMM/codemodel.ecore
 -- @atlcompiler emftvm
 
 module SimpleCMG;

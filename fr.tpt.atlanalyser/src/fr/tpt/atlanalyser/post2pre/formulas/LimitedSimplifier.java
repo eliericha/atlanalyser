@@ -10,9 +10,14 @@
  *******************************************************************************/
 package fr.tpt.atlanalyser.post2pre.formulas;
 
+import java.util.List;
+
 import org.eclipse.emf.henshin.model.Formula;
 import org.eclipse.emf.henshin.model.Graph;
+import org.eclipse.emf.henshin.model.Mapping;
+import org.eclipse.emf.henshin.model.MappingList;
 import org.eclipse.emf.henshin.model.NestedCondition;
+import org.eclipse.emf.henshin.model.Node;
 
 import fr.tpt.atlanalyser.utils.NGCUtils;
 import fr.tpt.atlanalyser.utils.Utils;
@@ -67,13 +72,32 @@ public class LimitedSimplifier extends SimplifyingTransformer {
 
             // formula might have become null after the above, so getFormula()
             // again
-            if (conclusion.getFormula() == null) {
+            formula = conclusion.getFormula();
+            if (formula == null) {
                 // Check with NestedCondition::isTrue which checks if the
                 // condition morphism is surjective (in which case the condition
                 // is always true).
                 if (nc.isTrue()) {
                     onDiscardBeforeTransform(nc);
                     return NGCUtils.createTrue();
+                }
+            } else {
+                // Check if condition is surjective, in which case it is
+                // useless.
+                MappingList mappings = nc.getMappings();
+                if (mappings.isOnto(nc.getConclusion())) {
+                    List<NestedCondition> nestedConditions = NGCUtils
+                            .getNestedConditions(formula);
+                    for (NestedCondition subNc : nestedConditions) {
+                        MappingList subMappings = subNc.getMappings();
+                        for (Mapping m : subMappings) {
+                            Node parentOrigin = mappings.getOrigin(m
+                                    .getOrigin());
+                            assert parentOrigin != null;
+                            m.setOrigin(parentOrigin);
+                        }
+                    }
+                    return formula;
                 }
             }
         }

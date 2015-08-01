@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ -f atlanalyzer.out ]]; then
+if [[ -f atlanalyser.out ]]; then
   read -p "Do you want to override existing results? " yn
   case $yn in
     [Yy]* ) ;;
@@ -10,6 +10,6 @@ if [[ -f atlanalyzer.out ]]; then
 fi
 
 echo "Updating..."
-scp extlame10:/infres/s3/richa/atlanalyzer/fr.tpt.atlanalyser.examples/atlanalyzer.log atlanalyzer.out
-grep MemMon atlanalyzer.out| awk '{split($10,a,"GB"); print $1 "\t" a[1]}' > mem.csv
-grep 'queue size' atlanalyzer.out| awk '{print $1 "\t" $10}' > queue.csv
+scp extlame10:/infres/s3/richa/atlanalyser/fr.tpt.atlanalyser.examples/atlanalyser.log atlanalyser.out
+grep MemMon atlanalyser.out| awk '{split($10,a,"GB"); print $1 "\t" a[1]}' > mem.csv
+grep 'queue size' atlanalyser.out| awk '{print $1 "\t" $10}' > queue.csv

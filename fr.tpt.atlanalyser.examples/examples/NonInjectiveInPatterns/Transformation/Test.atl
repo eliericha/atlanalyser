@@ -1,5 +1,5 @@
--- @path  IN=/fr.tpt.atlanalyzer.examples/examples/NonInjectiveInPatterns/InputMM/systemmodel.ecore
--- @path OUT=/fr.tpt.atlanalyzer.examples/examples/NonInjectiveInPatterns/OutputMM/codemodel.ecore
+-- @path  IN=/fr.tpt.atlanalyser.examples/examples/NonInjectiveInPatterns/InputMM/systemmodel.ecore
+-- @path OUT=/fr.tpt.atlanalyser.examples/examples/NonInjectiveInPatterns/OutputMM/codemodel.ecore
 -- @atlcompiler emftvm
 
 module Test;

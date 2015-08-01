@@ -1,5 +1,5 @@
--- @path ER=/fr.tpt.atlanalyzer.examples/examples/ER2REL/InputMM/ER.ecore
--- @path REL=/fr.tpt.atlanalyzer.examples/examples/ER2REL/OutputMM/REL.ecore
+-- @path ER=/fr.tpt.atlanalyser.examples/examples/ER2REL/InputMM/ER.ecore
+-- @path REL=/fr.tpt.atlanalyser.examples/examples/ER2REL/OutputMM/REL.ecore
 -- @atlcompiler emftvm
 
 module ER2REL;

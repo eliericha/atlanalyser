@@ -11,12 +11,14 @@
 package fr.tpt.atlanalyser.overlapping;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,6 +34,7 @@ import org.eclipse.emf.henshin.interpreter.Engine;
 import org.eclipse.emf.henshin.interpreter.InterpreterFactory;
 import org.eclipse.emf.henshin.interpreter.Match;
 import org.eclipse.emf.henshin.interpreter.RuleApplication;
+import org.eclipse.emf.henshin.interpreter.impl.ChangeImpl;
 import org.eclipse.emf.henshin.interpreter.util.HenshinEGraph;
 import org.eclipse.emf.henshin.model.Edge;
 import org.eclipse.emf.henshin.model.Graph;
@@ -51,6 +54,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import fr.tpt.atlanalyser.ATLAnalyserRuntimeException;
 import fr.tpt.atlanalyser.post2pre.Post2Pre;
 import fr.tpt.atlanalyser.utils.DynamicMorphism;
 import fr.tpt.atlanalyser.utils.GraphCopier;
@@ -114,6 +118,10 @@ public class GraphOverlapper {
                 Pair<Morphism, Morphism> anchor, boolean excludeEmptyOverlap,
                 boolean enforceEMFConstraints, boolean fixEdgeAutoMapping,
                 Engine hengine) {
+            assert g1 == anchor.getValue0().getTarget();
+            assert g2 == anchor.getValue1().getTarget();
+            assert anchor.getValue0().getSource() == anchor.getValue1()
+                    .getSource();
             this.g1 = g1;
             this.g2 = g2;
             this.anchor = anchor;
@@ -126,7 +134,7 @@ public class GraphOverlapper {
         public GraphOverlapGenerator(Morphism m1, Morphism m2,
                 boolean excludeEmptyOverlap, boolean enforceEMFConstraints,
                 boolean fixEdgeAutoMapping) {
-            this(m1.getSource(), m2.getSource(), new Pair<Morphism, Morphism>(
+            this(m1.getTarget(), m2.getTarget(), new Pair<Morphism, Morphism>(
                     m1, m2), excludeEmptyOverlap, enforceEMFConstraints,
                     fixEdgeAutoMapping, null);
             assert m1.getSource() == m2.getSource();
@@ -398,11 +406,12 @@ public class GraphOverlapper {
 
     public static class InclusionGenerator implements Iterable<Morphism> {
 
-        private Graph     graph;
-        private Set<Node> forcedSubSet;
-        private boolean   excludeEmptySubGraph;
+        private Graph                       graph;
+        private Set<? extends GraphElement> forcedSubSet;
+        private boolean                     excludeEmptySubGraph;
 
-        public InclusionGenerator(Graph graph, Set<Node> forcedSubSet,
+        public InclusionGenerator(Graph graph,
+                Set<? extends GraphElement> forcedSubSet,
                 boolean excludeEmptySubGraph) {
             this.graph = graph;
             this.forcedSubSet = forcedSubSet;
@@ -419,18 +428,30 @@ public class GraphOverlapper {
 
     public static class InclusionIterator implements Iterator<Morphism> {
 
-        private SubSetIterator<Node> subSetIterator;
-        private Graph                graph;
-        private boolean              computedNextInclusion;
-        private Morphism             nextInclusion;
+        private SubSetIterator<GraphElement> subSetIterator;
+        private Graph                        graph;
+        private boolean                      computedNextInclusion;
+        private Morphism                     nextInclusion;
 
-        public InclusionIterator(Graph graph, Set<Node> forcedSubSet,
+        public InclusionIterator(Graph graph,
+                Set<? extends GraphElement> forcedSubSet,
                 boolean excludeEmptySubGraph) {
+            this(graph, forcedSubSet, excludeEmptySubGraph, false);
+        }
+
+        public InclusionIterator(Graph graph,
+                Set<? extends GraphElement> forcedSubSet,
+                boolean excludeEmptySubGraph, boolean includeEdges) {
             this.graph = graph;
-            Set<Node> elSet = new LinkedHashSet<Node>(graph.getNodes());
-            // elSet.addAll(graph.getEdges());
-            this.subSetIterator = new SubSetIteratorLargerFirst<Node>(elSet,
-                    forcedSubSet, excludeEmptySubGraph);
+            Set<GraphElement> elSet = Sets.newLinkedHashSet(graph.getNodes());
+            if (includeEdges) {
+                elSet.addAll(graph.getEdges());
+            }
+            if (forcedSubSet == null) {
+                forcedSubSet = Collections.emptySet();
+            }
+            this.subSetIterator = new SubSetIteratorLargerFirst<GraphElement>(
+                    elSet, Sets.newHashSet(forcedSubSet), excludeEmptySubGraph);
         }
 
         @Override
@@ -685,11 +706,20 @@ public class GraphOverlapper {
                     EClass t = entry.getKey();
                     List<EClass> superTypes = entry.getValue();
 
-                    // TODO: this solution only works if there is one
-                    // subtype
-                    assert superTypes.size() == 1;
+                    // Find the highest supertype in the type hierarchy
+                    EClass superType;
+                    Optional<EClass> optional = superTypes
+                            .stream()
+                            .filter(t1 -> superTypes.stream().allMatch(
+                                    t2 -> t1 == t2 || t1.isSuperTypeOf(t2)))
+                            .findAny();
 
-                    EClass superType = superTypes.get(0);
+                    if (optional.isPresent()) {
+                        superType = optional.get();
+                    } else {
+                        throw new ATLAnalyserRuntimeException("Unsupported");
+                    }
+
                     EList<EReference> superERefs = superType.getEReferences();
                     Graph subGraph = this.inclusion.getSource();
                     EList<Node> nodes = subGraph.getNodes(t);
@@ -715,6 +745,9 @@ public class GraphOverlapper {
             sourceToLhs = triplet.getValue1();
             targetToRhs = triplet.getValue2();
             this.conflictNodes.replaceAll(n -> sourceToLhs.getImage(n));
+            // Remove edge indexing from rule
+            rule.getLhs().getEdges().forEach(e -> e.setIndex(null));
+            rule.getRhs().getEdges().forEach(e -> e.setIndex(null));
 
             g2EGraph = new HenshinEGraph(g2);
 
@@ -762,7 +795,7 @@ public class GraphOverlapper {
         private void computeNextOverlap() {
             nextOverlap = null;
             LOGGER.trace("Finding next overlap...");
-            while (nextOverlap == null && matches.hasNext()) {
+            matches: while (nextOverlap == null && matches.hasNext()) {
                 LOGGER.trace("Found!");
                 Match match = matches.next();
                 boolean lhsMatchInvalid = !match.isValid();
@@ -790,6 +823,7 @@ public class GraphOverlapper {
                 HenshinEGraph g2CopyEGraph = new HenshinEGraph(g2Copy);
                 Match newMatch = transposeMatch(match, g2EGraph, g2CopyEGraph,
                         g2ToG2Copy);
+                Rule indexlessRule = EcoreUtil.copy(rule);
                 RuleApplication ruleApp = IF.createRuleApplication(hengine);
                 ruleApp.setUnit(rule);
                 ruleApp.setEGraph(g2CopyEGraph);
@@ -797,11 +831,16 @@ public class GraphOverlapper {
 
                 boolean success = false;
                 try {
+                    ChangeImpl.PRINT_WARNINGS = false;
                     success = ruleApp.execute(null);
-                } catch (Exception ex) {
+                    // TODO The following is a race condition
+                    // ChangeImpl.PRINT_WARNINGS = true;
+                } catch (IllegalArgumentException | ClassCastException ex) {
                     // could not execute so there must be typing issues with the
-                    // overlap
+                    // overlap. Ignore and consider the next match.
                 }
+
+                HenshinUtils.dispose(g2CopyEGraph);
 
                 if (success) {
                     Match resultMatch = ruleApp.getResultMatch();
@@ -916,6 +955,50 @@ public class GraphOverlapper {
                                             .getSource()), g2ToOverlap
                                             .getImage(edge.getTarget()), eRef);
                             g2ToOverlap.add(edge, newImage);
+                        }
+                    }
+
+                    // Check the compatibility of edge indexes with the origin
+                    // edges, if any.
+                    EList<Edge> edges = overlapGraph.getEdges();
+                    for (Edge edge : edges) {
+                        Edge o1 = g1ToOverlap.getOrigin(edge);
+                        Edge o2 = g2ToOverlap.getOrigin(edge);
+                        Integer i1 = o1 != null ? o1.getIndexConstant() : null;
+                        Integer i2 = o2 != null ? o2.getIndexConstant() : null;
+                        if (i1 != null && i2 != null) {
+                            // if both are not null, then they must be equal
+                            if (!i1.equals(i2)) {
+                                LOGGER.trace("Discarded!");
+                                continue matches;
+                            }
+                            edge.setIndex(i2.toString());
+                        } else if (i1 != null) {
+                            // if i1 is set, use it for the overlapped edge
+                            edge.setIndex(i1.toString());
+                        } else if (i2 != null) {
+                            // if i2 is set, use it for the overlapped edge
+                            edge.setIndex(i2.toString());
+                        }
+
+                        // If an index was set, check that it doesn't interfere
+                        // with other indexes of the same edge type and same
+                        // source node.
+                        Integer index = edge.getIndexConstant();
+                        if (index != null) {
+                            Node source = edge.getSource();
+                            EList<Edge> outgoing = source.getOutgoing(edge
+                                    .getType());
+                            for (Edge edge2 : outgoing) {
+                                if (edge2 != edge
+                                        && edge2.getTarget() != edge
+                                                .getTarget()
+                                        && index.equals(edge2
+                                                .getIndexConstant())) {
+                                    LOGGER.trace("Discarded!");
+                                    continue matches;
+                                }
+                            }
                         }
                     }
 

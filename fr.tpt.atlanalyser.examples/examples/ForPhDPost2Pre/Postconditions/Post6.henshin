@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_lRg2ULZIEeSyppxYUZ_STg" name="MyHenshinModule">
+  <imports href="../OutputMM/out.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_lRg2UbZIEeSyppxYUZ_STg" name="Post">
+    <lhs xmi:id="_lRg2U7ZIEeSyppxYUZ_STg" name="Post">
+      <formula xsi:type="henshin:NestedCondition" xmi:id="_lntTQAoPEeWmf9QYNRhl7w">
+        <conclusion xmi:id="_lntTQQoPEeWmf9QYNRhl7w" name="TRUE"/>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_lRg2b7ZIEeSyppxYUZ_STg" name="Rhs"/>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_uBTX0EKsEeWLeL3vtp3fLg" name="Post">
+    <lhs xmi:id="_uBTX0UKsEeWLeL3vtp3fLg" name="Post">
+      <formula xsi:type="henshin:Not" xmi:id="_vJThsEKsEeWLeL3vtp3fLg">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_uBTX0kKsEeWLeL3vtp3fLg">
+          <conclusion xmi:id="_uBTX00KsEeWLeL3vtp3fLg" name="TRUE"/>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_uBTX1EKsEeWLeL3vtp3fLg" name="Rhs"/>
+  </units>
+</henshin:Module>

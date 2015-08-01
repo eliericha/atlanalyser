@@ -15,6 +15,7 @@ import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.DoubleSummaryStatistics;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -54,10 +55,11 @@ import org.eclipse.emf.henshin.interpreter.Engine;
 import org.eclipse.emf.henshin.interpreter.InterpreterFactory;
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl;
 import org.eclipse.emf.henshin.model.Annotation;
+import org.eclipse.emf.henshin.model.BinaryFormula;
 import org.eclipse.emf.henshin.model.Formula;
 import org.eclipse.emf.henshin.model.Graph;
 import org.eclipse.emf.henshin.model.HenshinFactory;
-import org.eclipse.emf.henshin.model.HenshinPackage;
+import org.eclipse.emf.henshin.model.IndependentUnit;
 import org.eclipse.emf.henshin.model.IteratedUnit;
 import org.eclipse.emf.henshin.model.LoopUnit;
 import org.eclipse.emf.henshin.model.Mapping;
@@ -69,6 +71,7 @@ import org.eclipse.emf.henshin.model.Rule;
 import org.eclipse.emf.henshin.model.SequentialUnit;
 import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
+import org.eclipse.emf.henshin.model.util.HenshinSwitch;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 
@@ -96,8 +99,9 @@ import fr.tpt.atlanalyser.utils.Utils;
 
 public class Post2Pre {
 
-    public static final boolean                 DISABLE_ALL_DUMPING        = false;
-    public static final boolean                 KEEP_NAMES                 = true;
+    public static final boolean                 DISABLE_ALL_DUMPING        = true;
+    public static boolean                       KEEP_NAMES                 = false;
+    public static final boolean                 DUMP_AFTER_EACH_LOOPUNIT   = false;
 
     private static final Logger                 LOGGER                     = LogManager
                                                                                    .getLogger(Post2Pre.class
@@ -109,7 +113,7 @@ public class Post2Pre {
                                                                                    .getLogger("RightNCValidation");
     private static final Logger                 LEFT_NC_VALIDATION_LOGGER  = LogManager
                                                                                    .getLogger("LeftNCValidation");
-    private static Post2PreManager              manager;
+    private static final Post2PreManager        manager                    = Post2PreManager.INSTANCE;
 
     private List<Throwable>                     errors                     = Collections
                                                                                    .synchronizedList(Lists
@@ -117,38 +121,8 @@ public class Post2Pre {
     private final ReentrantReadWriteLock        resLock                    = new ReentrantReadWriteLock(
                                                                                    true);
 
-    static {
-        manager = new Post2PreManager();
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name = null;
-        try {
-            name = new ObjectName(
-                    "fr.tpt.atlanalyzer.post2pre:type=Post2PreManager");
-        } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        try {
-            mbs.registerMBean(manager, name);
-        } catch (InstanceAlreadyExistsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (MBeanRegistrationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NotCompliantMBeanException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     private static final HenshinFactory         HF                         = HenshinFactory.eINSTANCE;
 
-    private EPackage                            traceMM;
-    private EClass                              traceEClass;
     private ThreadPoolExecutor                  executor                   = null;
 
     private int                                 jobs                       = 4;
@@ -162,18 +136,17 @@ public class Post2Pre {
     private Engine[]                            henginePool;
     private AtomicInteger                       hengineIndex               = new AtomicInteger(
                                                                                    0);
+    private Collection<Unit>                    unitsToIgnore;
     private static AtomicInteger                tmpCounter                 = new AtomicInteger(
                                                                                    0);
     private static final String                 CWD                        = System.getProperty("user.dir");
 
-    public Post2Pre(EPackage traceMM) {
-        this.traceMM = traceMM;
-        if (traceMM != null) {
-            this.traceEClass = (EClass) traceMM.getEClassifier("Trace");
+    public Post2Pre(HenshinResourceSet resourceSet) {
+        if (resourceSet != null) {
+            tmpResSet = new ConcurrentResourceSet(resourceSet);
+        } else {
+            tmpResSet = new ConcurrentResourceSet();
         }
-        atlSemanticsValidator = new ATLSemanticsValidator(traceEClass);
-        tmpResSet = new ConcurrentResourceSet((HenshinResourceSet) traceMM
-                .eResource().getResourceSet());
         manager.setResourceSet(tmpResSet);
         Resource.Factory binResFact = new Resource.Factory() {
 
@@ -203,18 +176,20 @@ public class Post2Pre {
         this(null);
     }
 
-    public Post2Pre(EPackage traceMM2, int jobs) {
-        this(traceMM2);
+    public Post2Pre(HenshinResourceSet resSet, int jobs) {
+        this(resSet);
         this.jobs = jobs;
         manager.setThreadPoolSize(jobs);
     }
 
-    public Post2Pre(EPackage traceMM2, int jobs2,
+    public Post2Pre(HenshinResourceSet resSet, int jobs2,
             Map<Unit, NestedConditionValidator> unitToLeftNCValidator,
-            Map<Unit, NestedConditionValidator> unitToRightNCValidator) {
-        this(traceMM2, jobs2);
+            Map<Unit, NestedConditionValidator> unitToRightNCValidator,
+            Collection<Unit> unitsToIgnore) {
+        this(resSet, jobs2);
         this.unitToLeftNCValidator = unitToLeftNCValidator;
         this.unitToRightNCValidator = unitToRightNCValidator;
+        this.unitsToIgnore = unitsToIgnore;
     }
 
     private final class QueueMonitor implements Runnable {
@@ -312,7 +287,8 @@ public class Post2Pre {
                 NGCUtils.checkConsistency(nc);
             }
 
-            if (resultContents.isEmpty() || Utils.allDummy(resultContents)) {
+            if (resultContents.isEmpty() || Utils.allDummy(resultContents)
+                    || NGCUtils.isTrue(simplRes) || NGCUtils.isFalse(simplRes)) {
                 try {
                     ResourceSet resourceSet = resultRes.getResourceSet();
                     if (resourceSet != null) {
@@ -362,7 +338,8 @@ public class Post2Pre {
                                     && resource.isLoaded()
                                     && ((ConcurrentResource) resource)
                                             .secondsSinceLastAccessed()
-                                            - timer.elapsed(TimeUnit.SECONDS) > 3) {
+                                            - timer.elapsed(TimeUnit.SECONDS) > manager
+                                                .getSecondsOldResource()) {
                                 try {
                                     resource.save(Collections.emptyMap());
                                 } catch (IOException e) {
@@ -447,16 +424,19 @@ public class Post2Pre {
         private int                      jobCount = 0;
         private Morphism                 ruleMorphism;
         private NestedConditionValidator leftNCValidator;
+        private NestedConditionValidator rightNCValidator;
 
         public PostToLeftAC(Graph formulaHost, Morphism anchor,
                 Morphism ruleMorphism,
-                NestedConditionValidator leftNCValidator, Phaser parent,
+                NestedConditionValidator leftNCValidator,
+                NestedConditionValidator rightNCValidator, Phaser parent,
                 int[] parentId) {
             this.host = formulaHost;
             this.anchor = anchor;
             this.newHost = anchor.getTarget();
             this.ruleMorphism = ruleMorphism;
             this.leftNCValidator = leftNCValidator;
+            this.rightNCValidator = rightNCValidator;
             this.parent = parent;
             this.parentId = parentId;
         }
@@ -473,8 +453,10 @@ public class Post2Pre {
                         this.host, cdt, anchor, ruleMorphism, Triplet.with(cdt
                                 .eContainer().eResource(), cdt.eContainer(),
                                 (EReference) cdt.eContainingFeature()),
-                        leftNCValidator, jobId, parent, nextEngine);
-                manager.allOverlaps.incrementAndGet();
+                        leftNCValidator, rightNCValidator, jobId, parent,
+                        nextEngine);
+                // manager.allOverlaps.incrementAndGet();
+                // manager.getIntCounter("AllOverlaps").incrementAndGet();
                 executor.execute(graphOverlapTask);
             }
             return cdt;
@@ -482,30 +464,34 @@ public class Post2Pre {
     }
 
     public Formula postToLeftAC(Formula post, Rule rule,
-            NestedConditionValidator rightACValidator,
-            NestedConditionValidator leftACValidator) {
+            NestedConditionValidator leftACValidator,
+            NestedConditionValidator rightACValidator) {
         Formula leftAC = postToLeftACParallel(post, rule, jobs,
-                rightACValidator, leftACValidator);
+                leftACValidator, rightACValidator);
 
         return leftAC;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Formula postToLeftACParallel(Formula post, Rule rule,
-            int numThreads, NestedConditionValidator rightACValidator,
-            NestedConditionValidator leftACValidator) {
+            int numThreads, NestedConditionValidator leftACValidator,
+            NestedConditionValidator rightACValidator) {
         // Initialize executor
         LOGGER.debug("Initializing executor with {} threads",
                 manager.getThreadPoolSize());
         queue = new ManagedJobQueue();
-        executor = new ThreadPoolExecutor(manager.getThreadPoolSize(),
-                manager.getThreadPoolSize(), 1, TimeUnit.SECONDS, queue);
+        if (executor == null) {
+            executor = new ThreadPoolExecutor(manager.getThreadPoolSize(),
+                    manager.getThreadPoolSize(), 1, TimeUnit.SECONDS, queue);
+        }
         manager.setExecutor(executor);
 
         // Initialize pool of Henshin engines
-        henginePool = new Engine[jobs];
-        for (int i = 0; i < henginePool.length; i++) {
-            henginePool[i] = InterpreterFactory.INSTANCE.createEngine();
+        if (henginePool == null) {
+            henginePool = new Engine[jobs];
+            for (int i = 0; i < henginePool.length; i++) {
+                henginePool[i] = InterpreterFactory.INSTANCE.createEngine();
+            }
         }
 
         ScheduledExecutorService monitorExecutor = Executors
@@ -515,15 +501,15 @@ public class Post2Pre {
 
         Formula leftAC = null;
         try {
-            leftAC = postToLeftACInternal(post, rule, rightACValidator,
-                    leftACValidator);
+            leftAC = postToLeftACInternal(post, rule, leftACValidator,
+                    rightACValidator);
         } finally {
             monitorExecutor.shutdown();
-            executor.shutdown();
+            // executor.shutdown();
             try {
-                executor.awaitTermination(10, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {
-                throw new ATLAnalyserRuntimeException(e);
+                // executor.awaitTermination(10, TimeUnit.SECONDS);
+                // } catch (InterruptedException e) {
+                // throw new ATLAnalyserRuntimeException(e);
             } finally {
                 if (errors.size() > 0) {
                     for (Throwable ex : errors) {
@@ -531,10 +517,10 @@ public class Post2Pre {
                     }
                 }
                 manager.setExecutor(null);
-                for (Engine e : henginePool) {
-                    e.shutdown();
-                }
-                henginePool = null;
+                // for (Engine e : henginePool) {
+                // e.shutdown();
+                // }
+                // henginePool = null;
             }
         }
 
@@ -550,8 +536,8 @@ public class Post2Pre {
      * @return
      */
     private Formula postToLeftACInternal(Formula post, Rule rule,
-            NestedConditionValidator rightACValidator,
-            NestedConditionValidator leftACValidator) {
+            NestedConditionValidator leftACValidator,
+            NestedConditionValidator rightACValidator) {
         // The postcondition is contained in an empty host graph
         Graph hostGraph = NGCUtils.getHostGraph(post);
         hostGraph = (Graph) EcoreUtil.resolve(hostGraph, tmpResSet);
@@ -561,13 +547,13 @@ public class Post2Pre {
 
         Morphism ruleMorphism = new Morphism(rule);
 
-        Resource eResource = hostGraph.eResource();
-        assert eResource != null;
+        // Resource eResource = hostGraph.eResource();
+        // assert eResource != null;
         Phaser completionBarrier = new Phaser(1);
 
         Formula leftAC = new PostToLeftAC(hostGraph, anchor, ruleMorphism,
-                leftACValidator, completionBarrier, new int[] {})
-                .transform(post);
+                leftACValidator, rightACValidator, completionBarrier,
+                new int[] {}).transform(post);
         int result;
         result = completionBarrier.arriveAndAwaitAdvance();
         if (result < 0) {
@@ -633,78 +619,82 @@ public class Post2Pre {
      * 
      * @return
      */
-    public static Formula leftACToForAllConstraint(Rule rule) {
-        Graph emptyGraph = HF.createGraph();
-        // We need to construct not (exists (LHS, not (leftAC)))
-        Not not = HF.createNot();
-        NestedCondition nc = HF.createNestedCondition();
-        Not subNot = HF.createNot();
-        emptyGraph.setFormula(not);
-        not.setChild(nc);
-        Graph lhsCopy = CopierWithResolveErrorNotification.copy(rule.getLhs());
-        nc.setConclusion(lhsCopy);
-        Formula leftAC = lhsCopy.getFormula() != null ? lhsCopy.getFormula()
-                : NGCUtils.createTrue();
-        subNot.setChild(leftAC);
-        lhsCopy.setFormula(subNot);
-        return not;
+    public static Formula leftACToForAllConstraint(Rule rule, Formula leftAC,
+            NestedConditionValidator ncValidator) {
+        Preconditions.checkArgument(!rule.eIsProxy());
+        Preconditions.checkArgument(!leftAC.eIsProxy());
+
+        Graph emptyGraph = NGCUtils.getHostGraph(leftAC);
+        assert emptyGraph.getNodes().isEmpty()
+                && emptyGraph.getEdges().isEmpty();
+
+        // We need to construct forAll (LHS, leftAC)
+        // which is not ( exists (LHS, not (leftAC)))
+        NestedCondition cst = HF.createNestedCondition();
+        emptyGraph.setFormula(NGCUtils.negate(cst));
+        Graph lhs = rule.getLhs();
+        cst.setConclusion(lhs);
+        Not notLeftAC = NGCUtils.negate(leftAC);
+        lhs.setFormula(notLeftAC);
+
+        // Simplify result
+        emptyGraph.setFormula(new LimitedSimplifier(1).transform(emptyGraph
+                .getFormula()));
+
+        return emptyGraph.getFormula();
     }
 
     public Formula post2Pre(Formula post, Rule rule) {
         return post2Pre(post, rule, 1, true);
     }
 
-    private static int                  i = 0;
-    private final ATLSemanticsValidator atlSemanticsValidator;
-    private XMLParserPool               xmlParserPool;
+    private static int    i = 0;
+    private XMLParserPool xmlParserPool;
 
-    public class Post2PreForUnits {
+    public class Wlp extends HenshinSwitch<Formula> {
 
         private Formula                  post;
         private int                      maxIterationsForLoops;
         private boolean                  doIntermediateSimplifications;
-        private EPackage                 traceMM;
-        private NestedConditionValidator ncValidator;
+        private NestedConditionValidator leftValidator;
+        private NestedConditionValidator rightValidator;
+        private boolean                  withIterationBound;
 
-        public Post2PreForUnits(Formula postcondition,
-                int maxIterationsForLoops,
-                boolean doIntermediateSimplifications, EPackage traceMM,
-                NestedConditionValidator ncValidator) {
+        public Wlp(Formula postcondition, int maxIterationsForLoops,
+                NestedConditionValidator leftValidator,
+                NestedConditionValidator rightValidator,
+                boolean withIterationBound) {
             this.post = postcondition;
             this.maxIterationsForLoops = maxIterationsForLoops;
-            this.doIntermediateSimplifications = doIntermediateSimplifications;
-            this.traceMM = traceMM;
-            this.ncValidator = ncValidator;
+            this.leftValidator = leftValidator;
+            this.rightValidator = rightValidator;
+            this.withIterationBound = withIterationBound;
         }
 
-        public Post2PreForUnits(Formula postcondition,
-                int maxIterationsForLoops, boolean doIntermediateSimplifications) {
-            this(postcondition, maxIterationsForLoops,
-                    doIntermediateSimplifications, null, null);
+        public Wlp(Formula postcondition, int maxIterationsForLoops,
+                boolean doIntermediateSimplifications,
+                boolean withIterationBound) {
+            this(postcondition, maxIterationsForLoops, null, null,
+                    withIterationBound);
         }
 
-        public Formula compute(Unit unit) {
-            return this.doSwitch(unit);
-        }
-
-        private Formula doSwitch(Unit unit) {
-            int classifierID = unit.eClass().getClassifierID();
-            switch (classifierID) {
-            case HenshinPackage.SEQUENTIAL_UNIT:
-                return caseSequentialUnit((SequentialUnit) unit);
-            case HenshinPackage.LOOP_UNIT:
-                return caseLoopUnit((LoopUnit) unit);
-            case HenshinPackage.ITERATED_UNIT:
-                return caseIteratedUnit((IteratedUnit) unit);
-            case HenshinPackage.RULE:
-                return caseRule((Rule) unit);
-            default:
-                throw new UnsupportedOperationException("Not implemented for "
-                        + unit);
+        @Override
+        public Formula doSwitch(EObject theEObject) {
+            if (unitsToIgnore.contains(theEObject)) {
+                manager.metrics.put("Unit", ((Unit) theEObject).getName());
+                manager.getIntCounter("AllOverlaps").set(-1);
+                manager.dumpMetrics();
+                if (leftValidator != null) {
+                    post = new FormulaFilter(leftValidator).transform(post);
+                }
+                return post;
+            } else {
+                return super.doSwitch(theEObject);
             }
         }
 
-        private Formula caseRule(Rule object) {
+        @Override
+        public Formula caseRule(Rule object) {
             LOGGER.info("Processing rule {}", object);
             Stopwatch fullTimer = Stopwatch.createStarted();
 
@@ -721,9 +711,23 @@ public class Post2Pre {
             LOGGER.info("Post2LeftAC...");
             Stopwatch timer = Stopwatch.createStarted();
 
-            manager.allOverlaps.set(0);
-            manager.performedOverlaps.set(0);
-            Formula leftAC = postToLeftAC(post, rule, null, ncValidator);
+            this.rightValidator = this.rightValidator != null ? this.rightValidator
+                    : unitToRightNCValidator.get(object);
+
+            post = new LimitedSimplifier(1).transform(post);
+            oldHostGraph.setFormula(post);
+
+            Formula leftAC = null;
+            boolean old = false;
+            // old = false;
+            if (old) {
+                leftAC = postToLeftAC(post, rule, leftValidator, rightValidator);
+            } else {
+                leftAC = new Post2Left(new Morphism(rule), new Morphism(
+                        NGCUtils.getHostGraph(post), rule.getRhs()),
+                        leftValidator, rightValidator, jobs).transform(post);
+            }
+
             LOGGER.info("Done Post2LeftAC in " + timer.stop());
 
             timer.reset().start();
@@ -749,7 +753,22 @@ public class Post2Pre {
                 }
             }.transform(leftAC);
 
-            Formula pre = leftACToExistsConstraint(rule, leftAC, ncValidator);
+            // Filter existing LHS formula
+            Formula lhsFormula = rule.getLhs().getFormula();
+            if (leftValidator != null) {
+                lhsFormula = new FormulaFilter(leftValidator)
+                        .transform(lhsFormula);
+            }
+
+            Formula implication = NGCUtils.createDisjunction(
+                    NGCUtils.negate(lhsFormula), leftAC);
+
+            oldHostGraph.setFormula(implication);
+
+            // Formula pre = leftACToExistsConstraint(rule, leftAC,
+            // ncValidator);
+            Formula pre = leftACToForAllConstraint(rule, implication,
+                    leftValidator);
             LOGGER.info("Done LeftAC2Pre in " + timer.stop());
 
             assert ruleRes.getContents().size() == 1;
@@ -771,93 +790,334 @@ public class Post2Pre {
             return pre;
         }
 
-        private Formula caseSequentialUnit(SequentialUnit object) {
+        @Override
+        public Formula caseSequentialUnit(SequentialUnit object) {
             LOGGER.info("Processing sequence {}", object);
             Formula pre = post;
             List<Unit> subUnits = Lists.newArrayList(object.getSubUnits());
             Collections.reverse(subUnits);
             for (Unit unit : subUnits) {
-                pre = new Post2PreForUnits(pre, maxIterationsForLoops,
-                        doIntermediateSimplifications, traceMM, ncValidator)
-                        .doSwitch(unit);
+                pre = new Wlp(pre, maxIterationsForLoops, leftValidator,
+                        rightValidator, withIterationBound).doSwitch(unit);
             }
             return pre;
         }
 
-        private Formula caseIteratedUnit(IteratedUnit object) {
+        @Override
+        public Formula caseIteratedUnit(IteratedUnit object) {
             LOGGER.info("Processing bounded iteration {}", object);
             int nIterations = Integer.parseInt(object.getIterations());
             Formula pre = post;
             for (int i = 0; i < nIterations; i++) {
-                pre = new Post2PreForUnits(pre, maxIterationsForLoops,
-                        doIntermediateSimplifications, traceMM, ncValidator)
-                        .doSwitch(object.getSubUnit());
+                pre = new Wlp(pre, maxIterationsForLoops, leftValidator,
+                        rightValidator, withIterationBound).doSwitch(object
+                        .getSubUnit());
             }
             return pre;
         }
 
-        private Formula caseLoopUnit(LoopUnit object) {
+        @Override
+        public Formula caseIndependentUnit(IndependentUnit object) {
+            EList<Unit> subUnits = object.getSubUnits();
+
+            List<Formula> preconditions = Lists.newArrayList();
+
+            for (Unit unit : subUnits) {
+                Graph newHostGraph = HF.createGraph();
+                Resource newRes = createResourceWithObj(newHostGraph);
+                Formula newPost = CopierWithResolveErrorNotification.copy(post);
+                newHostGraph.setFormula(newPost);
+                Formula newPre = new Wlp(newPost, maxIterationsForLoops,
+                        leftValidator, rightValidator, withIterationBound)
+                        .doSwitch(unit);
+
+                preconditions.add(newPre);
+            }
+
+            Formula result = NGCUtils.createConjunction(preconditions);
+
+            return result;
+        }
+
+        @Override
+        public Formula caseLoopUnit(LoopUnit object) {
             LOGGER.info("Processing unbounded loop {}", object);
-            Formula pre = post;
-            Graph hostGraph = NGCUtils.getHostGraph(pre);
+
+            manager.metrics.put("Unit", object.getName());
+            Stopwatch timer = Stopwatch.createStarted();
+
+            // initialise counters if they don't exist
+            manager.getIntCounter("AllOverlaps");
+            manager.getIntCounter("ATLSemFilter");
+            manager.getIntCounter("NoPushoutFilter");
+            manager.getIntCounter("LeftNCFilter");
+
+            List<NestedCondition> postNCs = NGCUtils
+                    .getAllNestedConditions(post);
+            manager.metrics.put("PostSize", postNCs.size());
+
+            DoubleSummaryStatistics numNodesStat = postNCs.stream()
+                    .mapToDouble(nc -> nc.getConclusion().getNodes().size())
+                    .summaryStatistics();
+            DoubleSummaryStatistics numEdgesStat = postNCs.stream()
+                    .mapToDouble(nc -> nc.getConclusion().getEdges().size())
+                    .summaryStatistics();
+            DoubleSummaryStatistics graphSizeStat = postNCs
+                    .stream()
+                    .mapToDouble(
+                            nc -> nc.getConclusion().getNodes().size()
+                                    + nc.getConclusion().getEdges().size())
+                    .summaryStatistics();
+
+            manager.metrics.put("PostGraphSizeAvg", graphSizeStat.getAverage());
+            manager.metrics.put("PostNodesAvg", numNodesStat.getAverage());
+            manager.metrics.put("PostEdgesAvg", numEdgesStat.getAverage());
+
+            manager.getIntCounter("PerformedOverlaps");
+            manager.resetCounters();
+
+            Formula originalPost = CopierWithResolveErrorNotification
+                    .copy(post);
+            Graph emptyGraph = HF.createGraph();
+            emptyGraph.setFormula(originalPost);
+            createResourceWithObj(emptyGraph);
+
+            Formula pre;
+            boolean doImplication = true;
+            if (doImplication) {
+                Resource eResource = post.eResource();
+                Graph g = HF.createGraph("Plop");
+                eResource.getContents().add(g);
+                g.setFormula(NGCUtils.createFalse());
+
+                Formula wlpFalse = new Wlp(g.getFormula(),
+                        maxIterationsForLoops, null, rightValidator,
+                        withIterationBound).doSwitch(object.getSubUnit());
+
+                // Formula wlpFalse = leftACToForAllConstraint(
+                // (Rule) EcoreUtil.copy(object.getSubUnit()), g.getFormula(),
+                // null);
+
+                Formula implication = NGCUtils.createDisjunction(
+                        NGCUtils.negate(wlpFalse), post);
+                // implication = new
+                // LimitedSimplifier(1).transform(implication);
+                pre = implication;
+                // Formula pre = post;
+                g.setFormula(pre);
+                // Formula pre = post;
+            } else {
+                pre = post;
+            }
+
+            Formula result = caseInfiniteLoop(object, pre,
+                    maxIterationsForLoops - 1);
+
+            // construct N applications of the subunit
+            SequentialUnit seq = HF.createSequentialUnit();
+            for (int i = 0; i < maxIterationsForLoops; i++) {
+                seq.getSubUnits().add(object.getSubUnit());
+            }
+
+            NestedConditionValidator leftValidator = unitToLeftNCValidator
+                    .get(object);
+            NestedConditionValidator rightValidator = unitToRightNCValidator
+                    .get(object);
+            Formula lastPre = new Wlp(originalPost, maxIterationsForLoops,
+                    leftValidator, rightValidator, withIterationBound)
+                    .doSwitch(seq);
+
+            result = NGCUtils.createConjunction(result, lastPre);
+
+            // Unit subUnit = object.getSubUnit();
+            //
+            // Graph cdtGraph = HF.createGraph();
+            // createResourceWithObj(cdtGraph);
+            // cdtGraph.setName("LimitExecutionsOf" + subUnit.getName());
+            // Formula ffalse = NGCUtils.createFalse();
+            // cdtGraph.setFormula(ffalse);
+            //
+            // Formula wlpFalse = new Wlp(ffalse, maxIterationsForLoops,
+            // doIntermediateSimplifications, traceMM, null,
+            // withIterationBound).doSwitch(object.getSubUnit());
+            //
+            // Formula implication = NGCUtils.createDisjunction(
+            // NGCUtils.negate(wlpFalse), NGCUtils.createFalse());
+            // cdtGraph.setFormula(implication);
+            // // Formula pre = post;
+            //
+            // Formula existanceResult =
+            // NGCUtils.negate(caseInfiniteLoop(object,
+            // implication));
+
+            // result = NGCUtils.createConjunction(existanceResult, result);
+
+            boolean useWlpFalse = true;
+            if (withIterationBound && !useWlpFalse) {
+                // Add condition that limits matches of the iterated rule
+                Rule rule = (Rule) object.getSubUnit();
+                Graph lhs = rule.getLhs();
+                Graph cdtGraph = HF.createGraph();
+                cdtGraph.setName("LimitMatchesOf" + rule.getName());
+                for (int i = 0; i < maxIterationsForLoops + 1; i++) {
+                    Graph lhsCopy = CopierWithResolveErrorNotification
+                            .copy(lhs);
+                    cdtGraph.getNodes().addAll(lhsCopy.getNodes());
+                    cdtGraph.getEdges().addAll(lhsCopy.getEdges());
+                    if (lhsCopy.getFormula() != null) {
+                        cdtGraph.setFormula(NGCUtils.createConjunction(
+                                cdtGraph.getFormula(), lhsCopy.getFormula()));
+                    }
+                }
+                Not neg = HF.createNot();
+                NestedCondition nc = HF.createNestedCondition();
+                neg.setChild(nc);
+                nc.setConclusion(cdtGraph);
+
+                Formula filteredNeg = neg;
+                if (leftValidator != null) {
+                    filteredNeg = new FormulaFilter(leftValidator)
+                            .transform(neg);
+                }
+
+                result = NGCUtils.createConjunction(filteredNeg, result);
+            } else if (withIterationBound && useWlpFalse) {
+                Unit subUnit = object.getSubUnit();
+                IteratedUnit iteratedUnit = HF.createIteratedUnit();
+                iteratedUnit.setSubUnit(subUnit);
+                iteratedUnit.setIterations(Integer
+                        .toString(maxIterationsForLoops + 1));
+
+                Graph cdtGraph = HF.createGraph();
+                createResourceWithObj(cdtGraph);
+                cdtGraph.setName("LimitExecutionsOf" + subUnit.getName());
+                Formula ffalse = NGCUtils.createFalse();
+                cdtGraph.setFormula(ffalse);
+                Formula execLimit = new Wlp(ffalse, maxIterationsForLoops,
+                        leftValidator, rightValidator, withIterationBound)
+                        .doSwitch(iteratedUnit);
+
+                result = NGCUtils.createConjunction(execLimit, result);
+            }
+
+            emptyGraph.setFormula(result);
+            result = new LimitedSimplifier(1).transform(result);
+
+            emptyGraph.setFormula(result);
+
+            if (DUMP_AFTER_EACH_LOOPUNIT) {
+                Resource res = tmpResSet.createResource(URI.createFileURI(CWD
+                        + "/" + Integer.toString(i++) + "_" + object.getName()
+                        + ".xmi"));
+                res.getContents().add(EcoreUtil.copy(result));
+                try {
+                    res.save(Collections.emptyMap());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                res.unload();
+            }
+
+            // manager.ruleDurationMillis.set(timer.stop().elapsed(
+            // TimeUnit.MILLISECONDS));
+            manager.metrics.put("RuleDurationMillis",
+                    timer.stop().elapsed(TimeUnit.MILLISECONDS));
+
+            // manager.preSize.set(NGCUtils.getAllNestedConditions(result).size());
+            List<NestedCondition> preNCs = NGCUtils
+                    .getAllNestedConditions(result);
+            manager.metrics.put("PreSize", preNCs.size());
+            numNodesStat = preNCs.stream()
+                    .mapToDouble(nc -> nc.getConclusion().getNodes().size())
+                    .summaryStatistics();
+            numEdgesStat = preNCs.stream()
+                    .mapToDouble(nc -> nc.getConclusion().getEdges().size())
+                    .summaryStatistics();
+            graphSizeStat = preNCs
+                    .stream()
+                    .mapToDouble(
+                            nc -> nc.getConclusion().getNodes().size()
+                                    + nc.getConclusion().getEdges().size())
+                    .summaryStatistics();
+
+            manager.metrics.put("PreGraphSizeAvg", graphSizeStat.getAverage());
+            manager.metrics.put("PreNodesAvg", numNodesStat.getAverage());
+            manager.metrics.put("PreEdgesAvg", numEdgesStat.getAverage());
+
+            // manager.dumpCounters(object.getName());
+            manager.dumpMetrics();
+
+            return result;
+        }
+
+        private Formula caseInfiniteLoop(LoopUnit object, Formula postCdt,
+                int maxIterations) {
+            Graph hostGraph = NGCUtils.getHostGraph(postCdt);
             hostGraph = (Graph) EcoreUtil.resolve(hostGraph, tmpResSet);
 
             // copy postcondition for final result
             Formula originalPost = CopierWithResolveErrorNotification
-                    .copy(post);
+                    .copy(postCdt);
+
+            NestedConditionValidator preValidator = unitToLeftNCValidator
+                    .get(object);
+
+            if (preValidator != null) {
+                originalPost = new FormulaFilter(preValidator)
+                        .transform(originalPost);
+            }
+
+            // if (originalPost instanceof Or) {
+            // Or or = (Or) originalPost;
+            // originalPost = or.getRight();
+            // }
             originalPost = dumpToFile(originalPost);
 
-            // init result with a copy of the precondition
+            // init result with a copy of the postcondition
             Graph resultHostGraph = HF.createGraph();
             createResourceWithObj(resultHostGraph);
             resultHostGraph.setName("Pre_" + object.getName());
             Formula result = originalPost;
             resultHostGraph.setFormula(result);
 
-            for (int i = 0; i < maxIterationsForLoops; i++) {
+            for (int i = 0; i < maxIterations; i++) {
                 // unloadTmpFilesExcept(pre.eResource());
                 NestedConditionValidator validator = null;
-                if (i == maxIterationsForLoops - 1
-                        && unitToLeftNCValidator.containsKey(object)) {
-                    // apply the validator only at the last iteration of the
-                    // subunit
-                    validator = unitToLeftNCValidator.get(object);
-                }
-                pre = new Post2PreForUnits(pre, maxIterationsForLoops,
-                        doIntermediateSimplifications, traceMM, validator)
-                        .doSwitch(object.getSubUnit());
 
-                // if this is the last iteration, filter the previous result
-                // with the validator if any
-                if (i == maxIterationsForLoops - 1 && validator != null) {
-                    result = (Formula) EcoreUtil.resolve(result, tmpResSet);
-                    result = new FormulaFilter(validator).transform(result);
-                }
+                // apply the validator only at the last iteration of the
+                // subunit
+                validator = i == maxIterations - 1 ? preValidator : null;
+                postCdt = new Wlp(postCdt, maxIterations, validator,
+                        rightValidator, withIterationBound).doSwitch(object
+                        .getSubUnit());
 
-                if (i < maxIterationsForLoops - 1) {
-                    // If there is a next iteration, store a copy of pre in the
-                    // disjuntion because the next iteration will modify pre
-                    result = NGCUtils.createDisjunction(result,
-                            CopierWithResolveErrorNotification.copy(pre));
-                } else {
-                    result = NGCUtils.createDisjunction(result, pre);
-                }
                 resultHostGraph = (Graph) EcoreUtil.resolve(resultHostGraph,
                         tmpResSet);
+                if (i < maxIterations - 1) {
+                    // If there is a next iteration, store a copy of postCdt in
+                    // the conjunction because the next iteration will modify
+                    // postCdt. The copy should be filtered.
+                    Formula postCdtCopy = CopierWithResolveErrorNotification
+                            .copy(postCdt);
+                    if (preValidator != null) {
+                        postCdtCopy = new FormulaFilter(preValidator)
+                                .transform(postCdtCopy);
+                    }
+                    result = NGCUtils.createConjunction(result, postCdtCopy);
+                } else {
+                    result = NGCUtils.createConjunction(result, postCdt);
+                }
                 resultHostGraph.setFormula(result);
+
+                if (NGCUtils.isTrue(postCdt)) {
+                    break;
+                }
             }
 
-            // Resource res = tmpResSet.createResource(URI.createFileURI(CWD +
-            // "/"
-            // + Integer.toString(i++) + "_" + object.getName() + ".xmi"));
-            // res.getContents().add(EcoreUtil.copy(result));
-            // try {
-            // res.save(Collections.emptyMap());
-            // } catch (IOException e) {
-            // e.printStackTrace();
-            // throw new RuntimeException(e);
-            // }
-            // res.unload();
+            result = (Formula) EcoreUtil.resolve(result, tmpResSet);
+            result = new LimitedSimplifier(0).transform(result);
+            resultHostGraph.setFormula(result);
 
             return result;
         }
@@ -865,7 +1125,7 @@ public class Post2Pre {
 
     class PostToLeftACTask implements Runnable, IWithId {
 
-        private NestedCondition                        cdt;
+        private NestedCondition                        post;
         private Graph                                  host;
         private int[]                                  id;
         private CompletionBarrier                      completionBarrier;
@@ -873,6 +1133,7 @@ public class Post2Pre {
         private Morphism                               anchor;
         private Morphism                               ruleMorphism;
         private NestedConditionValidator               leftNCValidator;
+        private NestedConditionValidator               rightNCValidator;
         private Engine                                 hengine;
         private Resource                               ncRes;
         private Resource                               hostRes;
@@ -883,11 +1144,14 @@ public class Post2Pre {
         public PostToLeftACTask(Graph host, NestedCondition cdt,
                 Morphism anchor, Morphism ruleMorphism,
                 Triplet<Resource, EObject, EReference> destination,
-                NestedConditionValidator leftNCValidator, int[] id,
+                NestedConditionValidator leftNCValidator,
+                NestedConditionValidator rightNCValidator, int[] id,
                 Phaser parent, Engine hengine) {
+            manager.getIntCounter("AllOverlaps").incrementAndGet();
+
             this.ncRes = cdt.eResource();
-            this.cdt = Utils.createProxy(cdt);
-            if (!EcoreUtil.getURI(this.cdt).trimFragment()
+            this.post = Utils.createProxy(cdt);
+            if (!EcoreUtil.getURI(this.post).trimFragment()
                     .equals(this.ncRes.getURI())) {
                 LOGGER.error("Error");
             }
@@ -918,7 +1182,10 @@ public class Post2Pre {
                     ruleMorphism.getSource().eResource(),
                     ruleMorphism.getTarget().eResource() };
             this.ruleMorphism = ruleMorphism.proxify();
-            this.leftNCValidator = leftNCValidator;
+            this.leftNCValidator = leftNCValidator != null ? leftNCValidator
+                    : NestedConditionValidator.TRUE;
+            this.rightNCValidator = rightNCValidator != null ? rightNCValidator
+                    : NestedConditionValidator.TRUE;
             this.hengine = hengine;
         }
 
@@ -956,12 +1223,12 @@ public class Post2Pre {
             EList<EObject> contents = newRes.getContents();
 
             List<NestedCondition> result = Lists.newArrayList();
-            completionBarrier = new CompletionBarrier(result, cdt, destination,
-                    parent, this.id, newRes, hostRes);
+            completionBarrier = new CompletionBarrier(result, post,
+                    destination, parent, this.id, newRes, hostRes);
             completionBarrier.register();
 
             Graph rightHost = anchor.getTarget();
-            Graph conclusion = cdt.getConclusion();
+            Graph postConclusion = post.getConclusion();
 
             OVRLP_LOGGER.trace("Starting Overlapping");
             Stopwatch timer = Stopwatch.createStarted();
@@ -971,18 +1238,18 @@ public class Post2Pre {
             Graph rightHostCopy = rightHostToRightHostCopy.getTarget();
             Morphism anchorCopy = anchor.compose(rightHostToRightHostCopy);
 
-            Morphism a = new Morphism(cdt, host);
-            Formula nestedFormula = conclusion.getFormula();
+            Morphism a = new Morphism(post, host);
+            Formula nestedPost = postConclusion.getFormula();
 
-            Morphism concToConcCopy = GraphCopier.copy(conclusion);
-            Graph concCopy = concToConcCopy.getTarget();
+            Morphism concToConcCopy = GraphCopier.copy(postConclusion);
+            Graph postConcCopy = concToConcCopy.getTarget();
             Morphism aCopy = a.compose(concToConcCopy);
 
             boolean excludeEmptyOverlap = false;
             boolean enforceEMFConstraints = true;
             boolean preventEdgeAutoMapping = false;
             GraphOverlapGenerator overlaps = new GraphOverlapGenerator(
-                    rightHostCopy, concCopy, new Pair<Morphism, Morphism>(
+                    rightHostCopy, postConcCopy, new Pair<Morphism, Morphism>(
                             anchorCopy, aCopy), excludeEmptyOverlap,
                     enforceEMFConstraints, preventEdgeAutoMapping, hengine);
 
@@ -990,144 +1257,154 @@ public class Post2Pre {
                     .newArrayList();
             Iterator<Pair<Morphism, Morphism>> overlapIterator = overlaps
                     .iterator();
-            try {
-                List<PostToLeftACTask> subTasks = Lists.newArrayList();
-                while (overlapIterator.hasNext()) {
-                    Pair<Morphism, Morphism> pair = overlapIterator.next();
-                    Morphism rightHostCopyToOverlap = pair.getValue0();
-                    Morphism newRightCdtMorphism = rightHostToRightHostCopy
-                            .compose(rightHostCopyToOverlap);
+            while (overlapIterator.hasNext()) {
+                Pair<Morphism, Morphism> pair = overlapIterator.next();
+                Morphism rightHostCopyToOverlap = pair.getValue0();
+                Morphism newRightCdtMorphism = rightHostToRightHostCopy
+                        .compose(rightHostCopyToOverlap);
 
-                    NestedCondition newRightCdt = NGCUtils
-                            .createNestedCondition(newRightCdtMorphism);
+                NestedCondition newRightCdt = NGCUtils
+                        .createNestedCondition(newRightCdtMorphism);
 
-                    Graph newConclusion = newRightCdt.getConclusion();
+                Graph newRightConclusion = newRightCdt.getConclusion();
 
-                    if (!atlSemanticsValidator.isValid(newRightCdt)
-                            || !atlSemanticsValidator.isTraceValid(pair)) {
-                        RIGHT_NC_VALIDATION_LOGGER
-                                .debug("ATL semantics violation");
+                if (!rightNCValidator.isValid(newRightCdt)) {
+                    // manager.atlSemanticsFilter.incrementAndGet();
+                    manager.getIntCounter("ATLSemFilter").incrementAndGet();
+                    RIGHT_NC_VALIDATION_LOGGER.debug("ATL semantics violation");
+                } else {
+                    Pair<Morphism, Morphism> pushoutComplement;
+                    synchronized (parent) {
+                        pushoutComplement = Morphism.getPushoutComplement(
+                                ruleMorphism, newRightCdtMorphism);
+                    }
+
+                    if (pushoutComplement == null) {
+                        // manager.noPushoutFilter.incrementAndGet();
+                        manager.getIntCounter("NoPushoutFilter")
+                                .incrementAndGet();
+                        LEFT_NC_VALIDATION_LOGGER
+                                .debug("No pushout complement");
                     } else {
-
-                        Pair<Morphism, Morphism> pushoutComplement;
-                        synchronized (parent) {
-                            pushoutComplement = Morphism.getPushoutComplement(
-                                    ruleMorphism, newRightCdtMorphism);
+                        Morphism newLeftCdtMorphism = pushoutComplement
+                                .getValue0();
+                        NestedCondition newLeftCdt = NGCUtils
+                                .createNestedCondition(newLeftCdtMorphism);
+                        if (KEEP_NAMES) {
+                            newLeftCdt.getConclusion().setName(
+                                    "L("
+                                            + newRightCdtMorphism.getTarget()
+                                                    .getName() + ")");
                         }
 
-                        if (pushoutComplement == null) {
+                        if (leftNCValidator != null
+                                && !leftNCValidator.isValid(newLeftCdt)) {
+                            // manager.leftNCFilter.incrementAndGet();
+                            manager.getIntCounter("LeftNCFilter")
+                                    .incrementAndGet();
                             LEFT_NC_VALIDATION_LOGGER
-                                    .debug("No pushout complement");
+                                    .debug("Removing invalid NC");
                         } else {
-                            Morphism newLeftCdtMorphism = pushoutComplement
-                                    .getValue0();
-                            NestedCondition newLeftCdt = NGCUtils
-                                    .createNestedCondition(newLeftCdtMorphism);
-                            if (KEEP_NAMES) {
-                                newLeftCdt.getConclusion().setName(
-                                        "L("
-                                                + newRightCdtMorphism
-                                                        .getTarget().getName()
-                                                + ")");
-                            }
+                            contents.add(newLeftCdt);
+                            result.add(Utils.createProxy(newLeftCdt));
+                            if (nestedPost != null) {
+                                contents.add(newRightCdt);
+                                Morphism newAnchorCopy = pair.getValue1();
+                                Morphism newAnchor = concToConcCopy
+                                        .compose(newAnchorCopy);
+                                Morphism newRuleMorphism = pushoutComplement
+                                        .getValue1();
 
-                            if (leftNCValidator != null
-                                    && !leftNCValidator.isValid(newLeftCdt)) {
-                                LEFT_NC_VALIDATION_LOGGER
-                                        .debug("Removing invalid NC");
-                            } else {
-                                contents.add(newLeftCdt);
-                                result.add(Utils.createProxy(newLeftCdt));
-                                if (nestedFormula != null) {
-                                    contents.add(newRightCdt);
-                                    Morphism newAnchorCopy = pair.getValue1();
-                                    Morphism newAnchor = concToConcCopy
-                                            .compose(newAnchorCopy);
-                                    Morphism newRuleMorphism = pushoutComplement
-                                            .getValue1();
+                                Triplet<NestedCondition, Morphism, Morphism> validOverlap = Triplet
+                                        .with(newLeftCdt, newAnchor,
+                                                newRuleMorphism);
+                                validOveraps.add(validOverlap);
 
-                                    Triplet<NestedCondition, Morphism, Morphism> validOverlap = Triplet
-                                            .with(newLeftCdt, newAnchor,
-                                                    newRuleMorphism);
-                                    validOveraps.add(validOverlap);
-
-                                }
                             }
                         }
                     }
-
-                    Morphism.dispose(pair.getValue0(), pair.getValue1());
                 }
 
-                manager.performedOverlaps.incrementAndGet();
+                // Morphism.dispose(pair.getValue0());
+                // Morphism.dispose(pair.getValue1());
+            }
 
-                if (!contents.isEmpty()) {
-                    Annotation annotation = HF.createAnnotation();
-                    annotation.setKey("Task " + Utils.toString(id));
-                    contents.add(annotation);
-                    tmpResSet.lockWrite();
-                    tmpResSet.getResources().add(newRes);
-                    tmpResSet.unlockWrite();
+            // manager.performedOverlaps.incrementAndGet();
+            manager.getIntCounter("PerformedOverlaps").incrementAndGet();
+
+            if (!contents.isEmpty()) {
+                Annotation annotation = HF.createAnnotation();
+                annotation.setKey("Task " + Utils.toString(id));
+                contents.add(annotation);
+                tmpResSet.lockWrite();
+                tmpResSet.getResources().add(newRes);
+                tmpResSet.unlockWrite();
+            }
+
+            int[] jobId = Arrays.copyOf(id, id.length + 2);
+            jobId[jobId.length - 2] = 0;
+            for (Iterator<Triplet<NestedCondition, Morphism, Morphism>> iterator = validOveraps
+                    .iterator(); iterator.hasNext();) {
+                Triplet<NestedCondition, Morphism, Morphism> triplet = (Triplet<NestedCondition, Morphism, Morphism>) iterator
+                        .next();
+                NestedCondition newLeftCdt = triplet.getValue0();
+                Morphism newAnchor = triplet.getValue1();
+                Morphism newRuleMorphism = triplet.getValue2();
+
+                Formula toTransform;
+                Resource toTransformRes = null;
+
+                // the subtasks will attempt in-place transformation of
+                // nestedFormula. So we need to copy it first...
+                if (iterator.hasNext()) {
+                    toTransform = CopierWithResolveErrorNotification
+                            .copy(nestedPost);
+                    toTransformRes = createResourceWithObj(toTransform);
+                } else {
+                    toTransform = nestedPost;
+                    new AbstractFormulaVisitor() {
+                        public Formula caseNestedCondition(NestedCondition nc) {
+                            for (Mapping mapping : nc.getMappings()) {
+                                boolean resolveSuccess = mapping.getOrigin()
+                                        .eContainer() == postConclusion;
+                                assert resolveSuccess;
+                            }
+                            return nc;
+                        };
+                    }.transform(toTransform);
                 }
+
+                newLeftCdt.getConclusion().setFormula(toTransform);
+
+                List<NestedCondition> nestedConditions = NGCUtils
+                        .getNestedConditions(toTransform);
 
                 // Create subtasks
-                int[] jobId = Arrays.copyOf(id, id.length + 2);
-                jobId[jobId.length - 2] = 0;
-                for (Iterator<Triplet<NestedCondition, Morphism, Morphism>> iterator = validOveraps
-                        .iterator(); iterator.hasNext();) {
-                    Triplet<NestedCondition, Morphism, Morphism> triplet = (Triplet<NestedCondition, Morphism, Morphism>) iterator
-                            .next();
-                    NestedCondition newLeftCdt = triplet.getValue0();
-                    Morphism newAnchor = triplet.getValue1();
-                    Morphism newRuleMorphism = triplet.getValue2();
-
-                    Formula toTransform;
-
-                    // the subtasks will attempt in-place transformation of
-                    // nestedFormula. So we need to copy it first...
-                    if (iterator.hasNext()) {
-                        toTransform = CopierWithResolveErrorNotification
-                                .copy(nestedFormula);
-                    } else {
-                        toTransform = nestedFormula;
-                        new AbstractFormulaVisitor() {
-                            public Formula caseNestedCondition(
-                                    NestedCondition nc) {
-                                for (Mapping mapping : nc.getMappings()) {
-                                    boolean resolveSuccess = mapping
-                                            .getOrigin().eContainer() == conclusion;
-                                    assert resolveSuccess;
-                                }
-                                return nc;
-                            };
-                        }.transform(toTransform);
-                    }
-
-                    newLeftCdt.getConclusion().setFormula(toTransform);
-
-                    List<NestedCondition> nestedConditions = NGCUtils
-                            .getNestedConditions(toTransform);
-
-                    jobId[jobId.length - 2]++;
-                    jobId[jobId.length - 1] = 0;
-                    for (NestedCondition nc : nestedConditions) {
-                        if (!NGCUtils.isTrue(nc)) {
-                            jobId[jobId.length - 1]++;
-                            Engine nextEngine = henginePool[hengineIndex
-                                    .incrementAndGet() % henginePool.length];
-                            PostToLeftACTask subTask = new PostToLeftACTask(
-                                    conclusion, nc, newAnchor, newRuleMorphism,
-                                    Triplet.with(nc.eContainer().eResource(),
-                                            nc.eContainer(), (EReference) nc
-                                                    .eContainingFeature()),
-                                    leftNCValidator, jobId, completionBarrier,
-                                    nextEngine);
-                            subTasks.add(subTask);
-                        }
+                List<PostToLeftACTask> subTasks = Lists.newArrayList();
+                jobId[jobId.length - 2]++;
+                jobId[jobId.length - 1] = 0;
+                for (NestedCondition nc : nestedConditions) {
+                    if (!NGCUtils.isTrue(nc)) {
+                        jobId[jobId.length - 1]++;
+                        Engine nextEngine = henginePool[hengineIndex
+                                .incrementAndGet() % henginePool.length];
+                        PostToLeftACTask subTask = new PostToLeftACTask(
+                                postConclusion, nc, newAnchor, newRuleMorphism,
+                                Triplet.with(nc.eContainer().eResource(),
+                                        nc.eContainer(),
+                                        (EReference) nc.eContainingFeature()),
+                                leftNCValidator, rightNCValidator, jobId,
+                                completionBarrier, nextEngine);
+                        subTasks.add(subTask);
                     }
                 }
 
-                manager.allOverlaps.addAndGet(subTasks.size());
+                if (toTransformRes != null) {
+                    saveAndUnload(toTransformRes);
+                }
+
+                // manager.allOverlaps.addAndGet(subTasks.size());
+                // manager.getIntCounter("AllOverlaps").addAndGet(subTasks.size());
 
                 LOGGER.trace("Done task " + Utils.toString(id) + ". Starting "
                         + subTasks.size() + " subtasks");
@@ -1140,21 +1417,20 @@ public class Post2Pre {
                     executor.execute(subTask);
                 }
 
-            } finally {
-                overlaps.dispose();
-                a.dispose();
             }
+
+            overlaps.dispose();
 
             resLock.readLock().unlock();
             completionBarrier.arrive();
         }
 
         private void resolveData() {
-            NestedCondition r = (NestedCondition) Utils.resolve(cdt, ncRes);
+            NestedCondition r = (NestedCondition) Utils.resolve(post, ncRes);
             assert !r.eIsProxy() : "Failed to resolve: " + EcoreUtil.getURI(r);
-            cdt = r;
+            post = r;
 
-            Formula formula = cdt.getConclusion().getFormula();
+            Formula formula = post.getConclusion().getFormula();
             if (formula != null) {
                 new AbstractFormulaVisitor() {
 
@@ -1171,7 +1447,7 @@ public class Post2Pre {
             // host = (Graph) EcoreUtil.resolve(host, tmpResSet);
             assert !host.eIsProxy();
 
-            MappingList mappings = cdt.getMappings();
+            MappingList mappings = post.getMappings();
             synchronized (host) {
                 for (Mapping m : mappings) {
                     Node origin = m.getOrigin();
@@ -1211,13 +1487,13 @@ public class Post2Pre {
     }
 
     public Formula post2Pre(Formula postcondition, Unit program,
-            int maxIterationsForLoops, boolean doIntermediateSimplifications) {
+            int maxIterationsForLoops, boolean withIterationBound) {
         Graph postHostCopy = CopierWithResolveErrorNotification.copy(NGCUtils
                 .getHostGraph(postcondition));
         Formula post = postHostCopy.getFormula();
         createResourceWithObj(postHostCopy);
-        return new Post2PreForUnits(post, maxIterationsForLoops,
-                doIntermediateSimplifications, traceMM, null).compute(program);
+        return new Wlp(post, maxIterationsForLoops, null, null,
+                withIterationBound).doSwitch(program);
     }
 
     public void unloadTmpFiles() {
@@ -1249,6 +1525,9 @@ public class Post2Pre {
     protected void finalize() throws Throwable {
         if (manager != null) {
             manager.finalize();
+        }
+        if (executor != null) {
+            executor.shutdownNow();
         }
         super.finalize();
     }
@@ -1288,13 +1567,26 @@ public class Post2Pre {
         return tmpRes;
     }
 
+    private void saveAndUnload(Resource tmpRes) {
+        if (DISABLE_ALL_DUMPING) {
+            return;
+        }
+        try {
+            tmpRes.save(Collections.emptyMap());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        tmpRes.unload();
+    }
+
     private Resource newTmpResource() {
         Resource tmpRes = newUnattachedTmpResource();
-        resLock.writeLock().lock();
+        tmpResSet.lockWrite();
         try {
             tmpResSet.getResources().add(tmpRes);
         } finally {
-            resLock.writeLock().unlock();
+            tmpResSet.unlockWrite();
         }
 
         return tmpRes;
@@ -1328,4 +1620,5 @@ public class Post2Pre {
 
         tmpRes.unload();
     }
+
 }

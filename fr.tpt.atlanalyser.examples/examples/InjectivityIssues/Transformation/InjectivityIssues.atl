@@ -1,5 +1,5 @@
--- @path  IN=/fr.tpt.atlanalyzer.examples/examples/InjectivityIssues/InputMM/in.ecore
--- @path OUT=/fr.tpt.atlanalyzer.examples/examples/InjectivityIssues/OutputMM/out.ecore
+-- @path  IN=/fr.tpt.atlanalyser.examples/examples/InjectivityIssues/InputMM/in.ecore
+-- @path OUT=/fr.tpt.atlanalyser.examples/examples/InjectivityIssues/OutputMM/out.ecore
 -- @atlcompiler emftvm
 
 module InjectivityIssues;

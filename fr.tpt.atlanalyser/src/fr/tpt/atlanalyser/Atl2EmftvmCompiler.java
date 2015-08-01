@@ -78,7 +78,7 @@ public class Atl2EmftvmCompiler implements AtlStandaloneCompiler {
         pbmm.setResource(((EMFReferenceModel) AtlParser.getDefault()
                 .getProblemMetamodel()).getResource());
         final ModuleResolverFactory mrf = new DefaultModuleResolverFactory(URI
-                .createFileURI("../fr.tpt.atlanalyzer/transformations/")
+                .createFileURI("../fr.tpt.atlanalyser/transformations/")
                 .toString());
 
         atlWfrPool.setModuleResolverFactory(mrf);

@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
@@ -26,6 +27,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.henshin.interpreter.Engine;
 import org.eclipse.emf.henshin.model.Action;
 import org.eclipse.emf.henshin.model.Action.Type;
 import org.eclipse.emf.henshin.model.Edge;
@@ -44,15 +46,18 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import fr.tpt.atlanalyser.overlapping.GraphOverlapper;
+import fr.tpt.atlanalyser.overlapping.GraphOverlapper.InclusionIterator;
 import fr.tpt.atlanalyser.overlapping.SubSetGenerator;
 import fr.tpt.atlanalyser.overlapping.SubSetIteratorLargerFirst;
 import fr.tpt.atlanalyser.overlapping.TraceOverlapFilter;
 import fr.tpt.atlanalyser.overlapping.GraphOverlapper.GraphOverlapGenerator;
+import fr.tpt.atlanalyser.post2pre.Post2Pre;
 import fr.tpt.atlanalyser.utils.HenshinGraphASCIIRenderer;
 import fr.tpt.atlanalyser.utils.Morphism;
 
 public class GraphOverlapperTest {
 
+    private static final EcorePackage   EP = EcorePackage.eINSTANCE;
     private static final EcoreFactory   EF = EcoreFactory.eINSTANCE;
     private static final HenshinFactory HF = HenshinFactory.eINSTANCE;
     private Graph                       g1;
@@ -347,6 +352,7 @@ public class GraphOverlapperTest {
         boolean excludeEmptyOverlap = false;
         boolean enforceEMFConstraints = false;
         boolean fixEdgeAutoMapping = false;
+        Post2Pre.KEEP_NAMES = true;
         List<Pair<Morphism, Morphism>> overlaps = Lists
                 .newArrayList(GraphOverlapper.enumerateOverlaps(g5, g6,
                         excludeEmptyOverlap, enforceEMFConstraints,
@@ -357,7 +363,7 @@ public class GraphOverlapperTest {
                         .map(HenshinGraphASCIIRenderer::render)
                         .toArray(String[]::new)));
 
-        assertEquals(5, overlaps.size());
+        assertEquals(4, overlaps.size());
     }
 
     @Test
@@ -419,10 +425,13 @@ public class GraphOverlapperTest {
         Edge edge = HF.createEdge(g1.getNode("p2"), g1.getNode("p3"),
                 EcorePackage.Literals.EPACKAGE__ESUBPACKAGES);
 
-        List<Morphism> subGraphs = Lists.newArrayList(GraphOverlapper
-                .enumerateAllSubGraphs(g1, Sets.newHashSet(g1.getNode("p3"))));
+        List<Morphism> subGraphs = Lists.newArrayList(new InclusionIterator(g1,
+                Sets.newHashSet(g1.getNode("p3")), false, true));
 
         // System.out.println(Joiner.on("\n--\n").join(subGraphs));
+        System.out.println(Joiner.on("====\n").join(
+                subGraphs.stream().map(s -> s.getSource())
+                        .map(HenshinGraphASCIIRenderer::render).toArray()));
 
         assertEquals(6, subGraphs.size());
 
@@ -716,7 +725,7 @@ public class GraphOverlapperTest {
 
         HF.createNode(g2, r1, "t1");
         HF.createNode(g2, rootTrace, "t2");
-        
+
         System.out.println(HenshinGraphASCIIRenderer.render(g1));
         System.out.println(HenshinGraphASCIIRenderer.render(g2));
 
@@ -791,10 +800,10 @@ public class GraphOverlapperTest {
 
         assertEquals(1, overlaps.size());
 
-        overlaps = Lists.newArrayList(TraceOverlapFilter
-                .filter(new GraphOverlapGenerator(g2, g1, null,
-                        excludeEmptyOverlap, enforceEMFConstraints,
-                        fixEdgeAutoMapping, null), traceEClass));
+        overlaps = Lists.newArrayList(TraceOverlapFilter.filter(
+                new GraphOverlapGenerator(g2, g1, null, excludeEmptyOverlap,
+                        enforceEMFConstraints, fixEdgeAutoMapping, null),
+                traceEClass));
 
         System.out.println(Joiner.on("\n").join(overlaps));
 
@@ -814,10 +823,10 @@ public class GraphOverlapperTest {
         HF.createEdge(g4.getNode("tr"), g4.getNode("s3"), from);
         HF.createEdge(g4.getNode("tr"), g4.getNode("s4"), from);
 
-        overlaps = Lists.newArrayList(TraceOverlapFilter
-                .filter(new GraphOverlapGenerator(g3, g4, null,
-                        excludeEmptyOverlap, enforceEMFConstraints,
-                        fixEdgeAutoMapping, null), traceEClass));
+        overlaps = Lists.newArrayList(TraceOverlapFilter.filter(
+                new GraphOverlapGenerator(g3, g4, null, excludeEmptyOverlap,
+                        enforceEMFConstraints, fixEdgeAutoMapping, null),
+                traceEClass));
 
         System.out.println(Joiner.on("\n").join(overlaps));
 
@@ -859,4 +868,88 @@ public class GraphOverlapperTest {
         return anchor;
     }
 
+    @Test
+    public void testEdgeIndexing() {
+        Graph g1 = HF.createGraph("G1");
+        HF.createNode(g1, EP.getEPackage(), "p");
+        HF.createNode(g1, EP.getEClass(), "c");
+        Edge e1 = HF.createEdge(g1.getNode("p"), g1.getNode("c"),
+                EP.getEPackage_EClassifiers());
+        e1.setIndex("2");
+
+        System.out.println(HenshinGraphASCIIRenderer.render(g1));
+
+        Graph g2 = HF.createGraph("G2");
+        HF.createNode(g2, EP.getEPackage(), "p");
+        HF.createNode(g2, EP.getEClass(), "c");
+        Edge e2 = HF.createEdge(g2.getNode("p"), g2.getNode("c"),
+                EP.getEPackage_EClassifiers());
+        e2.setIndex("2");
+        System.out.println(HenshinGraphASCIIRenderer.render(g2));
+
+        boolean excludeEmptyOverlap = true;
+        boolean enforceEMFConstraints = true;
+        boolean fixEdgeAutoMapping = false;
+        Engine hengine = null;
+        GraphOverlapGenerator graphOverlapGenerator = new GraphOverlapGenerator(
+                g1, g2, null, excludeEmptyOverlap, enforceEMFConstraints,
+                fixEdgeAutoMapping, hengine);
+        ArrayList<Pair<Morphism, Morphism>> overlaps = Lists
+                .newArrayList(graphOverlapGenerator);
+
+        System.out.println(Joiner.on("\n").join(
+                overlaps.stream().map(p -> p.getValue0().getTarget())
+                        .map(HenshinGraphASCIIRenderer::render)
+                        .collect(Collectors.toList())));
+        assertEquals(1, overlaps.size());
+
+        e1.setIndex(null);
+        graphOverlapGenerator = new GraphOverlapGenerator(g1, g2, null,
+                excludeEmptyOverlap, enforceEMFConstraints, fixEdgeAutoMapping,
+                hengine);
+        overlaps = Lists.newArrayList(graphOverlapGenerator);
+
+        System.out.println(Joiner.on("\n").join(
+                overlaps.stream().map(p -> p.getValue0().getTarget())
+                        .map(HenshinGraphASCIIRenderer::render)
+                        .collect(Collectors.toList())));
+        assertEquals(2, overlaps.size());
+
+        e1.setIndex("3");
+        HF.createNode(g1, EP.getEClass(), "c2");
+        HF.createEdge(g1.getNode("p"), g1.getNode("c2"),
+                EP.getEPackage_EClassifiers()).setIndex("4");
+        System.out.println(HenshinGraphASCIIRenderer.render(g1));
+
+        HF.createNode(g2, EP.getEClass(), "c2");
+        HF.createEdge(g2.getNode("p"), g2.getNode("c2"),
+                EP.getEPackage_EClassifiers()).setIndex("4");
+        System.out.println(HenshinGraphASCIIRenderer.render(g2));
+
+        graphOverlapGenerator = new GraphOverlapGenerator(g1, g2, null,
+                excludeEmptyOverlap, enforceEMFConstraints, fixEdgeAutoMapping,
+                hengine);
+        overlaps = Lists.newArrayList(graphOverlapGenerator);
+
+        System.out.println(Joiner.on("\n").join(
+                overlaps.stream().map(p -> p.getValue0().getTarget())
+                        .map(HenshinGraphASCIIRenderer::render)
+                        .collect(Collectors.toList())));
+        assertEquals(1, overlaps.size());
+
+        e1.setIndex(null);
+        System.out.println(HenshinGraphASCIIRenderer.render(g1));
+        System.out.println(HenshinGraphASCIIRenderer.render(g2));
+
+        graphOverlapGenerator = new GraphOverlapGenerator(g1, g2, null,
+                excludeEmptyOverlap, enforceEMFConstraints, fixEdgeAutoMapping,
+                hengine);
+        overlaps = Lists.newArrayList(graphOverlapGenerator);
+
+        System.out.println(Joiner.on("\n").join(
+                overlaps.stream().map(p -> p.getValue0().getTarget())
+                        .map(HenshinGraphASCIIRenderer::render)
+                        .collect(Collectors.toList())));
+        assertEquals(2, overlaps.size());
+    }
 }

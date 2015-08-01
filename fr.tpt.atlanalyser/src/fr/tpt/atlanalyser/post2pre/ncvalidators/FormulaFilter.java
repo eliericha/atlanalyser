@@ -32,9 +32,13 @@ public class FormulaFilter extends SimplifyingTransformer {
             Formula formula = conclusion.getFormula();
             if (formula != null) {
                 formula = this.transform(formula);
-                conclusion.setFormula(formula);
-                if (NGCUtils.isFalse(formula)) {
+
+                if (NGCUtils.isTrue(formula)) {
+                    conclusion.setFormula(null);
+                } else if (NGCUtils.isFalse(formula)) {
                     return formula;
+                } else {
+                    conclusion.setFormula(formula);
                 }
             }
             return nc;

@@ -22,10 +22,11 @@ import fr.tpt.atlanalyser.tests.generic.GenericPost2PreTest;
 @RunWith(Parameterized.class)
 public class TestSimpleCMGPost2Pre extends GenericPost2PreTest {
 
+    private static final int    JOBS    = 4;
     private static final String BASEDIR = "examples/SimpleCMG";
 
     public TestSimpleCMGPost2Pre(File inputModel) {
-        super(BASEDIR, inputModel);
+        super(BASEDIR, inputModel, JOBS);
     }
 
     @Parameters(name = "{index}: {0}")

@@ -20,11 +20,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.junit.Test;
 
+import com.google.common.base.Stopwatch;
+
 import fr.tpt.atlanalyser.examples.ExampleRunner;
 
 public abstract class GenericExecTest extends ExampleRunner {
 
-    protected File                inputModel;
+    protected File inputModel;
 
     public GenericExecTest(String baseDir, File inputModel) {
         super(baseDir);
@@ -33,10 +35,12 @@ public abstract class GenericExecTest extends ExampleRunner {
 
     public static Collection<File[]> enumerateModels(String baseDir) {
         File inputModelsDir = new File(baseDir, "InputModels");
-        File[] inputModels = inputModelsDir.listFiles();
         List<File[]> result = new ArrayList<File[]>();
-        for (File file : inputModels) {
-            result.add(new File[] { file });
+        if (inputModelsDir.isDirectory()) {
+            File[] inputModels = inputModelsDir.listFiles();
+            for (File file : inputModels) {
+                result.add(new File[] { file });
+            }
         }
         return result;
     }
@@ -45,14 +49,21 @@ public abstract class GenericExecTest extends ExampleRunner {
     public void test() throws IOException {
         File atlOutputFile = new File(atlOutputDir,
                 FilenameUtils.getBaseName(inputModel.getPath()) + "_atl.xmi");
-        Resource atlOutput = applyAtlTransformation(inputModel.getPath(),
-                atlOutputFile.getPath());
-
         File henshinOutputFile = new File(henshinOutputDir,
                 FilenameUtils.getBaseName(inputModel.getPath())
                         + "_henshin.xmi");
+        deleteIfExists(atlOutputFile);
+        deleteIfExists(henshinOutputFile);
+
+        Stopwatch timer = Stopwatch.createStarted();
+        Resource atlOutput = applyAtlTransformation(inputModel.getPath(),
+                atlOutputFile.getPath());
+        System.out.println("ATL executed in " + timer.stop());
+
+        timer = Stopwatch.createStarted();
         Resource henshinOutput = applyHenshinTransformation(
                 inputModel.getPath(), henshinOutputFile.getPath());
+        System.out.println("AGT executed in " + timer.stop());
 
         compareModels(atlOutput, henshinOutput);
     }

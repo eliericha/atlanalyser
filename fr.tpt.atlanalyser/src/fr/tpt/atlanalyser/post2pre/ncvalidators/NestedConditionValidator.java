@@ -14,6 +14,20 @@ import org.eclipse.emf.henshin.model.NestedCondition;
 
 public interface NestedConditionValidator {
 
+    public static NestedConditionValidator TRUE = new NestedConditionValidator() {
+
+                                                    @Override
+                                                    public boolean isValid(
+                                                            NestedCondition nc) {
+                                                        return true;
+                                                    }
+
+                                                    @Override
+                                                    public String toString() {
+                                                        return "TRUE";
+                                                    };
+                                                };
+
     public boolean isValid(NestedCondition nc);
 
 }

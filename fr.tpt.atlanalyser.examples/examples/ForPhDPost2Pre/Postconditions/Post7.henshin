@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_lRg2ULZIEeSyppxYUZ_STg" name="MyHenshinModule">
+  <imports href="../OutputMM/out.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_lRg2UbZIEeSyppxYUZ_STg" name="Post">
+    <lhs xmi:id="_lRg2U7ZIEeSyppxYUZ_STg" name="Post">
+      <formula xsi:type="henshin:NestedCondition" xmi:id="_lntTQAoPEeWmf9QYNRhl7w">
+        <conclusion xmi:id="_lntTQQoPEeWmf9QYNRhl7w">
+          <nodes xmi:id="_oJQqAAoPEeWmf9QYNRhl7w" name="d" outgoing="_V-6HEEKyEeWLeL3vtp3fLg">
+            <type href="../OutputMM/out.ecore#//D"/>
+          </nodes>
+          <nodes xmi:id="_oJQqAgoPEeWmf9QYNRhl7w" name="e" incoming="_V-6HEEKyEeWLeL3vtp3fLg">
+            <type href="../OutputMM/out.ecore#//E"/>
+          </nodes>
+          <edges xmi:id="_V-6HEEKyEeWLeL3vtp3fLg" source="_oJQqAAoPEeWmf9QYNRhl7w" target="_oJQqAgoPEeWmf9QYNRhl7w">
+            <type href="../OutputMM/out.ecore#//D/refE"/>
+          </edges>
+        </conclusion>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_lRg2b7ZIEeSyppxYUZ_STg" name="Rhs"/>
+  </units>
+</henshin:Module>

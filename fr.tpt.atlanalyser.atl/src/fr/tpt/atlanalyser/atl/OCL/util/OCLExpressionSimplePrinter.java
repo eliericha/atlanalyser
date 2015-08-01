@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -32,6 +33,7 @@ import fr.tpt.atlanalyser.atl.OCL.OclModelElement;
 import fr.tpt.atlanalyser.atl.OCL.OclType;
 import fr.tpt.atlanalyser.atl.OCL.OperationCallExp;
 import fr.tpt.atlanalyser.atl.OCL.OperatorCallExp;
+import fr.tpt.atlanalyser.atl.OCL.SequenceExp;
 import fr.tpt.atlanalyser.atl.OCL.StringExp;
 import fr.tpt.atlanalyser.atl.OCL.VariableDeclaration;
 import fr.tpt.atlanalyser.atl.OCL.VariableExp;
@@ -40,6 +42,20 @@ public class OCLExpressionSimplePrinter extends OCLSwitch<String> {
 
     public OCLExpressionSimplePrinter() {
         super();
+    }
+
+    @Override
+    public String defaultCase(EObject object) {
+        return "Printer NYI for " + object.eClass().getName();
+    }
+
+    @Override
+    public String caseSequenceExp(SequenceExp object) {
+        EList<OclExpression> elements = object.getElements();
+        return "Sequence{"
+                + Joiner.on(", ").join(
+                        elements.stream().map(e -> this.doSwitch(e)).toArray())
+                + "}";
     }
 
     @Override
@@ -135,7 +151,8 @@ public class OCLExpressionSimplePrinter extends OCLSwitch<String> {
     @Override
     public String caseVariableDeclaration(VariableDeclaration object) {
         OclType type = object.getType();
-        return object.getVarName() + ((type != null) ? " : " + doSwitch(type) : "");
+        return object.getVarName()
+                + ((type != null) ? " : " + doSwitch(type) : "");
     }
 
     @Override

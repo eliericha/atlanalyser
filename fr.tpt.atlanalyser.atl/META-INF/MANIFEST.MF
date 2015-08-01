@@ -6,7 +6,7 @@ Bundle-Version: 0.1.0.qualifier
 Bundle-ClassPath: .
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: fr.tpt.atlanalyser.atl.ATL,
  fr.tpt.atlanalyser.atl.ATL.impl,
  fr.tpt.atlanalyser.atl.ATL.util,
@@ -16,5 +16,6 @@ Export-Package: fr.tpt.atlanalyser.atl.ATL,
  fr.tpt.atlanalyser.atl.PrimitiveTypes,
  fr.tpt.atlanalyser.atl.PrimitiveTypes.impl
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.emf.ecore;visibility:=reexport
+ org.eclipse.emf.ecore;visibility:=reexport,
+ fr.tpt.atlanalyser.lib;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_lRg2ULZIEeSyppxYUZ_STg" name="MyHenshinModule">
+  <imports href="../OutputMM/out.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_46DaEEDrEeWFxsL11q0ALQ" name="Post_7">
+    <lhs xmi:id="_46EBIEDrEeWFxsL11q0ALQ" name="Post1">
+      <formula xsi:type="henshin:NestedCondition" xmi:id="_46EBIUDrEeWFxsL11q0ALQ">
+        <conclusion xmi:id="_46EBIkDrEeWFxsL11q0ALQ">
+          <nodes xmi:id="_46EBJEDrEeWFxsL11q0ALQ" name="e">
+            <type href="../OutputMM/out.ecore#//E"/>
+          </nodes>
+          <formula xsi:type="henshin:Not" xmi:id="_Anzv8EDsEeWFxsL11q0ALQ">
+            <child xsi:type="henshin:NestedCondition" xmi:id="_8XdVEEDrEeWFxsL11q0ALQ">
+              <conclusion xmi:id="_8XdVEUDrEeWFxsL11q0ALQ">
+                <nodes xmi:id="_8XdVEkDrEeWFxsL11q0ALQ" name="d" incoming="_-HmdAEDrEeWFxsL11q0ALQ">
+                  <type href="../OutputMM/out.ecore#//D"/>
+                </nodes>
+                <nodes xmi:id="_9D9OsEDrEeWFxsL11q0ALQ" name="e" outgoing="_-HmdAEDrEeWFxsL11q0ALQ">
+                  <type href="../OutputMM/out.ecore#//E"/>
+                </nodes>
+                <edges xmi:id="_-HmdAEDrEeWFxsL11q0ALQ" source="_9D9OsEDrEeWFxsL11q0ALQ" target="_8XdVEkDrEeWFxsL11q0ALQ">
+                  <type href="../OutputMM/out.ecore#//E/refD"/>
+                </edges>
+              </conclusion>
+              <mappings xmi:id="_9D9OsUDrEeWFxsL11q0ALQ" origin="_46EBJEDrEeWFxsL11q0ALQ" image="_9D9OsEDrEeWFxsL11q0ALQ"/>
+            </child>
+          </formula>
+        </conclusion>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_46EBJkDrEeWFxsL11q0ALQ" name="Rhs"/>
+  </units>
+</henshin:Module>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_92VdUF54EeWddLR9bolbVA" name="Preconditions">
+  <imports href="../InputMM/in.ecore#/"/>
+  <imports href="../OutputMM/out.ecore#/"/>
+  <imports href="http://www.eclipse.org/emf/2002/Ecore#/"/>
+  <units xsi:type="henshin:ConditionalUnit" xmi:id="_92VdUV54EeWddLR9bolbVA" name="Eval Pre" if="_92VdYF54EeWddLR9bolbVA" then="_92VdqF54EeWddLR9bolbVA" else="_92VdrF54EeWddLR9bolbVA"/>
+  <units xsi:type="henshin:Rule" xmi:id="_92VdUl54EeWddLR9bolbVA" name="Post">
+    <lhs xmi:id="_92VdU154EeWddLR9bolbVA" name="Post2">
+      <formula xsi:type="henshin:Not" xmi:id="_92VdVF54EeWddLR9bolbVA">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_92VdVV54EeWddLR9bolbVA">
+          <conclusion xmi:id="_92VdVl54EeWddLR9bolbVA">
+            <nodes xmi:id="_92VdV154EeWddLR9bolbVA" name="e">
+              <type href="../OutputMM/out.ecore#//E"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_92VdWF54EeWddLR9bolbVA">
+              <child xsi:type="henshin:NestedCondition" xmi:id="_92VdWV54EeWddLR9bolbVA">
+                <conclusion xmi:id="_92VdWl54EeWddLR9bolbVA">
+                  <nodes xmi:id="_92VdW154EeWddLR9bolbVA" name="e" outgoing="_92VdXV54EeWddLR9bolbVA">
+                    <type href="../OutputMM/out.ecore#//E"/>
+                  </nodes>
+                  <nodes xmi:id="_92VdXF54EeWddLR9bolbVA" name="d" incoming="_92VdXV54EeWddLR9bolbVA">
+                    <type href="../OutputMM/out.ecore#//D"/>
+                  </nodes>
+                  <edges xmi:id="_92VdXV54EeWddLR9bolbVA" source="_92VdW154EeWddLR9bolbVA" target="_92VdXF54EeWddLR9bolbVA">
+                    <type href="../OutputMM/out.ecore#//E/refD"/>
+                  </edges>
+                </conclusion>
+                <mappings xmi:id="_92VdXl54EeWddLR9bolbVA" origin="_92VdV154EeWddLR9bolbVA" image="_92VdW154EeWddLR9bolbVA"/>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_92VdX154EeWddLR9bolbVA" name="Rhs"/>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_92VdYF54EeWddLR9bolbVA" name="Pre">
+    <lhs xmi:id="_92VdYV54EeWddLR9bolbVA">
+      <formula xsi:type="henshin:And" xmi:id="_92VdYl54EeWddLR9bolbVA">
+        <left xsi:type="henshin:Or" xmi:id="_92VdY154EeWddLR9bolbVA">
+          <left xsi:type="henshin:NestedCondition" xmi:id="_92VdZF54EeWddLR9bolbVA">
+            <conclusion xmi:id="_92VdZV54EeWddLR9bolbVA" name="R1_Inst_LHS">
+              <nodes xmi:id="_92VdZl54EeWddLR9bolbVA" name="s">
+                <type href="../InputMM/in.ecore#//A"/>
+              </nodes>
+              <formula xsi:type="henshin:NestedCondition" xmi:id="_92VdZ154EeWddLR9bolbVA">
+                <annotations xmi:id="_92VdaF54EeWddLR9bolbVA" key="s.refB->exists(b | true)"/>
+                <conclusion xmi:id="_92VdaV54EeWddLR9bolbVA" name="Ov(null, Lhs)[1]">
+                  <nodes xmi:id="_92Vdal54EeWddLR9bolbVA" name="s" outgoing="_92VdbF54EeWddLR9bolbVA">
+                    <type href="../InputMM/in.ecore#//A"/>
+                  </nodes>
+                  <nodes xmi:id="_92Vda154EeWddLR9bolbVA" name="b" incoming="_92VdbF54EeWddLR9bolbVA">
+                    <type href="../InputMM/in.ecore#//B"/>
+                  </nodes>
+                  <edges xmi:id="_92VdbF54EeWddLR9bolbVA" source="_92Vdal54EeWddLR9bolbVA" target="_92Vda154EeWddLR9bolbVA">
+                    <type href="../InputMM/in.ecore#//A/refB"/>
+                  </edges>
+                </conclusion>
+                <mappings xmi:id="_92VdbV54EeWddLR9bolbVA" origin="_92VdZl54EeWddLR9bolbVA" image="_92Vdal54EeWddLR9bolbVA"/>
+              </formula>
+            </conclusion>
+          </left>
+          <right xsi:type="henshin:Not" xmi:id="_92Vdbl54EeWddLR9bolbVA">
+            <child xsi:type="henshin:NestedCondition" xmi:id="_92Vdb154EeWddLR9bolbVA">
+              <conclusion xmi:id="_92VdcF54EeWddLR9bolbVA" name="R2_Inst_LHS">
+                <nodes xmi:id="_92VdcV54EeWddLR9bolbVA" name="s">
+                  <type href="../InputMM/in.ecore#//B"/>
+                </nodes>
+              </conclusion>
+            </child>
+          </right>
+        </left>
+        <right xsi:type="henshin:Not" xmi:id="_92Vdcl54EeWddLR9bolbVA">
+          <child xsi:type="henshin:NestedCondition" xmi:id="_92Vdc154EeWddLR9bolbVA">
+            <conclusion xmi:id="_92VddF54EeWddLR9bolbVA" name="R1_Inst_LHS">
+              <nodes xmi:id="_92VddV54EeWddLR9bolbVA" name="s">
+                <type href="../InputMM/in.ecore#//A"/>
+              </nodes>
+              <formula xsi:type="henshin:Not" xmi:id="_92Vddl54EeWddLR9bolbVA">
+                <child xsi:type="henshin:Or" xmi:id="_92Vdd154EeWddLR9bolbVA">
+                  <left xsi:type="henshin:Not" xmi:id="_92VdeF54EeWddLR9bolbVA">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_92VdeV54EeWddLR9bolbVA">
+                      <annotations xmi:id="_92Vdel54EeWddLR9bolbVA" key="s.refB->exists(b | true)"/>
+                      <conclusion xmi:id="_92Vde154EeWddLR9bolbVA" name="Ov(null, Lhs)[1]">
+                        <nodes xmi:id="_92VdfF54EeWddLR9bolbVA" name="s" outgoing="_92Vdfl54EeWddLR9bolbVA">
+                          <type href="../InputMM/in.ecore#//A"/>
+                        </nodes>
+                        <nodes xmi:id="_92VdfV54EeWddLR9bolbVA" name="b" incoming="_92Vdfl54EeWddLR9bolbVA">
+                          <type href="../InputMM/in.ecore#//B"/>
+                        </nodes>
+                        <edges xmi:id="_92Vdfl54EeWddLR9bolbVA" source="_92VdfF54EeWddLR9bolbVA" target="_92VdfV54EeWddLR9bolbVA">
+                          <type href="../InputMM/in.ecore#//A/refB"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_92Vdf154EeWddLR9bolbVA" origin="_92VddV54EeWddLR9bolbVA" image="_92VdfF54EeWddLR9bolbVA"/>
+                    </child>
+                  </left>
+                  <right xsi:type="henshin:Not" xmi:id="_92VdgF54EeWddLR9bolbVA">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_92VdgV54EeWddLR9bolbVA">
+                      <conclusion xmi:id="_92Vdgl54EeWddLR9bolbVA" name="C">
+                        <nodes xmi:id="_92Vdg154EeWddLR9bolbVA" name="s">
+                          <type href="../InputMM/in.ecore#//A"/>
+                        </nodes>
+                        <nodes xmi:id="_92VdhF54EeWddLR9bolbVA" name="s">
+                          <type href="../InputMM/in.ecore#//B"/>
+                        </nodes>
+                        <formula xsi:type="henshin:Not" xmi:id="_92VdhV54EeWddLR9bolbVA">
+                          <child xsi:type="henshin:And" xmi:id="_92Vdhl54EeWddLR9bolbVA">
+                            <left xsi:type="henshin:Or" xmi:id="_92Vdh154EeWddLR9bolbVA">
+                              <left xsi:type="henshin:NestedCondition" xmi:id="_92VdiF54EeWddLR9bolbVA">
+                                <conclusion xmi:id="_92VdiV54EeWddLR9bolbVA" name="C">
+                                  <nodes xmi:id="_92Vdil54EeWddLR9bolbVA" name="s" outgoing="_92VdjF54EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//A"/>
+                                  </nodes>
+                                  <nodes xmi:id="_92Vdi154EeWddLR9bolbVA" name="s" incoming="_92VdjF54EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//B"/>
+                                  </nodes>
+                                  <edges xmi:id="_92VdjF54EeWddLR9bolbVA" source="_92Vdil54EeWddLR9bolbVA" target="_92Vdi154EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//A/refB"/>
+                                  </edges>
+                                </conclusion>
+                                <mappings xmi:id="_92VdjV54EeWddLR9bolbVA" origin="_92Vdg154EeWddLR9bolbVA" image="_92Vdil54EeWddLR9bolbVA"/>
+                                <mappings xmi:id="_92Vdjl54EeWddLR9bolbVA" origin="_92VdhF54EeWddLR9bolbVA" image="_92Vdi154EeWddLR9bolbVA"/>
+                              </left>
+                              <right xsi:type="henshin:NestedCondition" xmi:id="_92Vdj154EeWddLR9bolbVA">
+                                <conclusion xmi:id="_92VdkF54EeWddLR9bolbVA" name="C">
+                                  <nodes xmi:id="_92VdkV54EeWddLR9bolbVA" name="s" outgoing="_92Vdk154EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//B"/>
+                                  </nodes>
+                                  <nodes xmi:id="_92Vdkl54EeWddLR9bolbVA" name="s" incoming="_92Vdk154EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//A"/>
+                                  </nodes>
+                                  <edges xmi:id="_92Vdk154EeWddLR9bolbVA" source="_92VdkV54EeWddLR9bolbVA" target="_92Vdkl54EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//B/refA"/>
+                                  </edges>
+                                </conclusion>
+                                <mappings xmi:id="_92VdlF54EeWddLR9bolbVA" origin="_92Vdg154EeWddLR9bolbVA" image="_92Vdkl54EeWddLR9bolbVA"/>
+                                <mappings xmi:id="_92VdlV54EeWddLR9bolbVA" origin="_92VdhF54EeWddLR9bolbVA" image="_92VdkV54EeWddLR9bolbVA"/>
+                              </right>
+                            </left>
+                            <right xsi:type="henshin:Not" xmi:id="_92Vdll54EeWddLR9bolbVA">
+                              <child xsi:type="henshin:NestedCondition" xmi:id="_92Vdl154EeWddLR9bolbVA">
+                                <conclusion xmi:id="_92VdmF54EeWddLR9bolbVA" name="C">
+                                  <nodes xmi:id="_92VdmV54EeWddLR9bolbVA" name="s" outgoing="_92Vdm154EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//A"/>
+                                  </nodes>
+                                  <nodes xmi:id="_92Vdml54EeWddLR9bolbVA" name="s" incoming="_92Vdm154EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//B"/>
+                                  </nodes>
+                                  <edges xmi:id="_92Vdm154EeWddLR9bolbVA" source="_92VdmV54EeWddLR9bolbVA" target="_92Vdml54EeWddLR9bolbVA">
+                                    <type href="../InputMM/in.ecore#//A/refB"/>
+                                  </edges>
+                                  <formula xsi:type="henshin:Not" xmi:id="_92VdnF54EeWddLR9bolbVA">
+                                    <child xsi:type="henshin:NestedCondition" xmi:id="_92VdnV54EeWddLR9bolbVA">
+                                      <conclusion xmi:id="_92Vdnl54EeWddLR9bolbVA" name="C">
+                                        <nodes xmi:id="_92Vdn154EeWddLR9bolbVA" name="s" incoming="_92Vdol54EeWddLR9bolbVA" outgoing="_92VdoV54EeWddLR9bolbVA">
+                                          <type href="../InputMM/in.ecore#//A"/>
+                                        </nodes>
+                                        <nodes xmi:id="_92VdoF54EeWddLR9bolbVA" name="s" incoming="_92VdoV54EeWddLR9bolbVA" outgoing="_92Vdol54EeWddLR9bolbVA">
+                                          <type href="../InputMM/in.ecore#//B"/>
+                                        </nodes>
+                                        <edges xmi:id="_92VdoV54EeWddLR9bolbVA" source="_92Vdn154EeWddLR9bolbVA" target="_92VdoF54EeWddLR9bolbVA">
+                                          <type href="../InputMM/in.ecore#//A/refB"/>
+                                        </edges>
+                                        <edges xmi:id="_92Vdol54EeWddLR9bolbVA" source="_92VdoF54EeWddLR9bolbVA" target="_92Vdn154EeWddLR9bolbVA">
+                                          <type href="../InputMM/in.ecore#//B/refA"/>
+                                        </edges>
+                                      </conclusion>
+                                      <mappings xmi:id="_92Vdo154EeWddLR9bolbVA" origin="_92VdmV54EeWddLR9bolbVA" image="_92Vdn154EeWddLR9bolbVA"/>
+                                      <mappings xmi:id="_92VdpF54EeWddLR9bolbVA" origin="_92Vdml54EeWddLR9bolbVA" image="_92VdoF54EeWddLR9bolbVA"/>
+                                    </child>
+                                  </formula>
+                                </conclusion>
+                                <mappings xmi:id="_92VdpV54EeWddLR9bolbVA" origin="_92Vdg154EeWddLR9bolbVA" image="_92VdmV54EeWddLR9bolbVA"/>
+                                <mappings xmi:id="_92Vdpl54EeWddLR9bolbVA" origin="_92VdhF54EeWddLR9bolbVA" image="_92Vdml54EeWddLR9bolbVA"/>
+                              </child>
+                            </right>
+                          </child>
+                        </formula>
+                      </conclusion>
+                      <mappings xmi:id="_92Vdp154EeWddLR9bolbVA" origin="_92VddV54EeWddLR9bolbVA" image="_92Vdg154EeWddLR9bolbVA"/>
+                    </child>
+                  </right>
+                </child>
+              </formula>
+            </conclusion>
+          </child>
+        </right>
+      </formula>
+    </lhs>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_92VdqF54EeWddLR9bolbVA" name="PreSat">
+    <rhs xmi:id="_92VdqV54EeWddLR9bolbVA" name="Rhs">
+      <nodes xmi:id="_92Vdql54EeWddLR9bolbVA" name="eval">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+        <attributes xmi:id="_92Vdq154EeWddLR9bolbVA" value="&quot;Pre Satisfied&quot;">
+          <type href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+        </attributes>
+      </nodes>
+    </rhs>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_92VdrF54EeWddLR9bolbVA" name="PreUnsat">
+    <rhs xmi:id="_92VdrV54EeWddLR9bolbVA" name="Rhs">
+      <nodes xmi:id="_92Vdrl54EeWddLR9bolbVA" name="eval">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+        <attributes xmi:id="_92Vdr154EeWddLR9bolbVA" value="&quot;Pre Unsatisfied&quot;">
+          <type href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+        </attributes>
+      </nodes>
+    </rhs>
+  </units>
+</henshin:Module>

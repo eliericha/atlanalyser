@@ -132,37 +132,48 @@
       <nodes xmi:id="_QN74FrYKEeS_tKhwn1BahQ" name="s">
         <type href="../InputMM/in.ecore#//B"/>
       </nodes>
-      <formula xsi:type="henshin:Not" xmi:id="_QN74F7YKEeS_tKhwn1BahQ">
-        <child xsi:type="henshin:NestedCondition" xmi:id="_QN74GLYKEeS_tKhwn1BahQ">
-          <conclusion xmi:id="_QN74GbYKEeS_tKhwn1BahQ" name="ApplyOncePerMatch">
-            <nodes xmi:id="_QN74GrYKEeS_tKhwn1BahQ" outgoing="_QN74HLYKEeS_tKhwn1BahQ">
-              <type href="Test.traces.manual.ecore#//Trace"/>
-            </nodes>
-            <nodes xmi:id="_QN74G7YKEeS_tKhwn1BahQ" name="s" incoming="_QN74HLYKEeS_tKhwn1BahQ">
-              <type href="../InputMM/in.ecore#//B"/>
-            </nodes>
-            <edges xmi:id="_QN74HLYKEeS_tKhwn1BahQ" source="_QN74GrYKEeS_tKhwn1BahQ" target="_QN74G7YKEeS_tKhwn1BahQ" index="0">
-              <type href="Test.traces.manual.ecore#//Trace/from"/>
-            </edges>
-            <formula xsi:type="henshin:Not" xmi:id="_QN74HbYKEeS_tKhwn1BahQ">
-              <child xsi:type="henshin:NestedCondition" xmi:id="_QN74HrYKEeS_tKhwn1BahQ">
-                <conclusion xmi:id="_QN74H7YKEeS_tKhwn1BahQ" name="ExactMatch">
-                  <nodes xmi:id="_QN74ILYKEeS_tKhwn1BahQ" outgoing="_QN74IrYKEeS_tKhwn1BahQ">
-                    <type href="Test.traces.manual.ecore#//Trace"/>
-                  </nodes>
-                  <nodes xmi:id="_QN74IbYKEeS_tKhwn1BahQ" incoming="_QN74IrYKEeS_tKhwn1BahQ">
-                    <type href="../InputMM/in.ecore#//RootIn"/>
-                  </nodes>
-                  <edges xmi:id="_QN74IrYKEeS_tKhwn1BahQ" source="_QN74ILYKEeS_tKhwn1BahQ" target="_QN74IbYKEeS_tKhwn1BahQ">
-                    <type href="Test.traces.manual.ecore#//Trace/from"/>
-                  </edges>
-                </conclusion>
-                <mappings xmi:id="_QN74I7YKEeS_tKhwn1BahQ" origin="_QN74GrYKEeS_tKhwn1BahQ" image="_QN74ILYKEeS_tKhwn1BahQ"/>
-              </child>
-            </formula>
-          </conclusion>
-          <mappings xmi:id="_QN74JLYKEeS_tKhwn1BahQ" origin="_QN74FrYKEeS_tKhwn1BahQ" image="_QN74G7YKEeS_tKhwn1BahQ"/>
-        </child>
+      <formula xsi:type="henshin:And" xmi:id="_HSnBoJ8_EeWCvpOaGHbNGA">
+        <left xsi:type="henshin:Not" xmi:id="_QN74F7YKEeS_tKhwn1BahQ">
+          <child xsi:type="henshin:NestedCondition" xmi:id="_QN74GLYKEeS_tKhwn1BahQ">
+            <conclusion xmi:id="_QN74GbYKEeS_tKhwn1BahQ" name="ApplyOncePerMatch">
+              <nodes xmi:id="_QN74G7YKEeS_tKhwn1BahQ" name="s">
+                <type href="../InputMM/in.ecore#//B"/>
+              </nodes>
+              <formula xsi:type="henshin:Not" xmi:id="_QN74HbYKEeS_tKhwn1BahQ">
+                <child xsi:type="henshin:NestedCondition" xmi:id="_QN74HrYKEeS_tKhwn1BahQ">
+                  <conclusion xmi:id="_QN74H7YKEeS_tKhwn1BahQ" name="ExactMatch">
+                    <nodes xmi:id="_QN74ILYKEeS_tKhwn1BahQ" outgoing="_QN74IrYKEeS_tKhwn1BahQ">
+                      <type href="Test.traces.manual.ecore#//Trace"/>
+                    </nodes>
+                    <nodes xmi:id="_QN74IbYKEeS_tKhwn1BahQ" incoming="_QN74IrYKEeS_tKhwn1BahQ">
+                      <type href="../InputMM/in.ecore#//RootIn"/>
+                    </nodes>
+                    <edges xmi:id="_QN74IrYKEeS_tKhwn1BahQ" source="_QN74ILYKEeS_tKhwn1BahQ" target="_QN74IbYKEeS_tKhwn1BahQ">
+                      <type href="Test.traces.manual.ecore#//Trace/from"/>
+                    </edges>
+                  </conclusion>
+                </child>
+              </formula>
+            </conclusion>
+            <mappings xmi:id="_QN74JLYKEeS_tKhwn1BahQ" origin="_QN74FrYKEeS_tKhwn1BahQ" image="_QN74G7YKEeS_tKhwn1BahQ"/>
+          </child>
+        </left>
+        <right xsi:type="henshin:Not" xmi:id="_HSnBoZ8_EeWCvpOaGHbNGA">
+          <child xsi:type="henshin:NestedCondition" xmi:id="_HSnBop8_EeWCvpOaGHbNGA">
+            <conclusion xmi:id="_HSnBo58_EeWCvpOaGHbNGA">
+              <nodes xmi:id="_HSnosJ8_EeWCvpOaGHbNGA" name="s" incoming="_QN74HLYKEeS_tKhwn1BahQ">
+                <type href="../InputMM/in.ecore#//B"/>
+              </nodes>
+              <nodes xmi:id="_QN74GrYKEeS_tKhwn1BahQ" outgoing="_QN74HLYKEeS_tKhwn1BahQ">
+                <type href="Test.traces.manual.ecore#//Trace"/>
+              </nodes>
+              <edges xmi:id="_QN74HLYKEeS_tKhwn1BahQ" source="_QN74GrYKEeS_tKhwn1BahQ" target="_HSnosJ8_EeWCvpOaGHbNGA" index="0">
+                <type href="Test.traces.manual.ecore#//Trace/from"/>
+              </edges>
+            </conclusion>
+            <mappings xmi:id="_HSnosZ8_EeWCvpOaGHbNGA" origin="_QN74FrYKEeS_tKhwn1BahQ" image="_HSnosJ8_EeWCvpOaGHbNGA"/>
+          </child>
+        </right>
       </formula>
     </lhs>
     <rhs xmi:id="_QN74JbYKEeS_tKhwn1BahQ" name="Rhs">
@@ -374,7 +385,7 @@
       <edges xmi:id="_QN8fJ7YKEeS_tKhwn1BahQ" source="_QN8fH7YKEeS_tKhwn1BahQ" target="_QN8fILYKEeS_tKhwn1BahQ" index="0">
         <type href="Test.traces.manual.ecore#//Trace/to"/>
       </edges>
-      <formula xsi:type="henshin:And" xmi:id="_QN8fKLYKEeS_tKhwn1BahQ">
+      <formula xsi:type="henshin:And" xmi:id="_8WQmMJ04EeWKgZsBc6muSQ">
         <left xsi:type="henshin:And" xmi:id="_QN8fKbYKEeS_tKhwn1BahQ">
           <left xsi:type="henshin:Not" xmi:id="_QN8fKrYKEeS_tKhwn1BahQ">
             <child xsi:type="henshin:NestedCondition" xmi:id="_QN8fK7YKEeS_tKhwn1BahQ">
@@ -460,21 +471,21 @@
             </child>
           </right>
         </left>
-        <right xsi:type="henshin:Not" xmi:id="_QN8fTrYKEeS_tKhwn1BahQ">
-          <child xsi:type="henshin:NestedCondition" xmi:id="_QN8fT7YKEeS_tKhwn1BahQ">
-            <conclusion xmi:id="_QN8fULYKEeS_tKhwn1BahQ" name="ApplyOncePerMatch">
-              <nodes xmi:id="_QN8fUbYKEeS_tKhwn1BahQ" name="t1" outgoing="_QN8fU7YKEeS_tKhwn1BahQ">
+        <right xsi:type="henshin:Not" xmi:id="_8WQmMZ04EeWKgZsBc6muSQ">
+          <child xsi:type="henshin:NestedCondition" xmi:id="_8WQmMp04EeWKgZsBc6muSQ">
+            <conclusion xmi:id="_8WQmM504EeWKgZsBc6muSQ">
+              <nodes xmi:id="_8WRNQJ04EeWKgZsBc6muSQ" name="t1" outgoing="_QN8fU7YKEeS_tKhwn1BahQ">
                 <type href="../OutputMM/out.ecore#//D"/>
               </nodes>
-              <nodes xmi:id="_QN8fUrYKEeS_tKhwn1BahQ" incoming="_QN8fU7YKEeS_tKhwn1BahQ">
+              <nodes xmi:id="_8WRNQp04EeWKgZsBc6muSQ" incoming="_QN8fU7YKEeS_tKhwn1BahQ">
                 <type href="../OutputMM/out.ecore#//E"/>
               </nodes>
-              <edges xmi:id="_QN8fU7YKEeS_tKhwn1BahQ" source="_QN8fUbYKEeS_tKhwn1BahQ" target="_QN8fUrYKEeS_tKhwn1BahQ">
+              <edges xmi:id="_QN8fU7YKEeS_tKhwn1BahQ" source="_8WRNQJ04EeWKgZsBc6muSQ" target="_8WRNQp04EeWKgZsBc6muSQ">
                 <type href="../OutputMM/out.ecore#//D/refE"/>
               </edges>
             </conclusion>
-            <mappings xmi:id="_QN8fVLYKEeS_tKhwn1BahQ" origin="_QN8fHLYKEeS_tKhwn1BahQ" image="_QN8fUbYKEeS_tKhwn1BahQ"/>
-            <mappings xmi:id="_QN8fVbYKEeS_tKhwn1BahQ" origin="_QN8fILYKEeS_tKhwn1BahQ" image="_QN8fUrYKEeS_tKhwn1BahQ"/>
+            <mappings xmi:id="_8WRNQZ04EeWKgZsBc6muSQ" origin="_QN8fHLYKEeS_tKhwn1BahQ" image="_8WRNQJ04EeWKgZsBc6muSQ"/>
+            <mappings xmi:id="_8WRNQ504EeWKgZsBc6muSQ" origin="_QN8fILYKEeS_tKhwn1BahQ" image="_8WRNQp04EeWKgZsBc6muSQ"/>
           </child>
         </right>
       </formula>

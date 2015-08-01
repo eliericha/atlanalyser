@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_lRg2ULZIEeSyppxYUZ_STg" name="MyHenshinModule">
+  <imports href="../OutputMM/out.ecore#/"/>
+  <units xsi:type="henshin:Rule" xmi:id="_-CYFQD9rEeWhT9PZIGBGcQ" name="Post_9">
+    <lhs xmi:id="_-CYFQT9rEeWhT9PZIGBGcQ" name="Post11">
+      <formula xsi:type="henshin:Not" xmi:id="_-CYFQj9rEeWhT9PZIGBGcQ">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_-CYFQz9rEeWhT9PZIGBGcQ">
+          <conclusion xmi:id="_-CYFRD9rEeWhT9PZIGBGcQ" name="L0">
+            <nodes xmi:id="_-CYFRT9rEeWhT9PZIGBGcQ" name="d">
+              <type href="../OutputMM/out.ecore#//D"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_lELzgEsKEeWm_rwFSa6vmg">
+              <child xsi:type="henshin:Or" xmi:id="_LzwREEsKEeWm_rwFSa6vmg">
+                <left xsi:type="henshin:And" xmi:id="_IF0cMEsJEeWm_rwFSa6vmg">
+                  <left xsi:type="henshin:NestedCondition" xmi:id="_-CYFRz9rEeWhT9PZIGBGcQ">
+                    <conclusion xmi:id="_-CYFSD9rEeWhT9PZIGBGcQ" name="L1.1">
+                      <nodes xmi:id="_-CYFST9rEeWhT9PZIGBGcQ" name="d" outgoing="_55LsEErAEeWap4SToXidkg _8MHYYEsKEeWm_rwFSa6vmg">
+                        <type href="../OutputMM/out.ecore#//D"/>
+                      </nodes>
+                      <nodes xmi:id="_-CYFSj9rEeWhT9PZIGBGcQ" name="e1" incoming="_55LsEErAEeWap4SToXidkg">
+                        <type href="../OutputMM/out.ecore#//E"/>
+                      </nodes>
+                      <nodes xmi:id="_8MHYYUsKEeWm_rwFSa6vmg" name="e2" incoming="_8MHYYEsKEeWm_rwFSa6vmg">
+                        <type href="../OutputMM/out.ecore#//E"/>
+                      </nodes>
+                      <edges xmi:id="_55LsEErAEeWap4SToXidkg" source="_-CYFST9rEeWhT9PZIGBGcQ" target="_-CYFSj9rEeWhT9PZIGBGcQ">
+                        <type href="../OutputMM/out.ecore#//D/refE"/>
+                      </edges>
+                      <edges xmi:id="_8MHYYEsKEeWm_rwFSa6vmg" source="_-CYFST9rEeWhT9PZIGBGcQ" target="_8MHYYUsKEeWm_rwFSa6vmg">
+                        <type href="../OutputMM/out.ecore#//D/refE"/>
+                      </edges>
+                    </conclusion>
+                    <mappings xmi:id="_-CYFTD9rEeWhT9PZIGBGcQ" origin="_-CYFRT9rEeWhT9PZIGBGcQ" image="_-CYFST9rEeWhT9PZIGBGcQ"/>
+                  </left>
+                  <right xsi:type="henshin:Not" xmi:id="_L_k8AEsJEeWm_rwFSa6vmg">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_MkXrIEsJEeWm_rwFSa6vmg">
+                      <conclusion xmi:id="_NMDWMEsJEeWm_rwFSa6vmg" name="L1.2">
+                        <nodes xmi:id="_NMDWMUsJEeWm_rwFSa6vmg" name="d" outgoing="_NMDWNEsJEeWm_rwFSa6vmg _NMDWNUsJEeWm_rwFSa6vmg _Y9OeMEsJEeWm_rwFSa6vmg _AuDSgEsLEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//D"/>
+                        </nodes>
+                        <nodes xmi:id="_NMDWMksJEeWm_rwFSa6vmg" name="e1" incoming="_NMDWNEsJEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_NMDWM0sJEeWm_rwFSa6vmg" name="e2" incoming="_NMDWNUsJEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_V6g7IEsJEeWm_rwFSa6vmg" name="e3" incoming="_Y9OeMEsJEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_--y7YEsKEeWm_rwFSa6vmg" name="e4" incoming="_AuDSgEsLEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <edges xmi:id="_NMDWNEsJEeWm_rwFSa6vmg" source="_NMDWMUsJEeWm_rwFSa6vmg" target="_NMDWMksJEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                        <edges xmi:id="_NMDWNUsJEeWm_rwFSa6vmg" source="_NMDWMUsJEeWm_rwFSa6vmg" target="_NMDWM0sJEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                        <edges xmi:id="_Y9OeMEsJEeWm_rwFSa6vmg" source="_NMDWMUsJEeWm_rwFSa6vmg" target="_V6g7IEsJEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                        <edges xmi:id="_AuDSgEsLEeWm_rwFSa6vmg" source="_NMDWMUsJEeWm_rwFSa6vmg" target="_--y7YEsKEeWm_rwFSa6vmg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_1pSaAEsJEeWm_rwFSa6vmg" origin="_-CYFRT9rEeWhT9PZIGBGcQ" image="_NMDWMUsJEeWm_rwFSa6vmg"/>
+                    </child>
+                  </right>
+                </left>
+                <right xsi:type="henshin:Not" xmi:id="_NQhKAEsKEeWm_rwFSa6vmg">
+                  <child xsi:type="henshin:NestedCondition" xmi:id="_PD3-AEsKEeWm_rwFSa6vmg">
+                    <conclusion xmi:id="_PD3-AUsKEeWm_rwFSa6vmg" name="L1.3">
+                      <nodes xmi:id="_PD3-AksKEeWm_rwFSa6vmg" name="d" outgoing="_PD3-BEsKEeWm_rwFSa6vmg">
+                        <type href="../OutputMM/out.ecore#//D"/>
+                      </nodes>
+                      <nodes xmi:id="_PD3-A0sKEeWm_rwFSa6vmg" name="e" incoming="_PD3-BEsKEeWm_rwFSa6vmg">
+                        <type href="../OutputMM/out.ecore#//E"/>
+                      </nodes>
+                      <edges xmi:id="_PD3-BEsKEeWm_rwFSa6vmg" source="_PD3-AksKEeWm_rwFSa6vmg" target="_PD3-A0sKEeWm_rwFSa6vmg">
+                        <type href="../OutputMM/out.ecore#//D/refE"/>
+                      </edges>
+                    </conclusion>
+                    <mappings xmi:id="_PD3-BUsKEeWm_rwFSa6vmg" origin="_-CYFRT9rEeWhT9PZIGBGcQ" image="_PD3-AksKEeWm_rwFSa6vmg"/>
+                  </child>
+                </right>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_-CYFTT9rEeWhT9PZIGBGcQ" name="Rhs"/>
+  </units>
+</henshin:Module>

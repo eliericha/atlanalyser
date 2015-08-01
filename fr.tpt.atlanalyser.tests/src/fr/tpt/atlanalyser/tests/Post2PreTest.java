@@ -18,6 +18,8 @@ import java.util.Map;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.henshin.model.Action;
 import org.eclipse.emf.henshin.model.Formula;
@@ -30,12 +32,12 @@ import org.eclipse.emf.henshin.model.Node;
 import org.eclipse.emf.henshin.model.Rule;
 import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.resource.HenshinResource;
+import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.Maps;
 
-import fr.tpt.atlanalyser.post2pre.FlattenBinaryOperators;
 import fr.tpt.atlanalyser.post2pre.Post2Pre;
 import fr.tpt.atlanalyser.utils.NGCUtils;
 
@@ -49,7 +51,11 @@ public class Post2PreTest {
 
     @Test
     public void testPostToRightAC() throws IOException {
+        ResourceSet resSet = new HenshinResourceSet();
+        Resource resource = resSet.createResource(URI
+                .createFileURI("plop.henshin"));
         Module module = HF.createModule();
+        resource.getContents().add(module);
 
         Rule rule = HF.createRule("CreateEClass");
         module.getUnits().add(rule);
@@ -165,7 +171,7 @@ public class Post2PreTest {
 
         Unit unit = root.getUnit("Main");
 
-        Formula pre = new Post2Pre().post2Pre(post, unit, 3, true);
+        Formula pre = new Post2Pre().post2Pre(post, unit, 3, false);
 
         Rule preRule = HF.createRule("Pre");
         Graph preLhs = HF.createGraph();
@@ -176,60 +182,6 @@ public class Post2PreTest {
 
         res.setURI(URI.createFileURI("out.henshin"));
         res.save(Collections.emptyMap());
-    }
-
-    @Test
-    public void testACFlattening() throws IOException {
-        Module module = HF.createModule();
-
-        Rule rule = HF.createRule("CreateEClass");
-        module.getUnits().add(rule);
-        Node p = HF.createNode(rule.getLhs(), EcorePackage.Literals.EPACKAGE,
-                "p");
-        p.setAction(new Action(Action.Type.PRESERVE));
-        Node c = HF
-                .createNode(rule.getRhs(), EcorePackage.Literals.ECLASS, "c");
-        HF.createEdge(rule.getMappings().getImage(p, rule.getRhs()), c,
-                EcorePackage.Literals.EPACKAGE__ECLASSIFIERS);
-
-        Rule postRule = HF.createRule("Post");
-        module.getUnits().add(postRule);
-        Graph emptyHostGraph = HF.createGraph();
-        postRule.setLhs(emptyHostGraph);
-        NestedCondition post1 = emptyHostGraph.createPAC("Postcondition");
-        Graph conc = post1.getConclusion();
-        Node p1 = HF.createNode(conc, EcorePackage.Literals.EPACKAGE, "p1");
-        Node c1 = HF.createNode(conc, EcorePackage.Literals.ECLASS, "c1");
-        Node c2 = HF.createNode(conc, EcorePackage.Literals.ECLASS, "c2");
-        HF.createEdge(p1, c1, EcorePackage.Literals.EPACKAGE__ECLASSIFIERS);
-        HF.createEdge(p1, c2, EcorePackage.Literals.EPACKAGE__ECLASSIFIERS);
-
-        Post2Pre post2Pre = new Post2Pre();
-
-        Formula leftAC = new Post2Pre().postToLeftAC(post1, rule, null, null);
-        rule.getLhs().setFormula(leftAC);
-
-        Formula pre = Post2Pre.leftACToExistsConstraint(rule, leftAC);
-
-        Formula flattenedPre = new FlattenBinaryOperators().transform(EcoreUtil
-                .copy(pre));
-
-        Rule preRule = HF.createRule("Pre");
-        module.getUnits().add(preRule);
-        preRule.setLhs((Graph) pre.eContainer());
-
-        Rule flattenedPreRule = HF.createRule("FlattenedPre");
-        module.getUnits().add(flattenedPreRule);
-        flattenedPreRule.setLhs(HF.createGraph());
-        flattenedPreRule.getLhs().setFormula(flattenedPre);
-
-        HenshinResource res = new HenshinResource(
-                URI.createFileURI("out.henshin"));
-        res.getContents().add(module);
-        Map<Object, Object> options = Maps.newHashMap();
-        // options.put(HenshinResource.OPTION_PROCESS_DANGLING_HREF,
-        // HenshinResource.OPTION_PROCESS_DANGLING_HREF_RECORD);
-        res.save(options);
     }
 
 }

@@ -31,9 +31,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.emf.common.util.DiagnosticException;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.compare.Comparison;
 import org.eclipse.emf.compare.Diff;
 import org.eclipse.emf.compare.DifferenceKind;
@@ -52,8 +54,10 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.IOWrappedException;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.DanglingHREFException;
 import org.eclipse.emf.ecore.xmi.XMIResource;
@@ -67,6 +71,7 @@ import org.eclipse.emf.henshin.interpreter.UnitApplication;
 import org.eclipse.emf.henshin.interpreter.impl.AssignmentImpl;
 import org.eclipse.emf.henshin.interpreter.impl.EngineImpl;
 import org.eclipse.emf.henshin.interpreter.util.InterpreterUtil;
+import org.eclipse.emf.henshin.model.ConditionalUnit;
 import org.eclipse.emf.henshin.model.Edge;
 import org.eclipse.emf.henshin.model.Formula;
 import org.eclipse.emf.henshin.model.Graph;
@@ -101,8 +106,10 @@ import fr.tpt.atlanalyser.utils.Utils;
 
 public class ExampleRunner {
 
+    private static final HenshinFactory  HF                   = HenshinFactory.eINSTANCE;
+
     // public static void main(String[] args) throws IOException,
-    // ATLAnalyzerException {
+    // atlanalyserException {
     // ExampleRunner ex = new ExampleRunner("examples/SimpleCMG");
     // ex.compileAndTransform();
     // Resource atlRes = ex.applyAtlTransformation(
@@ -114,30 +121,30 @@ public class ExampleRunner {
     // ex.compareModels(atlRes, henshinRes);
     // }
 
-    private static final Logger        LOGGER               = LogManager
-                                                                    .getLogger(ExampleRunner.class
-                                                                            .getSimpleName());
+    protected static final Logger        LOGGER               = LogManager
+                                                                      .getLogger(ExampleRunner.class
+                                                                              .getSimpleName());
 
-    protected final File               baseDir;
-    protected final File               inputMMDir;
-    protected final File               outputMMDir;
-    protected final File               transformationDir;
-    protected final File               inputDir;
-    protected final File               atlOutputDir;
-    protected final File               henshinOutputDir;
-    protected final ATL2Henshin        atl2Henshin;
-    protected final HenshinResourceSet resourceSet;
-    private File                       compiledTransfo;
-    private static final EmftvmFactory emftvmFactory        = EmftvmFactory.eINSTANCE;
+    protected final File                 baseDir;
+    protected final File                 inputMMDir;
+    protected final File                 outputMMDir;
+    protected final File                 transformationDir;
+    protected final File                 inputDir;
+    protected final File                 atlOutputDir;
+    protected final File                 henshinOutputDir;
+    protected final ATL2Henshin          atl2Henshin;
+    protected final HenshinResourceSet   resourceSet;
+    private File                         compiledTransfo;
+    private static final EmftvmFactory   emftvmFactory        = EmftvmFactory.eINSTANCE;
 
-    private static final boolean       IGNORE_EREF_ORDERING = false;
-    private EPackage                   inputMM;
-    private EPackage                   outputMM;
-    private File                       atlTransformation;
+    private static final boolean         IGNORE_EREF_ORDERING = false;
+    protected EPackage                   inputMM;
+    protected EPackage                   outputMM;
+    private File                         atlTransformation;
 
-    private int                        jobs;
+    protected int                        jobs;
 
-    private static Map<Object, Object> xmiSaveOptions;
+    protected static Map<Object, Object> xmiSaveOptions;
 
     static {
         xmiSaveOptions = Maps.newHashMap();
@@ -192,27 +199,18 @@ public class ExampleRunner {
         EPackage traceMM = resourceSet.getPackageRegistry().getEPackage(
                 "http://traces/1.0");
 
-        stripFromAttributes(transfo);
-
         Resource postRes = resourceSet.getResource(
                 URI.createFileURI(postFile.getCanonicalPath()), true);
         Module postModule = (Module) postRes.getContents().get(0);
-        EList<Unit> units = postModule.getUnits();
-        List<Formula> postconditions = Lists.transform(units,
-                new Function<Unit, Formula>() {
-                    @Override
-                    public Formula apply(Unit arg0) {
-                        return ((Rule) arg0).getLhs().getFormula();
-                    }
-                });
-
-        Module preModule = HenshinFactory.eINSTANCE.createModule();
+        Module preModule = HF.createModule();
         preModule.setName("Preconditions");
 
-        LOGGER.info("Starting Post2Pre for {}", transfo.getName());
+        EList<EPackage> imports = preModule.getImports();
+        imports.add(inputMM);
+        imports.add(outputMM);
+        imports.add(EcorePackage.eINSTANCE);
 
-        Post2Pre4ATL post2Pre = new Post2Pre4ATL(transfo, inputMM, outputMM,
-                traceMM, jobs);
+        LOGGER.info("Starting Post2Pre for {}", transfo.getName());
 
         ScheduledExecutorService memMonitorExecutor = Executors
                 .newScheduledThreadPool(1);
@@ -245,14 +243,37 @@ public class ExampleRunner {
             }
         }, 0, 10, TimeUnit.SECONDS);
 
+        boolean allowReordering = true;
+        boolean enableValidators = true;
+        Post2Pre4ATL post2Pre = new Post2Pre4ATL(transfo, inputMM, outputMM,
+                traceMM, jobs, allowReordering, enableValidators);
+
         try {
-            for (Formula formula : postconditions) {
-                Formula pre = post2Pre.post2Pre(formula, maxNumRuleIterations);
-                Rule preRule = HenshinFactory.eINSTANCE.createRule();
-                Graph preLhs = HenshinFactory.eINSTANCE.createGraph();
-                preLhs.setFormula(EcoreUtil.copy(pre));
-                preRule.setLhs(preLhs);
-                preModule.getUnits().add(preRule);
+            EList<Unit> units = postModule.getUnits();
+            for (Unit unit : units) {
+                if (unit instanceof Rule) {
+                    Rule postRule = (Rule) unit;
+
+                    // Store copy of post in result file
+                    Rule copy = EcoreUtil.copy(postRule);
+                    // copy.setName("Post");
+                    preModule.getUnits().add(copy);
+
+                    Formula formula = postRule.getLhs().getFormula();
+                    Formula pre = post2Pre.post2Pre(formula,
+                            maxNumRuleIterations);
+
+                    Rule preRule = HF.createRule(postRule.getName());
+                    preRule.setName(String.format(
+                            "wlp\\left( SimpleATL_{\\leq1}, %s \\right)",
+                            postRule.getName()));
+                    Graph preLhs = HF.createGraph();
+                    preLhs.setFormula(EcoreUtil.copy(pre));
+                    preRule.setLhs(preLhs);
+                    preModule.getUnits().add(preRule);
+
+                    createEvalUnit(preModule, preRule);
+                }
             }
         } finally {
             memMonitorExecutor.shutdown();
@@ -263,19 +284,63 @@ public class ExampleRunner {
             outputDir.mkdir();
         }
 
+        String preFileName = postFile.getName() + "_pre.henshin";
+        File preFile = new File(new File(this.baseDir, "Preconditions"),
+                preFileName);
         Resource outputRes = resourceSet.createResource(URI
-                .createFileURI("Preconditions/" + postFile.getName()
-                        + "_pre.henshin"));
+                .createFileURI(preFile.getAbsolutePath()));
 
         outputRes.getContents().add(preModule);
 
         LOGGER.info("Writing Precondition in {}", outputRes.getURI().toString());
         outputRes.save(xmiSaveOptions);
-        
+
+        File refFile = new File(new File(this.baseDir, "Preconditions_Ref"),
+                preFileName);
+        URI preRefFile = URI.createFileURI(refFile.getAbsolutePath());
+        LOGGER.info("Comparing to ref Precondition {}", preRefFile.toString());
+        try {
+            Resource refResource = resourceSet.getResource(preRefFile, true);
+            compareModels(refResource, outputRes);
+        } catch (WrappedException ex) {
+            // ref file does not exist
+            LOGGER.warn("Ref Precondition {} does not exist",
+                    preRefFile.toString());
+        }
+
         LOGGER.info("Done!");
     }
 
-    private void makeAbstractClassesInstantiable(EPackage pkg) {
+    public ConditionalUnit createEvalUnit(Module preModule, Rule preRule) {
+        ConditionalUnit condUnit = HF.createConditionalUnit();
+        condUnit.setName("Eval " + preRule.getName());
+        condUnit.setIf(preRule);
+
+        Rule preSatisfiedRule = HF.createRule();
+        preSatisfiedRule.setName("PreSat");
+        Node eval = HF.createNode(preSatisfiedRule.getRhs(),
+                EcorePackage.Literals.ECLASS, "eval");
+        HF.createAttribute(eval, EcorePackage.Literals.ENAMED_ELEMENT__NAME,
+                "\"Pre Satisfied\"");
+        preModule.getUnits().add(preSatisfiedRule);
+
+        condUnit.setThen(preSatisfiedRule);
+
+        Rule preUnsatisfiedRule = HF.createRule();
+        preUnsatisfiedRule.setName("PreUnsat");
+        eval = HF.createNode(preUnsatisfiedRule.getRhs(),
+                EcorePackage.Literals.ECLASS, "eval");
+        HF.createAttribute(eval, EcorePackage.Literals.ENAMED_ELEMENT__NAME,
+                "\"Pre Unsatisfied\"");
+        preModule.getUnits().add(preUnsatisfiedRule);
+        condUnit.setElse(preUnsatisfiedRule);
+
+        preModule.getUnits().add(0, condUnit);
+
+        return condUnit;
+    }
+
+    protected void makeAbstractClassesInstantiable(EPackage pkg) {
         TreeIterator<EObject> eAllContents = pkg.eAllContents();
         for (TreeIterator<EObject> iterator = eAllContents; iterator.hasNext();) {
             EObject obj = iterator.next();
@@ -288,43 +353,8 @@ public class ExampleRunner {
         }
     }
 
-    private void stripFromAttributes(Module transfo) {
-
-        new HenshinSwitch<Object>() {
-
-            @Override
-            public Object caseRule(Rule object) {
-                object.getParameters().clear();
-                object.getAttributeConditions().clear();
-                return object;
-            };
-
-            public Object caseNode(Node object) {
-                object.getAttributes().clear();
-                return object;
-            };
-
-            public Object caseEdge(Edge object) {
-                object.setIndex(null);
-                return object;
-            };
-
-            @Override
-            public Object doSwitch(EObject eObject) {
-                final EList<EObject> eContents = eObject.eContents();
-                for (EObject contObj : eContents) {
-                    this.doSwitch(contObj);
-                }
-                return super.doSwitch(eObject);
-            }
-
-        }.doSwitch(transfo);
-
-    }
-
     public void compileAndTransform() throws IOException, ATLAnalyserException {
         // checkDirs();
-
         LOGGER.info("Loading input metamodel");
 
         inputMM = getInputMMEPkg();
@@ -341,6 +371,19 @@ public class ExampleRunner {
 
         atlTransformation = transformationDir
                 .listFiles((FilenameFilter) new SuffixFileFilter(".atl"))[0];
+
+        File henshinTransformation = new File(
+                atlTransformation.getParentFile(),
+                FilenameUtils.getBaseName(atlTransformation.getPath())
+                        + ".henshin");
+
+        File tracesMM = new File(atlTransformation.getParentFile(),
+                FilenameUtils.getBaseName(atlTransformation.getPath())
+                        + ".traces.ecore");
+
+        deleteIfExists(henshinTransformation);
+        deleteIfExists(tracesMM);
+
         Module henshinModule = atl2Henshin
                 .translateToHenshin(atlTransformation);
 
@@ -350,11 +393,6 @@ public class ExampleRunner {
                 EcoreUtil.getObjectsByType(henshinModule.getUnits(),
                         HenshinPackage.Literals.RULE).size() > 0);
 
-        File henshinTransformation = new File(
-                atlTransformation.getParentFile(),
-                FilenameUtils.getBaseName(atlTransformation.getPath())
-                        + ".henshin");
-
         LOGGER.info("Writing Henshin transformation to {}",
                 henshinTransformation.getPath());
 
@@ -362,9 +400,6 @@ public class ExampleRunner {
                 .createFileURI(henshinTransformation.getCanonicalPath()));
         henshinRes.getContents().add(henshinModule);
 
-        File tracesMM = new File(atlTransformation.getParentFile(),
-                FilenameUtils.getBaseName(atlTransformation.getPath())
-                        + ".traces.ecore");
         Resource tracesRes = resourceSet.createResource(URI
                 .createFileURI(tracesMM.getCanonicalPath()));
         tracesRes.getContents().add(atl2Henshin.getTraceMM());
@@ -384,6 +419,12 @@ public class ExampleRunner {
             } else {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    protected static void deleteIfExists(File file) {
+        if (file.exists() && file.isFile()) {
+            file.delete();
         }
     }
 

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="ASCII"?>
+<henshin:Module xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:henshin="http://www.eclipse.org/emf/2011/Henshin" xmi:id="_mwlrsGjqEeWqO_YqVfnevg" name="Preconditions">
+  <imports href="../InputMM/in.ecore#/"/>
+  <imports href="../OutputMM/out.ecore#/"/>
+  <imports href="http://www.eclipse.org/emf/2002/Ecore#/"/>
+  <units xsi:type="henshin:ConditionalUnit" xmi:id="_mwlrsWjqEeWqO_YqVfnevg" name="Eval Pre" if="_mwmS4mjqEeWqO_YqVfnevg" then="_mwmS_2jqEeWqO_YqVfnevg" else="_mwmTA2jqEeWqO_YqVfnevg"/>
+  <units xsi:type="henshin:Rule" xmi:id="_mwlrsmjqEeWqO_YqVfnevg" name="Post">
+    <lhs xmi:id="_mwlrs2jqEeWqO_YqVfnevg" name="Post11">
+      <formula xsi:type="henshin:Not" xmi:id="_mwlrtGjqEeWqO_YqVfnevg">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_mwlrtWjqEeWqO_YqVfnevg">
+          <conclusion xmi:id="_mwmSwGjqEeWqO_YqVfnevg" name="L0">
+            <nodes xmi:id="_mwmSwWjqEeWqO_YqVfnevg" name="d">
+              <type href="../OutputMM/out.ecore#//D"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_mwmSwmjqEeWqO_YqVfnevg">
+              <child xsi:type="henshin:Or" xmi:id="_mwmSw2jqEeWqO_YqVfnevg">
+                <left xsi:type="henshin:And" xmi:id="_mwmSxGjqEeWqO_YqVfnevg">
+                  <left xsi:type="henshin:NestedCondition" xmi:id="_mwmSxWjqEeWqO_YqVfnevg">
+                    <conclusion xmi:id="_mwmSxmjqEeWqO_YqVfnevg" name="L1.1">
+                      <nodes xmi:id="_mwmSx2jqEeWqO_YqVfnevg" name="d" outgoing="_mwmSymjqEeWqO_YqVfnevg _mwmSy2jqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//D"/>
+                      </nodes>
+                      <nodes xmi:id="_mwmSyGjqEeWqO_YqVfnevg" name="e1" incoming="_mwmSymjqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//E"/>
+                      </nodes>
+                      <nodes xmi:id="_mwmSyWjqEeWqO_YqVfnevg" name="e2" incoming="_mwmSy2jqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//E"/>
+                      </nodes>
+                      <edges xmi:id="_mwmSymjqEeWqO_YqVfnevg" source="_mwmSx2jqEeWqO_YqVfnevg" target="_mwmSyGjqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//D/refE"/>
+                      </edges>
+                      <edges xmi:id="_mwmSy2jqEeWqO_YqVfnevg" source="_mwmSx2jqEeWqO_YqVfnevg" target="_mwmSyWjqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//D/refE"/>
+                      </edges>
+                    </conclusion>
+                    <mappings xmi:id="_mwmSzGjqEeWqO_YqVfnevg" origin="_mwmSwWjqEeWqO_YqVfnevg" image="_mwmSx2jqEeWqO_YqVfnevg"/>
+                  </left>
+                  <right xsi:type="henshin:Not" xmi:id="_mwmSzWjqEeWqO_YqVfnevg">
+                    <child xsi:type="henshin:NestedCondition" xmi:id="_mwmSzmjqEeWqO_YqVfnevg">
+                      <conclusion xmi:id="_mwmSz2jqEeWqO_YqVfnevg" name="L1.2">
+                        <nodes xmi:id="_mwmS0GjqEeWqO_YqVfnevg" name="d" outgoing="_mwmS1WjqEeWqO_YqVfnevg _mwmS1mjqEeWqO_YqVfnevg _mwmS12jqEeWqO_YqVfnevg _mwmS2GjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//D"/>
+                        </nodes>
+                        <nodes xmi:id="_mwmS0WjqEeWqO_YqVfnevg" name="e1" incoming="_mwmS1WjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_mwmS0mjqEeWqO_YqVfnevg" name="e2" incoming="_mwmS1mjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_mwmS02jqEeWqO_YqVfnevg" name="e3" incoming="_mwmS12jqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <nodes xmi:id="_mwmS1GjqEeWqO_YqVfnevg" name="e4" incoming="_mwmS2GjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//E"/>
+                        </nodes>
+                        <edges xmi:id="_mwmS1WjqEeWqO_YqVfnevg" source="_mwmS0GjqEeWqO_YqVfnevg" target="_mwmS0WjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                        <edges xmi:id="_mwmS1mjqEeWqO_YqVfnevg" source="_mwmS0GjqEeWqO_YqVfnevg" target="_mwmS0mjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                        <edges xmi:id="_mwmS12jqEeWqO_YqVfnevg" source="_mwmS0GjqEeWqO_YqVfnevg" target="_mwmS02jqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                        <edges xmi:id="_mwmS2GjqEeWqO_YqVfnevg" source="_mwmS0GjqEeWqO_YqVfnevg" target="_mwmS1GjqEeWqO_YqVfnevg">
+                          <type href="../OutputMM/out.ecore#//D/refE"/>
+                        </edges>
+                      </conclusion>
+                      <mappings xmi:id="_mwmS2WjqEeWqO_YqVfnevg" origin="_mwmSwWjqEeWqO_YqVfnevg" image="_mwmS0GjqEeWqO_YqVfnevg"/>
+                    </child>
+                  </right>
+                </left>
+                <right xsi:type="henshin:Not" xmi:id="_mwmS2mjqEeWqO_YqVfnevg">
+                  <child xsi:type="henshin:NestedCondition" xmi:id="_mwmS22jqEeWqO_YqVfnevg">
+                    <conclusion xmi:id="_mwmS3GjqEeWqO_YqVfnevg" name="L1.3">
+                      <nodes xmi:id="_mwmS3WjqEeWqO_YqVfnevg" name="d" outgoing="_mwmS32jqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//D"/>
+                      </nodes>
+                      <nodes xmi:id="_mwmS3mjqEeWqO_YqVfnevg" name="e" incoming="_mwmS32jqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//E"/>
+                      </nodes>
+                      <edges xmi:id="_mwmS32jqEeWqO_YqVfnevg" source="_mwmS3WjqEeWqO_YqVfnevg" target="_mwmS3mjqEeWqO_YqVfnevg">
+                        <type href="../OutputMM/out.ecore#//D/refE"/>
+                      </edges>
+                    </conclusion>
+                    <mappings xmi:id="_mwmS4GjqEeWqO_YqVfnevg" origin="_mwmSwWjqEeWqO_YqVfnevg" image="_mwmS3WjqEeWqO_YqVfnevg"/>
+                  </child>
+                </right>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+    <rhs xmi:id="_mwmS4WjqEeWqO_YqVfnevg" name="Rhs"/>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_mwmS4mjqEeWqO_YqVfnevg" name="Pre">
+    <lhs xmi:id="_mwmS42jqEeWqO_YqVfnevg">
+      <formula xsi:type="henshin:Not" xmi:id="_mwmS5GjqEeWqO_YqVfnevg">
+        <child xsi:type="henshin:NestedCondition" xmi:id="_mwmS5WjqEeWqO_YqVfnevg">
+          <conclusion xmi:id="_mwmS5mjqEeWqO_YqVfnevg" name="R1_Inst_LHS">
+            <nodes xmi:id="_mwmS52jqEeWqO_YqVfnevg" name="s">
+              <type href="../InputMM/in.ecore#//A"/>
+            </nodes>
+            <formula xsi:type="henshin:Not" xmi:id="_mwmS6GjqEeWqO_YqVfnevg">
+              <child xsi:type="henshin:Or" xmi:id="_mwmS6WjqEeWqO_YqVfnevg">
+                <left xsi:type="henshin:Not" xmi:id="_mwmS6mjqEeWqO_YqVfnevg">
+                  <child xsi:type="henshin:NestedCondition" xmi:id="_mwmS62jqEeWqO_YqVfnevg">
+                    <annotations xmi:id="_mwmS7GjqEeWqO_YqVfnevg" key="s.refB->exists(b | true)"/>
+                    <conclusion xmi:id="_mwmS7WjqEeWqO_YqVfnevg" name="Ov(null, Lhs)[1]">
+                      <nodes xmi:id="_mwmS7mjqEeWqO_YqVfnevg" name="s" outgoing="_mwmS8GjqEeWqO_YqVfnevg">
+                        <type href="../InputMM/in.ecore#//A"/>
+                      </nodes>
+                      <nodes xmi:id="_mwmS72jqEeWqO_YqVfnevg" name="b" incoming="_mwmS8GjqEeWqO_YqVfnevg">
+                        <type href="../InputMM/in.ecore#//B"/>
+                      </nodes>
+                      <edges xmi:id="_mwmS8GjqEeWqO_YqVfnevg" source="_mwmS7mjqEeWqO_YqVfnevg" target="_mwmS72jqEeWqO_YqVfnevg">
+                        <type href="../InputMM/in.ecore#//A/refB"/>
+                      </edges>
+                    </conclusion>
+                    <mappings xmi:id="_mwmS8WjqEeWqO_YqVfnevg" origin="_mwmS52jqEeWqO_YqVfnevg" image="_mwmS7mjqEeWqO_YqVfnevg"/>
+                  </child>
+                </left>
+                <right xsi:type="henshin:Not" xmi:id="_mwmS8mjqEeWqO_YqVfnevg">
+                  <child xsi:type="henshin:NestedCondition" xmi:id="_mwmS82jqEeWqO_YqVfnevg">
+                    <conclusion xmi:id="_mwmS9GjqEeWqO_YqVfnevg" name="C">
+                      <nodes xmi:id="_mwmS9WjqEeWqO_YqVfnevg" name="s">
+                        <type href="../InputMM/in.ecore#//A"/>
+                      </nodes>
+                      <nodes xmi:id="_mwmS9mjqEeWqO_YqVfnevg" name="s">
+                        <type href="../InputMM/in.ecore#//B"/>
+                      </nodes>
+                      <formula xsi:type="henshin:NestedCondition" xmi:id="_mwmS92jqEeWqO_YqVfnevg">
+                        <conclusion xmi:id="_mwmS-GjqEeWqO_YqVfnevg" name="C">
+                          <nodes xmi:id="_mwmS-WjqEeWqO_YqVfnevg" name="s" outgoing="_mwmS-2jqEeWqO_YqVfnevg">
+                            <type href="../InputMM/in.ecore#//A"/>
+                          </nodes>
+                          <nodes xmi:id="_mwmS-mjqEeWqO_YqVfnevg" name="s" incoming="_mwmS-2jqEeWqO_YqVfnevg">
+                            <type href="../InputMM/in.ecore#//B"/>
+                          </nodes>
+                          <edges xmi:id="_mwmS-2jqEeWqO_YqVfnevg" source="_mwmS-WjqEeWqO_YqVfnevg" target="_mwmS-mjqEeWqO_YqVfnevg">
+                            <type href="../InputMM/in.ecore#//A/refB"/>
+                          </edges>
+                        </conclusion>
+                        <mappings xmi:id="_mwmS_GjqEeWqO_YqVfnevg" origin="_mwmS9WjqEeWqO_YqVfnevg" image="_mwmS-WjqEeWqO_YqVfnevg"/>
+                        <mappings xmi:id="_mwmS_WjqEeWqO_YqVfnevg" origin="_mwmS9mjqEeWqO_YqVfnevg" image="_mwmS-mjqEeWqO_YqVfnevg"/>
+                      </formula>
+                    </conclusion>
+                    <mappings xmi:id="_mwmS_mjqEeWqO_YqVfnevg" origin="_mwmS52jqEeWqO_YqVfnevg" image="_mwmS9WjqEeWqO_YqVfnevg"/>
+                  </child>
+                </right>
+              </child>
+            </formula>
+          </conclusion>
+        </child>
+      </formula>
+    </lhs>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_mwmS_2jqEeWqO_YqVfnevg" name="PreSat">
+    <rhs xmi:id="_mwmTAGjqEeWqO_YqVfnevg" name="Rhs">
+      <nodes xmi:id="_mwmTAWjqEeWqO_YqVfnevg" name="eval">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+        <attributes xmi:id="_mwmTAmjqEeWqO_YqVfnevg" value="&quot;Pre Satisfied&quot;">
+          <type href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+        </attributes>
+      </nodes>
+    </rhs>
+  </units>
+  <units xsi:type="henshin:Rule" xmi:id="_mwmTA2jqEeWqO_YqVfnevg" name="PreUnsat">
+    <rhs xmi:id="_mwmTBGjqEeWqO_YqVfnevg" name="Rhs">
+      <nodes xmi:id="_mwmTBWjqEeWqO_YqVfnevg" name="eval">
+        <type href="http://www.eclipse.org/emf/2002/Ecore#//EClass"/>
+        <attributes xmi:id="_mwmTBmjqEeWqO_YqVfnevg" value="&quot;Pre Unsatisfied&quot;">
+          <type href="http://www.eclipse.org/emf/2002/Ecore#//ENamedElement/name"/>
+        </attributes>
+      </nodes>
+    </rhs>
+  </units>
+</henshin:Module>
