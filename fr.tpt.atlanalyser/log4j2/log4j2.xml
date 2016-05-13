@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" monitorInterval="10">
+<Configuration status="warn" monitorInterval="10">
   <Appenders>
     <File name="LogFile" fileName="atlanalyser.log" append="false">
       <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
-    <File name="Metrics" fileName="atlanalyser.metrics.csv" append="false">
-      <PatternLayout pattern="%msg%n"/>
-    </File>
+    <!--<File name="Metrics" fileName="atlanalyser.metrics.csv" append="false">-->
+    <!--  <PatternLayout pattern="%msg%n"/>-->
+    <!--</File>-->
     <File name="Rs" fileName="atlanalyser.rs.log" append="false">
       <PatternLayout pattern="%8r %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </File>
@@ -22,7 +22,7 @@
   </Appenders>
   <Loggers>
     <Logger name="Metrics" level="info" additivity="false">
-      <AppenderRef ref="Metrics"/>
+      <!--<AppenderRef ref="Metrics"/>-->
     </Logger>
     <Logger name="ConcurrentResource" level="debug" additivity="false">
       <AppenderRef ref="Rs"/>
@@ -35,7 +35,7 @@
       <AppenderRef ref="Manager"/>
     </Logger>
     <Logger name="GraphOverlapTask" level="debug" additivity="true"/>
-    <Root level="debug">
+    <Root level="info">
       <AppenderRef ref="Console"/>
       <AppenderRef ref="LogFile"/>
     </Root>

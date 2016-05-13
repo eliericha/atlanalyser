@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -81,6 +82,7 @@ import fr.tpt.atlanalyser.atl.ATL.ModuleElement;
 import fr.tpt.atlanalyser.atl.ATL.OutPatternElement;
 import fr.tpt.atlanalyser.atl.ATL.PatternElement;
 import fr.tpt.atlanalyser.atl.ATL.Rule;
+import fr.tpt.atlanalyser.atl.OCL.LetExp;
 import fr.tpt.atlanalyser.atl.OCL.NavigationOrAttributeCallExp;
 import fr.tpt.atlanalyser.atl.OCL.OCLFactory;
 import fr.tpt.atlanalyser.atl.OCL.OclContextDefinition;
@@ -101,7 +103,7 @@ import fr.tpt.atlanalyser.utils.NGCUtils;
 public class ATL2Henshin {
 
     private static final boolean WITHOUT_NACS         = false;
-    static final boolean         DISABLE_ORDERED_REFS = true;
+    static final boolean         DISABLE_ORDERED_REFS = false;
 
     public static void main(String[] args) throws Exception {
         /*
@@ -232,17 +234,9 @@ public class ATL2Henshin {
     private EClass findRootMetaclass(EPackage pkg) {
         EClass res = null;
 
-        final List<EClass> eClasses = Lists.transform(pkg.getEClassifiers(),
-                new Function<EClassifier, EClass>() {
-                    @Override
-                    public EClass apply(EClassifier arg) {
-                        if (arg instanceof EClass) {
-                            return (EClass) arg;
-                        } else {
-                            return null;
-                        }
-                    }
-                });
+        final List<EClass> eClasses = pkg.getEClassifiers().stream()
+                .filter(c -> c instanceof EClass).map(c -> (EClass) c)
+                .collect(Collectors.toList());
 
         res = eClasses.get(0);
 
@@ -251,6 +245,8 @@ public class ATL2Henshin {
                 res = eClass;
             }
         }
+
+        assert res != null;
 
         return res;
     }
@@ -317,7 +313,7 @@ public class ATL2Henshin {
     }
 
     private static void out(Object obj) {
-        System.out.println(obj);
+        LOGGER.info(obj);
     }
 
     // IReferenceModel atlMetamodel;
@@ -913,22 +909,21 @@ public class ATL2Henshin {
         return instantiationRule;
     }
 
-    private void createNACfromRHS(
-            org.eclipse.emf.henshin.model.Rule instantiationRule) {
+    private void createNACfromRHS(org.eclipse.emf.henshin.model.Rule rule) {
         if (WITHOUT_NACS)
             return;
         // Create a NAC identical to the RHS so that the rule gets applied once
         // for each match
-        NestedCondition nac = instantiationRule.getLhs().createNAC("Once");
+        NestedCondition nac = rule.getLhs().createNAC("Once");
 
         // graphCopier will serve as a map between original and new copies
         Copier graphCopier = new Copier();
-        Graph conclusion = (Graph) graphCopier.copy(instantiationRule.getRhs());
+        Graph conclusion = (Graph) graphCopier.copy(rule.getRhs());
         graphCopier.copyReferences();
 
         nac.setConclusion(conclusion);
 
-        for (Mapping mapping : instantiationRule.getMappings()) {
+        for (Mapping mapping : rule.getMappings()) {
             nac.getMappings().add(mapping.getOrigin(),
                     (GraphElement) graphCopier.get(mapping.getImage()));
         }
@@ -1026,6 +1021,7 @@ public class ATL2Henshin {
         }
 
         guard = inlineAllHelperCalls(guard);
+        guard = inlineLetExpressions(guard);
 
         OCL2NGC ocl2Ngc = new OCL2NGC(this, instantiationRule.getLhs(),
                 varName2Node);
@@ -1146,6 +1142,40 @@ public class ATL2Henshin {
 
                 return res;
             }
+        };
+
+        return (OclExpression) inlineVisitor.doSwitch(exp);
+    }
+
+    private OclExpression inlineLetExpressions(OclExpression exp) {
+        OCLContainmentVisitor<Object> inlineVisitor = new OCLContainmentVisitor<Object>() {
+
+            @Override
+            public Object defaultCase(EObject object) {
+                return object;
+            }
+
+            @Override
+            public Object caseLetExp(LetExp object) {
+                VariableDeclaration variable = object.getVariable();
+                OclExpression initExpression = variable.getInitExpression();
+                List<VariableExp> variableReferences = Lists
+                        .newArrayList(variable.getVariableExp());
+
+                for (VariableExp variableExp : variableReferences) {
+                    EcoreUtil.replace(variableExp,
+                            CopierPreservingReferences.copy(initExpression));
+                }
+
+                OclExpression body = object.getIn_();
+
+                body = inlineLetExpressions(body);
+
+                EcoreUtil.replace(object, body);
+
+                return body;
+            }
+
         };
 
         return (OclExpression) inlineVisitor.doSwitch(exp);

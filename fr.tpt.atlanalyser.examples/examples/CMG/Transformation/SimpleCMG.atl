@@ -1,0 +1,410 @@
+-- @path IN_MM=/fr.tpt.atlanalyser.examples/examples/CMG/InputMM/systemmodel.ecore
+-- @path OUT_MM=/fr.tpt.atlanalyser.examples/examples/CMG/OutputMM/codemodel.ecore
+---- @atlcompiler emftvm
+
+
+module SimpleCMG;
+create OUT: OUT_MM from IN: IN_MM;
+
+--------------------------------------------
+-- Root rule bringing everything together --
+--------------------------------------------
+
+-- A SystemModel is translated to a CodeModule
+rule SystemModel2CodeModule {
+	from
+		sm: IN_MM!SystemModel
+	to
+		cm: OUT_MM!CodeModule (
+			name <- sm.name + '_codemodel',
+			-- The code module contains 2 functions: 'init' and 'compute'
+			functions <- OrderedSet{initFct,
+						computeFct},
+			globalVariables <- sm.blocks -> collect(b | thisModule.resolveTemp(b,
+					'globalVariable')),
+			dataTypes <- sm.dataTypes
+		),
+		initFct: OUT_MM!Function (
+			name <- 'init',
+			body <- sm.blocks -> collect(b | thisModule.resolveTemp(b, 'initStatement'))
+		),
+		computeFct: OUT_MM!Function (
+			name <- 'compute',
+			-- Arguments are variables produced from InputBlock outports and OutputBlock
+			-- inports.
+			arguments <- sm.blocks -> select(b | b.oclIsTypeOf(IN_MM!InputBlock)) ->
+					collect(b | b.outports -> at(1)) -> union(sm.blocks -> select(b | b.
+					oclIsTypeOf(IN_MM!OutputBlock)) -> collect(b | b.inports -> at(1))),
+			-- Local variables are produced from the outports of all blocks except
+			-- InterfaceBlocks.
+			localVariables <- sm.blocks -> select(b | not b.
+					oclIsKindOf(IN_MM!InterfaceBlock)) -> collect(b | b.outports) ->
+					flatten(),
+			-- The body of the compute function is composed of the statements contructed
+			-- by block-specific rules: first the compute statements and then the
+			-- update statements.
+			body <- OrderedSet{computeStmt,
+						updateStmt}
+		),
+		-- Compute statements are retrieved by resolving the 'computeStatement' target.
+		-- Compute statements are sorted according to the sequenceNumber attribute of
+		-- the corresponding blocks.
+		computeStmt: OUT_MM!CompositeStmt (
+		name <- 'Compute Statements',
+			statements <- sm.blocks -> sortedBy(b | b.sequenceNumber) -> collect(b |
+					thisModule.resolveTemp(b, 'computeStatement'))
+		),
+		-- Update statements are retrieved by resolving the 'updateStatement' target.
+		updateStmt: OUT_MM!CompositeStmt (
+			name <- 'Update Statements',
+			statements <- sm.blocks -> collect(b | thisModule.resolveTemp(b,
+					'updateStatement'))
+		)
+}
+
+------------------------------
+-- Rules copying data types --
+------------------------------
+rule DataType {
+	from
+		dt_in: IN_MM!ScalarType
+	to
+		dt_out: OUT_MM!ScalarType (
+			basetype <- dt_in.basetype
+		)
+}
+
+rule MatrixType {
+	from
+		dt_in: IN_MM!MatrixType
+	to
+		dt_out: OUT_MM!MatrixType (
+			basetype <- dt_in.basetype,
+			rows <- dt_in.rows,
+			columns <- dt_in.columns
+		)
+}
+
+rule VectorType {
+	from
+		dt_in: IN_MM!VectorType
+	to
+		dt_out: OUT_MM!VectorType (
+			basetype <- dt_in.basetype,
+			size <- dt_in.size
+		)
+}
+
+------------------------------
+-- Rules creating Variables --
+------------------------------
+helper context IN_MM!Block def: outVariableName(): String =
+	self.name + '_out';
+
+helper context IN_MM!Block def: memVariableName(): String =
+	self.name + '_memory';
+
+-- The Outport of an InputBlock is translated to an (input) argument of the
+-- compute function
+rule InputBlockOutport2FunctionArgument {
+	from
+		oport: IN_MM!Outport (
+			oport.parentBlock.oclIsTypeOf(IN_MM!InputBlock)
+		)
+	to
+		var: OUT_MM!FunctionArgument (
+			name <- oport.parentBlock.name,
+			type <- oport.type
+		)
+}
+
+-- The Inport of an OutputBlock is translated to an (output) argument of the
+-- compute function.
+rule OutputBlockInport2FunctionArgument {
+	from
+		inport: IN_MM!Inport (
+			inport.parentBlock.oclIsTypeOf(IN_MM!OutputBlock)
+		)
+	to
+		outputVariable: OUT_MM!FunctionArgument (
+			name <- inport.parentBlock.name,
+			type <- inport.type
+		)
+}
+
+-- Each block's outport (except InterfaceBlocks) is translated to a local
+-- variable in the compute function.
+rule Outport2LocalVariable {
+	from
+		oport: IN_MM!Outport (
+			not oport.parentBlock.oclIsKindOf(IN_MM!InterfaceBlock)
+		)
+	to
+		var: OUT_MM!LocalVariable (
+			name <- oport.parentBlock.outVariableName(),
+			type <- oport.type
+		)
+}
+
+--------------------------------------------
+-- Rules creating references to Variables --
+--------------------------------------------
+
+-- Each Signal is translated to a reference VariableExp to the variable
+-- correponding to the source port of the signal.
+rule Signal2VariableExp {
+	from
+		sig: IN_MM!Signal
+	to
+		varExp: OUT_MM!VariableExp (
+			name <- sig.srcPort.parentBlock.outVariableName(),
+			referencedVariable <- sig.srcPort
+		)
+}
+
+-----------------------------------------------------------------------------------
+-- Block-specific rules creating global variables, local variables, and init and --
+-- update statements                                                             --
+------------------------------------------------------------------------------------
+rule OutputBlock2OutArgumentAssignment {
+	from
+		block: IN_MM!OutputBlock
+	to
+		-- Create an assignment to the output argument of the compute function.
+		computeStatement: OUT_MM!AssignmentStmt (
+			name <- ':=',
+			name <- 'Compute statement for ' + block.name,
+			leftExp <- outParamExp,
+			rightExp <- block.inports -> at(1).inSignal
+		),
+		outParamExp: OUT_MM!VariableExp (
+			name <- block.name,
+			-- The output argument is retrieved by resolving the input port (see
+			-- rule OutputBlockInport2FunctionArgument).
+			referencedVariable <- block.inports -> at(1)
+		)
+}
+
+rule Sum {
+	from
+		block: IN_MM!Sum
+	to
+		-- Create an assignment statement performing the sum of the variables
+		-- corresponding to the input signals of the block.
+		computeStatement: OUT_MM!AssignmentStmt (
+			name <- ':=',
+			name <- 'Compute statement for ' + block.name,
+			leftExp <- outVariableExp,
+			rightExp <- binExp
+		),
+		binExp: OUT_MM!BinaryExp (
+			name <- '+',
+			operator <- '+',
+			-- The Variables of the sum are retrieved by resolving the input Signals (see
+			-- rule Signal2VariableExp).
+			left <- block.inports -> at(1).inSignal,
+			right <- block.inports -> at(2).inSignal
+		),
+		outVariableExp: OUT_MM!VariableExp (
+			name <- block.outVariableName(),
+			-- The target Variable is retrieved by resolving the Outport (see rule
+			-- Outport2LocalVariable).
+			referencedVariable <- block.outports -> at(1)
+		)
+}
+
+helper context IN_MM!Block def: gainVariableName(): String =
+	self.name + '_gain_factor';
+
+rule Gain {
+	from
+		block: IN_MM!GainBlock
+	to
+		-- Create the gain factor variable.
+		globalVariable: OUT_MM!GlobalVariable (
+			name <- block.gainVariableName(),
+			constant <- true
+		),
+		-- Create an init statement to initialize the global variable.
+		initStatement: OUT_MM!AssignmentStmt (
+			name <- ':=',
+			leftExp <- globVariableExp,
+			rightExp <- globVarInitValue
+		),
+		globVariableExp: OUT_MM!VariableExp (
+			name <- block.memVariableName(),
+			referencedVariable <- globalVariable
+		),
+		globVarInitValue: OUT_MM!LiteralExp (
+			name <- block.gainfactor,
+			value <- block.gainfactor
+		),
+		-- Create a compute statement that sets the output to the value of the memory
+		-- variable.
+		computeStatement: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			name <- 'Compute statement for ' + block.name,
+			leftExp <- outVariableExp,
+			rightExp <- binExp
+		),
+		outVariableExp: OUT_MM!VariableExp (
+--			name <- block.outVariableName(),
+			referencedVariable <- block.outports -> at(1)
+		),
+		globVariableExp1: OUT_MM!VariableExp (
+--			name <- block.memVariableName(),
+			referencedVariable <- globalVariable
+		),
+		binExp: OUT_MM!BinaryExp (
+--			name <- '*',
+			operator <- '*',
+			-- The Variables of the sum are retrieved by resolving the input Signals (see
+			-- rule Signal2VariableExp).
+			left <- globVariableExp1,
+			right <- block.inports -> at(1).inSignal
+		)
+}
+
+rule Saturation {
+	from
+		block: IN_MM!Saturation
+	to
+		-- Create a compute statement of the form:
+		--    if in < upperBound then
+		--       if in > lowerBound then
+		--          out := in;
+		--       else
+		--          out := lowerBound;
+		--       end if;
+		--    else
+		--       out := upperBound;
+		--    end if;
+		computeStatement: OUT_MM!IfStmt (
+--			name <- 'if1',
+			name <- 'Compute statement for ' + block.name,
+			condition <- condition1,
+			thenStmt <- thenStmt1,
+			elseStmt <- elseStmt1
+		),
+		condition1: OUT_MM!BinaryExp (
+--			name <- '<',
+			operator <- '<',
+			left <- ref1ToInput,
+			right <- upperBound1
+		),
+		thenStmt1: OUT_MM!IfStmt (
+--			name <- 'if2',
+			condition <- condition2,
+			thenStmt <- thenStmt2,
+			elseStmt <- elseStmt2
+		),
+		condition2: OUT_MM!BinaryExp (
+--			name <- '>',
+			operator <- '>',
+			left <- ref2ToInput,
+			right <- lowerBound1
+		),
+		elseStmt1: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			leftExp <- ref1ToOutput,
+			rightExp <- upperBound2
+		),
+		thenStmt2: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			leftExp <- ref2ToOutput,
+			rightExp <- block.inports -> at(1).inSignal
+		),
+		elseStmt2: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			leftExp <- ref3ToOutput,
+			rightExp <- lowerBound2
+		),
+		ref1ToInput: OUT_MM!VariableExp (
+--			name <- block.inports -> at(1).inSignal.srcPort.name,
+			referencedVariable <- block.inports -> at(1).inSignal.srcPort
+		),
+		ref2ToInput: OUT_MM!VariableExp (
+--			name <- block.inports -> at(1).inSignal.srcPort.name,
+			referencedVariable <- block.inports -> at(1).inSignal.srcPort
+		),
+		upperBound1: OUT_MM!LiteralExp (
+--			name <- block.upperBound,
+			value <- block.upperBound
+		),
+		upperBound2: OUT_MM!LiteralExp (
+--			name <- block.upperBound,
+			value <- block.upperBound
+		),
+		ref1ToOutput: OUT_MM!VariableExp (
+--			name <- block.outVariableName(),
+			referencedVariable <- block.outports -> at(1)
+		),
+		ref2ToOutput: OUT_MM!VariableExp (
+--			name <- block.outVariableName(),
+			referencedVariable <- block.outports -> at(1)
+		),
+		ref3ToOutput: OUT_MM!VariableExp (
+--			name <- block.outVariableName(),
+			referencedVariable <- block.outports -> at(1)
+		),
+		lowerBound1: OUT_MM!LiteralExp (
+--			name <- block.lowerBound,
+			value <- block.lowerBound
+		),
+		lowerBound2: OUT_MM!LiteralExp (
+--			name <- block.lowerBound,
+			value <- block.lowerBound
+		)
+}
+
+rule UnitDelay {
+	from
+		block: IN_MM!UnitDelay
+	to
+		-- Create a global/memory variable.
+		globalVariable: OUT_MM!GlobalVariable (
+			name <- block.memVariableName()
+		),
+		-- Create an init statement to initialize the global variable.
+		initStatement: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			leftExp <- globVarExp,
+			rightExp <- globVarInitValue
+		),
+		globVarExp: OUT_MM!VariableExp (
+--			name <- block.memVariableName(),
+			referencedVariable <- globalVariable
+		),
+		globVarInitValue: OUT_MM!LiteralExp (
+--			name <- block.initialCondition,
+			value <- block.initialCondition
+		),
+		-- Create a compute statement that sets the output to the value of the memory
+		-- variable.
+		computeStatement: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			name <- 'Compute statement for ' + block.name,
+			leftExp <- outVariableExp,
+			rightExp <- globVariableExp1
+		),
+		-- Create the update statement that updates the memory variable to the value
+		-- of the current input.
+		updateStatement: OUT_MM!AssignmentStmt (
+--			name <- ':=',
+			name <- 'Update statement for ' + block.name,
+			leftExp <- globVariableExp2,
+			rightExp <- block.inports -> at(1).inSignal
+		),
+		outVariableExp: OUT_MM!VariableExp (
+--			name <- block.outVariableName(),
+			referencedVariable <- block.outports -> at(1)
+		),
+		globVariableExp1: OUT_MM!VariableExp (
+--			name <- block.memVariableName(),
+			referencedVariable <- globalVariable
+		),
+		globVariableExp2: OUT_MM!VariableExp (
+--			name <- block.memVariableName(),
+			referencedVariable <- globalVariable
+		)
+}

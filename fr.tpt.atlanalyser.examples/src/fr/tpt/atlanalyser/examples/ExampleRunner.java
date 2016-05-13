@@ -14,15 +14,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +35,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.util.DiagnosticException;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -48,6 +53,7 @@ import org.eclipse.emf.compare.match.IMatchEngine;
 import org.eclipse.emf.compare.match.eobject.IEObjectMatcher;
 import org.eclipse.emf.compare.match.impl.MatchEngineFactoryImpl;
 import org.eclipse.emf.compare.match.impl.MatchEngineFactoryRegistryImpl;
+import org.eclipse.emf.compare.scope.DefaultComparisonScope;
 import org.eclipse.emf.compare.scope.IComparisonScope;
 import org.eclipse.emf.compare.utils.UseIdentifiers;
 import org.eclipse.emf.ecore.EClass;
@@ -84,6 +90,17 @@ import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.resource.HenshinResourceFactory;
 import org.eclipse.emf.henshin.model.resource.HenshinResourceSet;
 import org.eclipse.emf.henshin.model.util.HenshinSwitch;
+import org.eclipse.m2m.atl.core.ATLCoreException;
+import org.eclipse.m2m.atl.core.IExtractor;
+import org.eclipse.m2m.atl.core.IInjector;
+import org.eclipse.m2m.atl.core.IModel;
+import org.eclipse.m2m.atl.core.IReferenceModel;
+import org.eclipse.m2m.atl.core.ModelFactory;
+import org.eclipse.m2m.atl.core.emf.EMFExtractor;
+import org.eclipse.m2m.atl.core.emf.EMFInjector;
+import org.eclipse.m2m.atl.core.emf.EMFModel;
+import org.eclipse.m2m.atl.core.emf.EMFModelFactory;
+import org.eclipse.m2m.atl.core.launch.ILauncher;
 import org.eclipse.m2m.atl.emftvm.EmftvmFactory;
 import org.eclipse.m2m.atl.emftvm.ExecEnv;
 import org.eclipse.m2m.atl.emftvm.Metamodel;
@@ -91,6 +108,7 @@ import org.eclipse.m2m.atl.emftvm.Model;
 import org.eclipse.m2m.atl.emftvm.ModelDeclaration;
 import org.eclipse.m2m.atl.emftvm.impl.resource.EMFTVMResourceFactoryImpl;
 import org.eclipse.m2m.atl.emftvm.util.ExecEnvPool;
+import org.eclipse.m2m.atl.engine.emfvm.launch.EMFVMLauncher;
 import org.javatuples.Triplet;
 
 import com.google.common.base.Function;
@@ -441,52 +459,103 @@ public class ExampleRunner {
         LOGGER.info("    input: {}", inputModelPath);
         LOGGER.info("   output: {}", outputModelPath);
 
-        ExecEnvPool pool = new ExecEnvPool();
-        ExecEnv execEnv = pool.getExecEnv();
+        ILauncher transformationLauncher = new EMFVMLauncher();
+        ModelFactory modelFactory = new EMFModelFactory();
+        IInjector injector = new EMFInjector();
 
         compiledTransfo = transformationDir
-                .listFiles((FilenameFilter) new SuffixFileFilter(".emftvm"))[0];
+                .listFiles((FilenameFilter) new SuffixFileFilter(".asm"))[0];
+        try {
+            File inputMMFile = inputMMDir
+                    .listFiles((FilenameFilter) new SuffixFileFilter(".ecore"))[0];
+            File outputMMFile = outputMMDir
+                    .listFiles((FilenameFilter) new SuffixFileFilter(".ecore"))[0];
 
-        assertTrue(compiledTransfo.isFile());
+            IReferenceModel MMA = modelFactory.newReferenceModel();
+            injector.inject(MMA,
+                    URI.createFileURI(inputMMFile.getAbsolutePath()).toString());
+            IReferenceModel MMB = modelFactory.newReferenceModel();
+            injector.inject(MMB,
+                    URI.createFileURI(outputMMFile.getAbsolutePath())
+                            .toString());
 
-        PathModuleResolver resolver = new PathModuleResolver();
-        org.eclipse.m2m.atl.emftvm.Module emftvmModule = resolver
-                .resolveModule(compiledTransfo.getPath());
+            IModel mA = modelFactory.newModel(MMA);
+            File inputFile = new File(inputModelPath);
+            injector.inject(mA, URI.createFileURI(inputFile.getAbsolutePath())
+                    .toString());
 
-        ModelDeclaration inModelDecl = emftvmModule.getInputModels().get(0);
-        ModelDeclaration outModelDecl = emftvmModule.getOutputModels().get(0);
+            transformationLauncher.initialize(new HashMap<String, Object>());
 
-        Metamodel inputMetamodel = emftvmFactory.createMetamodel();
-        inputMetamodel.setResource(getInputMMEPkg().eResource());
-        execEnv.registerMetaModel(inModelDecl.getMetaModelName(),
-                inputMetamodel);
+            transformationLauncher.addInModel(mA, "IN", "IN_MM");
 
-        Metamodel outputMetamodel = emftvmFactory.createMetamodel();
-        outputMetamodel.setResource(getOutputMMEPkg().eResource());
-        execEnv.registerMetaModel(outModelDecl.getMetaModelName(),
-                outputMetamodel);
+            EMFModel mB = (EMFModel) modelFactory.newModel(MMB);
+            transformationLauncher.addOutModel(mB, "OUT", "OUT_MM");
+            transformationLauncher.launch(ILauncher.RUN_MODE,
+                    new NullProgressMonitor(), new HashMap<String, Object>(),
+                    new FileInputStream(compiledTransfo.getPath()));
 
-        execEnv.loadModule(resolver, compiledTransfo.getPath());
+            IExtractor extractor = new EMFExtractor();
+            File outFile = new File(outputModelPath);
+            extractor.extract(mB, URI.createFileURI(outFile.getAbsolutePath())
+                    .toString());
 
-        Model inModel = emftvmFactory.createModel();
-        File inFile = new File(inputModelPath);
-        Resource inRes = resourceSet.createResource(URI.createFileURI(inFile
-                .getCanonicalPath()));
-        inRes.load(Collections.emptyMap());
-        inModel.setResource(inRes);
-        execEnv.registerInputModel(inModelDecl.getModelName(), inModel);
+            mB.getResource().save(xmiSaveOptions);
 
-        Model outModel = emftvmFactory.createModel();
-        File outFile = new File(outputModelPath);
-        outModel.setResource(resourceSet.createResource(URI
-                .createFileURI(outFile.getCanonicalPath())));
-        execEnv.registerOutputModel(outModelDecl.getModelName(), outModel);
+            return mB.getResource();
+        } catch (ATLCoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-        execEnv.run(null);
+        return null;
 
-        outModel.getResource().save(xmiSaveOptions);
-
-        return outModel.getResource();
+        // ExecEnvPool pool = new ExecEnvPool();
+        // ExecEnv execEnv = pool.getExecEnv();
+        //
+        // compiledTransfo = transformationDir
+        // .listFiles((FilenameFilter) new SuffixFileFilter(".emftvm"))[0];
+        //
+        // assertTrue(compiledTransfo.isFile());
+        //
+        // PathModuleResolver resolver = new PathModuleResolver();
+        // org.eclipse.m2m.atl.emftvm.Module emftvmModule = resolver
+        // .resolveModule(compiledTransfo.getPath());
+        //
+        // ModelDeclaration inModelDecl = emftvmModule.getInputModels().get(0);
+        // ModelDeclaration outModelDecl =
+        // emftvmModule.getOutputModels().get(0);
+        //
+        // Metamodel inputMetamodel = emftvmFactory.createMetamodel();
+        // inputMetamodel.setResource(getInputMMEPkg().eResource());
+        // execEnv.registerMetaModel(inModelDecl.getMetaModelName(),
+        // inputMetamodel);
+        //
+        // Metamodel outputMetamodel = emftvmFactory.createMetamodel();
+        // outputMetamodel.setResource(getOutputMMEPkg().eResource());
+        // execEnv.registerMetaModel(outModelDecl.getMetaModelName(),
+        // outputMetamodel);
+        //
+        // execEnv.loadModule(resolver, compiledTransfo.getPath());
+        //
+        // Model inModel = emftvmFactory.createModel();
+        // File inFile = new File(inputModelPath);
+        // Resource inRes = resourceSet.createResource(URI.createFileURI(inFile
+        // .getCanonicalPath()));
+        // inRes.load(Collections.emptyMap());
+        // inModel.setResource(inRes);
+        // execEnv.registerInputModel(inModelDecl.getModelName(), inModel);
+        //
+        // Model outModel = emftvmFactory.createModel();
+        // File outFile = new File(outputModelPath);
+        // outModel.setResource(resourceSet.createResource(URI
+        // .createFileURI(outFile.getCanonicalPath())));
+        // execEnv.registerOutputModel(outModelDecl.getModelName(), outModel);
+        //
+        // execEnv.run(null);
+        //
+        // outModel.getResource().save(xmiSaveOptions);
+        //
+        // return outModel.getResource();
     }
 
     public Module loadHenshinTransformation() throws IOException {
@@ -618,8 +687,21 @@ public class ExampleRunner {
 
     public void compareModels(Resource left, Resource right) throws IOException {
         LOGGER.info("Comparing output models");
+
+        // First compare the raw text. If that's exactly the same then no need
+        // to check the model structure.
+        File leftFile = new File(left.getURI().path());
+        File rightFile = new File(right.getURI().path());
+        boolean same = compareTextualContent(leftFile, rightFile);
+
+        if (same) {
+            return;
+        }
+
+        // Compare the model structure.
+
         IEObjectMatcher matcher = DefaultMatchEngine
-                .createDefaultEObjectMatcher(UseIdentifiers.NEVER);
+                .createDefaultEObjectMatcher(UseIdentifiers.WHEN_AVAILABLE);
         IComparisonFactory comparisonFactory = new DefaultComparisonFactory(
                 new DefaultEqualityHelperFactory());
         IMatchEngine.Factory matchEngineFactory = new MatchEngineFactoryImpl(
@@ -630,10 +712,9 @@ public class ExampleRunner {
         EMFCompare comparator = EMFCompare.builder()
                 .setMatchEngineFactoryRegistry(matchEngineRegistry).build();
 
-        IComparisonScope scope = EMFCompare.createDefaultScope(left, right);
-        Comparison comp = comparator.compare(scope);
+        Comparison comp = comparator.compare(new DefaultComparisonScope(left,
+                right, null));
 
-        File rightFile = new File(right.getURI().path());
         File diffFile = new File(rightFile.getParentFile(),
                 FilenameUtils.getBaseName(rightFile.getPath()) + ".diff");
         Resource diffRes = resourceSet.createResource(URI
@@ -656,6 +737,19 @@ public class ExampleRunner {
                     differences.size() == 0);
         }
 
+    }
+
+    private boolean compareTextualContent(File leftFile, File rightFile)
+            throws FileNotFoundException {
+        boolean same = true;
+        Scanner leftScanner = new Scanner(leftFile);
+        Scanner rightScanner = new Scanner(rightFile);
+        while (same && leftScanner.hasNext() && rightScanner.hasNext()) {
+            same = leftScanner.next().equals(rightScanner.next());
+        }
+        leftScanner.close();
+        rightScanner.close();
+        return same;
     }
 
     protected EPackage getOutputMMEPkg() throws IOException {

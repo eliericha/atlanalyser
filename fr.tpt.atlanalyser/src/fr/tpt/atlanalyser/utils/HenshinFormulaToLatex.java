@@ -28,6 +28,7 @@ import org.eclipse.emf.henshin.model.Rule;
 import org.eclipse.emf.henshin.model.Unit;
 import org.eclipse.emf.henshin.model.util.HenshinSwitch;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -189,17 +190,30 @@ public class HenshinFormulaToLatex {
                 String nodeId = "n" + Integer.toString(i++);
                 nodeToId.put(node, nodeId);
 
+                String attributes = "";
+                if (!node.getAttributes().isEmpty()) {
+                    attributes += "\n"
+                            + Joiner.on("\n").join(
+                                    node.getAttributes()
+                                            .stream()
+                                            .map(a -> String.format("%s = %s",
+                                                    a.getType().getName(),
+                                                    a.getValue()))
+                                            .collect(Collectors.toList()));
+                }
+
                 String color = nodeToColor.get(node);
 
-                dot += String.format("%s [label=\"%s:%s\",color=\"%s\"];\n",
+                dot += String.format("%s [label=\"%s:%s%s\",color=\"%s\"];\n",
                         nodeId, node.getName() != null ? node.getName() : "",
-                        node.getType().getName(), color);
+                        node.getType().getName(), attributes,
+                        color);
             }
 
             for (Edge edge : conclusion.getEdges()) {
-                Integer index = edge.getIndexConstant();
+                String index = edge.getIndex();
                 dot += String.format("%s -> %s [label=\"%s"
-                        + (index != null ? "[%s]" : "") + "\"];\n", nodeToId
+                        + (index != null && index != "" ? "[%s]" : "") + "\"];\n", nodeToId
                         .get(edge.getSource()), nodeToId.get(edge.getTarget()),
                         edge.getType().getName(), index);
             }

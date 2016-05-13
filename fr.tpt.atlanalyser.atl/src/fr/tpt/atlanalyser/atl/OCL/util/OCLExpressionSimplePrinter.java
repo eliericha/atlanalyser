@@ -27,8 +27,10 @@ import fr.tpt.atlanalyser.atl.OCL.CollectionOperationCallExp;
 import fr.tpt.atlanalyser.atl.OCL.IfExp;
 import fr.tpt.atlanalyser.atl.OCL.IntegerExp;
 import fr.tpt.atlanalyser.atl.OCL.IteratorExp;
+import fr.tpt.atlanalyser.atl.OCL.LetExp;
 import fr.tpt.atlanalyser.atl.OCL.NavigationOrAttributeCallExp;
 import fr.tpt.atlanalyser.atl.OCL.OclExpression;
+import fr.tpt.atlanalyser.atl.OCL.OclModel;
 import fr.tpt.atlanalyser.atl.OCL.OclModelElement;
 import fr.tpt.atlanalyser.atl.OCL.OclType;
 import fr.tpt.atlanalyser.atl.OCL.OperationCallExp;
@@ -47,6 +49,15 @@ public class OCLExpressionSimplePrinter extends OCLSwitch<String> {
     @Override
     public String defaultCase(EObject object) {
         return "Printer NYI for " + object.eClass().getName();
+    }
+
+    @Override
+    public String caseLetExp(LetExp object) {
+        // TODO Auto-generated method stub
+        VariableDeclaration variableDecl = object.getVariable();
+        OclExpression body = object.getIn_();
+        return String.format("let %s in %s", this.doSwitch(variableDecl),
+                this.doSwitch(body));
     }
 
     @Override
@@ -175,8 +186,9 @@ public class OCLExpressionSimplePrinter extends OCLSwitch<String> {
 
     @Override
     public String caseOclModelElement(OclModelElement object) {
-        return String.format("%s!%s", object.getModel().getName(),
-                object.getName());
+        OclModel model = object.getModel();
+        String modelName = model != null ? model.getName() : "null";
+        return String.format("%s!%s", modelName, object.getName());
     }
 
     public String print(OclExpression exp) {

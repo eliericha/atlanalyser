@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,7 +86,6 @@ public class OCL2NGC extends OCLSwitch<Object> {
     List<ATLAnalyserException>          errors       = new ArrayList<ATLAnalyserException>();
     private Graph                       hostGraph;
     private NestedCondition             currentNC;
-    private Formula                     currentFormula;
     static private int                  paramCounter = 1;
     private Graph                       conclusion;
     private EObject                     currentObj;
@@ -112,16 +112,26 @@ public class OCL2NGC extends OCLSwitch<Object> {
         this.parentOcl2Ngc = ocl2ngc;
     }
 
+    public OCL2NGC(OCL2NGC ocl2ngc, ATL2Henshin atl2Henshin2, Graph hostGraph2,
+            NestedCondition currentNC, Map<String, Node> varNameToNode2) {
+        this(atl2Henshin2, hostGraph2, varNameToNode2);
+        this.parentOcl2Ngc = ocl2ngc;
+        this.currentNC = currentNC;
+        this.conclusion = currentNC.getConclusion();
+    }
+
     @Override
     public Object caseNavigationOrAttributeCallExp(
             NavigationOrAttributeCallExp navExp) {
         final OclExpression source = navExp.getSource();
+        final String propertyName = navExp.getName();
         final Node sourceNode = (Node) this.doSwitch(source);
 
-        final String propertyName = navExp.getName();
         EClass sourceType = sourceNode.getType();
         EStructuralFeature eStructuralFeature = sourceType
-                .getEStructuralFeature(propertyName);
+                .getEAllStructuralFeatures().stream()
+                .filter(f -> propertyName.equals(f.getName())).findAny()
+                .orElse(null);
 
         if (eStructuralFeature instanceof EReference) {
             EReference eRef = (EReference) eStructuralFeature;
@@ -164,7 +174,8 @@ public class OCL2NGC extends OCLSwitch<Object> {
                 return param;
             }
         } else {
-            nys("NavigationOrAttributeCallExp not supported: {}", navExp);
+            error("Could not resolve the feature '{}' in: {}", propertyName,
+                    navExp);
         }
 
         return NULL;
@@ -362,7 +373,10 @@ public class OCL2NGC extends OCLSwitch<Object> {
             } else {
                 return NGCUtils.createTrue();
             }
-
+        } else if ("notEmpty".equals(op)) {
+            assert sourceNode != null;
+            Formula overlappedNC = overlapWithHost();
+            return overlappedNC;
         } else {
             nys("CollectionOperationCallExp NYS: {}", exp);
         }
@@ -427,6 +441,14 @@ public class OCL2NGC extends OCLSwitch<Object> {
     }
 
     @Override
+    public Object caseOclModelElement(OclModelElement object) {
+        String oclType = object.getName();
+        EClass eClass = atl2Henshin.resolveOclType(oclType);
+        Node node = HF.createNode(currentNC.getConclusion(), eClass, null);
+        return node;
+    }
+
+    @Override
     public Object caseOperationCallExp(OperationCallExp opCallExp) {
         String opName = opCallExp.getOperationName();
         OclExpression source = opCallExp.getSource();
@@ -440,14 +462,22 @@ public class OCL2NGC extends OCLSwitch<Object> {
             sourceNode.setType(argType);
 
             return currentNC;
+        } else if ("oclAsType".equals(opName)) {
+            OclModelElement arg = (OclModelElement) opCallExp.getArguments()
+                    .get(0);
+            EClass type = atl2Henshin.resolveOclType(arg.getName());
+            sourceNode.setType(type);
+            return sourceNode;
         } else if ("oclIsUndefined".equals(opName)) {
             Formula overlappedNC = overlapWithHost();
 
             Not res = NGCUtils.negate(overlappedNC);
 
             return res;
+        } else if ("allInstances".equals(opName)) {
+            return sourceNode;
         } else {
-            nys(opName);
+            nys("OperationCallExp " + opName);
         }
 
         return NULL;
@@ -573,6 +603,35 @@ public class OCL2NGC extends OCLSwitch<Object> {
 
                 return NGCUtils.createConjunction(NGCUtils.negate(newNCs));
             }
+        } else if ("select".equals(itName)) {
+            List<NestedCondition> newNCs = overlapIteratorAndBody(iteratorExp,
+                    sourceNode);
+            Formula selectCondition = NGCUtils.createDisjunction(newNCs);
+            assert currentNC.getConclusion().getFormula() == null;
+            currentNC.getConclusion().setFormula(selectCondition);
+            return sourceNode;
+        } else if ("collect".equals(itName)) {
+
+            List<Pair<NestedCondition, Node>> results = overlapCollectIteratorAndBody(
+                    iteratorExp, sourceNode);
+            assert !results.isEmpty();
+            Node collectResult = HF.createNode(currentNC.getConclusion(),
+                    results.get(0).getValue1().getType(), null);
+            Annotation ann = HF.createAnnotation();
+            ann.setKey(OCLExpressionSimplePrinter.toString(iteratorExp));
+            collectResult.getAnnotations().add(ann);
+
+            for (Pair<NestedCondition, Node> pair : results) {
+                NestedCondition cdt = pair.getValue0();
+                Node subCollectResult = pair.getValue1();
+                cdt.getMappings().add(collectResult, subCollectResult);
+            }
+
+            currentNC.getConclusion().setFormula(
+                    NGCUtils.createDisjunction(results.stream()
+                            .map(p -> p.getValue0())
+                            .collect(Collectors.toList())));
+            return collectResult;
         } else {
             nys("IteratorExp not yet supported {}",
                     OCLExpressionSimplePrinter.toString(iteratorExp));
@@ -637,6 +696,60 @@ public class OCL2NGC extends OCLSwitch<Object> {
         return newNCs;
     }
 
+    private List<Pair<NestedCondition, Node>> overlapCollectIteratorAndBody(
+            IteratorExp iteratorExp, Node sourceNode) {
+        fr.tpt.atlanalyser.atl.OCL.Iterator iterator = iteratorExp
+                .getIterators().get(0);
+        sourceNode.setName(iterator.getVarName());
+
+        GraphOverlapGenerator overlapper = overlapNCWithHost(currentNC,
+                hostGraph);
+
+        OclExpression body = iteratorExp.getBody();
+        String itVarName = iterator.getVarName();
+        List<Pair<NestedCondition, Node>> res = Lists.newArrayList();
+        for (Pair<Morphism, Morphism> overlap : overlapper) {
+            Morphism conclusionToOverlap = overlap.getValue0();
+            Morphism hostToOverlap = overlap.getValue1();
+
+            SetView<Node> overlappedNodes = Sets.intersection(
+                    conclusionToOverlap.getCodomainNodes(),
+                    hostToOverlap.getCodomainNodes());
+
+            Map<String, Node> newVarMap = Maps.newHashMap();
+            for (Node node : overlappedNodes) {
+                Node hostNode = hostToOverlap.getOrigin(node);
+                Node conclusionNode = conclusionToOverlap.getOrigin(node);
+                if (hostNode.getName().equals(conclusionNode.getName())) {
+                    node.setName(hostNode.getName());
+                } else {
+                    newVarMap.put(hostNode.getName(), node);
+                    newVarMap.put(conclusionNode.getName(), node);
+                }
+            }
+
+            NestedCondition newNC = NGCUtils
+                    .createNestedCondition(hostToOverlap);
+
+            for (Mapping mapping : conclusionToOverlap) {
+                Node origin = mapping.getOrigin();
+                Node image = mapping.getImage();
+
+                image.getAttributes().addAll(
+                        EcoreUtil.copyAll(origin.getAttributes()));
+            }
+
+            Node sourceNodeInNewNC = conclusionToOverlap.getImage(sourceNode);
+
+            newVarMap.put("self", sourceNodeInNewNC);
+            newVarMap.put(itVarName, sourceNodeInNewNC);
+            Node queryResult = (Node) new OCL2NGC(this, atl2Henshin,
+                    conclusion, newNC, newVarMap).translateOcl2NgcGeneric(body);
+            res.add(Pair.with(newNC, queryResult));
+        }
+        return res;
+    }
+
     private void nys(String fmt, Object... objects) {
         error("Not yet supported: " + fmt, objects);
     }
@@ -648,7 +761,21 @@ public class OCL2NGC extends OCLSwitch<Object> {
         } else {
             EObject oldObject = currentObj;
             currentObj = eObject;
-            Object result = super.doSwitch(eObject);
+            Object result = null;
+            try {
+                result = super.doSwitch(eObject);
+            } catch (Exception ex) {
+                if (currentObj instanceof LocatedElement) {
+                    error((LocatedElement) currentObj, "Error parsing: {}",
+                            currentObj);
+                } else {
+                    error("Error parsing: {}", currentObj);
+                }
+                throw ex;
+            }
+            if (result == null) {
+                nys("Result was null for: {}", eObject.toString());
+            }
             currentObj = oldObject;
             return result;
         }
@@ -736,9 +863,10 @@ public class OCL2NGC extends OCLSwitch<Object> {
         }
     }
 
-    public Formula translateOcl2Ngc(OclExpression oclExp) {
+    public Object translateOcl2NgcGeneric(OclExpression oclExp) {
         if (oclExp != null) {
             Object result = this.doSwitch(oclExp);
+            assert result != null;
             String stringExp = OCLExpressionSimplePrinter.toString(oclExp);
 
             if (result instanceof Parameter) {
@@ -756,31 +884,32 @@ public class OCL2NGC extends OCLSwitch<Object> {
                 rule.getAttributeConditions().add(cdt);
 
                 result = currentNC;
+            } else if (result instanceof Formula || result instanceof Node) {
+                // result is a Formula.
+                // But we need a ModelElement to be able to annotate it. Formula
+                // is abstract, and all its descendants inherit ModelElement, so
+                // the following is safe.
+                ModelElement modelEl = (ModelElement) result;
+                EList<Annotation> annotations = modelEl.getAnnotations();
+                if (annotations.size() > 0) {
+                    Annotation annotation = annotations.get(0);
+                    annotation.setKey(stringExp + " " + annotation.getKey());
+                } else {
+                    Annotation annotation = HF.createAnnotation();
+                    annotation.setKey(stringExp);
+                    annotations.add(annotation);
+                }
             }
 
-            // result is a Formula.
-            // But we need a ModelElement to be able to annotate it. Formula
-            // is abstract, and all its descendants inherit ModelElement, so
-            // the following is safe.
-            ModelElement formula = (ModelElement) result;
-            EList<Annotation> annotations = formula.getAnnotations();
-            if (annotations.size() > 0) {
-                Annotation annotation = annotations.get(0);
-                annotation.setKey(stringExp + " " + annotation.getKey());
-            } else {
-                Annotation annotation = HF.createAnnotation();
-                annotation.setKey(stringExp);
-                annotations.add(annotation);
-            }
-
-            return (Formula) result;
+            return result;
         }
 
-        // if (errors.size() > 0) {
-        // throw errors.get(0);
-        // }
-
         return null;
+
+    }
+
+    public Formula translateOcl2Ngc(OclExpression oclExp) {
+        return (Formula) translateOcl2NgcGeneric(oclExp);
     }
 
     private void error(String fmt, Object... args) {

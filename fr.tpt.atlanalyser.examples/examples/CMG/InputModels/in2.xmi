@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ASCII"?>
+<systemmodel:SystemModel
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:systemmodel="http://systemmodel/1.0"
+    xsi:schemaLocation="http://systemmodel/1.0 ../InputMM/systemmodel.ecore"
+    name="mySystem">
+  <blocks xsi:type="systemmodel:InputBlock"
+      name="In1"
+      sequenceNumber="1">
+    <outports
+        name="In1_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.0"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:InputBlock"
+      name="In2"
+      sequenceNumber="2">
+    <outports
+        name="In2_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.1"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:Sum"
+      name="Sum1"
+      sequenceNumber="3">
+    <inports
+        name="Sum1_In1"
+        type="//@dataTypes.0"
+        inSignal="//@signals.0"/>
+    <inports
+        name="Sum1_In2"
+        type="//@dataTypes.0"
+        inSignal="//@signals.1"/>
+    <outports
+        name="Sum1_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.2"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:Sum"
+      name="Sum2"
+      sequenceNumber="5">
+    <inports
+        name="Sum2_In1"
+        type="//@dataTypes.0"
+        inSignal="//@signals.2"/>
+    <inports
+        name="Sum2_In2"
+        type="//@dataTypes.0"
+        inSignal="//@signals.4"/>
+    <outports
+        name="Sum2_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.3 //@signals.5"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:UnitDelay"
+      name="UD1"
+      sequenceNumber="4"
+      initialCondition="2">
+    <inports
+        name="UD1_In1"
+        type="//@dataTypes.0"
+        inSignal="//@signals.3"/>
+    <outports
+        name="UD1_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.4"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:UnitDelay"
+      name="UD2"
+      sequenceNumber="6"
+      initialCondition="-3">
+    <inports
+        name="UD2_In1"
+        type="//@dataTypes.0"
+        inSignal="//@signals.5"/>
+    <outports
+        name="UD2_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.6"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:Saturation"
+      name="Sat"
+      sequenceNumber="7"
+      lowerBound="-3"
+      upperBound="5">
+    <inports
+        name="Sat_In1"
+        type="//@dataTypes.0"
+        inSignal="//@signals.6"/>
+    <outports
+        name="Sat_Out1"
+        type="//@dataTypes.0"
+        outSignals="//@signals.7"/>
+  </blocks>
+  <blocks xsi:type="systemmodel:OutputBlock"
+      name="Out1"
+      sequenceNumber="8">
+    <inports
+        name="Out1"
+        type="//@dataTypes.0"
+        inSignal="//@signals.7"/>
+  </blocks>
+  <signals name="In1 -> Sum1"
+      srcPort="//@blocks.0/@outports.0"
+      dstPort="//@blocks.2/@inports.0"/>
+  <signals name="In2 -> Sum1"
+      srcPort="//@blocks.1/@outports.0"
+      dstPort="//@blocks.2/@inports.1"/>
+  <signals name="Sum1 -> Sum2"
+      srcPort="//@blocks.2/@outports.0"
+      dstPort="//@blocks.3/@inports.0"/>
+  <signals name="Sum2 -> UD1"
+      srcPort="//@blocks.3/@outports.0"
+      dstPort="//@blocks.4/@inports.0"/>
+  <signals name="UD1 -> Sum2"
+      srcPort="//@blocks.4/@outports.0"
+      dstPort="//@blocks.3/@inports.1"/>
+  <signals name="Sum2 -> UD2"
+      srcPort="//@blocks.3/@outports.0"
+      dstPort="//@blocks.5/@inports.0"/>
+  <signals name="UD2 -> Sat"
+      srcPort="//@blocks.5/@outports.0"
+      dstPort="//@blocks.6/@inports.0"/>
+  <signals name="Sat -> Out1"
+      srcPort="//@blocks.6/@outports.0"
+      dstPort="//@blocks.7/@inports.0"/>
+  <dataTypes
+      xsi:type="systemmodel:MatrixType"
+      name="mat"
+      basetype="uint16"
+      rows="4"
+      columns="3"/>
+</systemmodel:SystemModel>

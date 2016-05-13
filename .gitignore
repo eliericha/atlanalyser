@@ -122,6 +122,7 @@ tramp
 # ATLAnalyzer log and output files
 /fr.tpt.atlanalyzer/201*.log
 /fr.tpt.atlanalyzer/201*.ggx
+*.log
 
 # Conflict files
 *.orig

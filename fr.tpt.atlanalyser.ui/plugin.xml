@@ -43,6 +43,25 @@
                menubarPath="fr.tpt.atlanalyser.ui.menu2/group2">
          </action>
       </objectContribution>
+      <objectContribution
+            id="fr.tpt.atlanalyser.ui.contribution3"
+            objectClass="org.eclipse.emf.henshin.model.Rule">
+         <menu
+               id="fr.tpt.atlanalyser.ui.menu3"
+               label="ATLAnalyser"
+               path="additions">
+            <separator
+                  name="group3">
+            </separator>
+         </menu>
+         <action
+               class="fr.tpt.atlanalyser.ui.popup.actions.RuleToLatex"
+               enablesFor="1"
+               id="fr.tpt.atlanalyser.ui.newAction2"
+               label="Translate Rule to LaTeX"
+               menubarPath="fr.tpt.atlanalyser.ui.menu3/group3">
+         </action>
+      </objectContribution>
    </extension>
 
 </plugin>

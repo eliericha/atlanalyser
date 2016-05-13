@@ -61,6 +61,8 @@ import fr.tpt.atlanalyser.atl.ATL.Module;
 import fr.tpt.atlanalyser.atl.ATL.OutPatternElement;
 import fr.tpt.atlanalyser.atl.ATL.PatternElement;
 import fr.tpt.atlanalyser.atl.ATL.Rule;
+import fr.tpt.atlanalyser.atl.OCL.BooleanExp;
+import fr.tpt.atlanalyser.atl.OCL.CollectionExp;
 import fr.tpt.atlanalyser.atl.OCL.CollectionOperationCallExp;
 import fr.tpt.atlanalyser.atl.OCL.IfExp;
 import fr.tpt.atlanalyser.atl.OCL.IntegerExp;
@@ -71,6 +73,7 @@ import fr.tpt.atlanalyser.atl.OCL.OclModelElement;
 import fr.tpt.atlanalyser.atl.OCL.OclType;
 import fr.tpt.atlanalyser.atl.OCL.OperationCallExp;
 import fr.tpt.atlanalyser.atl.OCL.OperatorCallExp;
+import fr.tpt.atlanalyser.atl.OCL.OrderedSetExp;
 import fr.tpt.atlanalyser.atl.OCL.SequenceExp;
 import fr.tpt.atlanalyser.atl.OCL.SetExp;
 import fr.tpt.atlanalyser.atl.OCL.StringExp;
@@ -104,6 +107,9 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
     private Map<GraphElement, List<GraphElement>>                                          elemToOrderNacElems = new HashMap<GraphElement, List<GraphElement>>();
     private Map<Edge, Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition>> edgeToOrderingNac   = new HashMap<Edge, Triplet<List<Parameter>, List<AttributeCondition>, NestedCondition>>();
     private EObject                                                                        currentObj;
+    private boolean                                                                        inSortedBy;
+    private String                                                                         prevIndex;
+    private String                                                                         currentIndex;
 
     public ResolveRuleBuilder(ATL2Henshin atl2Henshin, Rule atlRule,
             org.eclipse.emf.henshin.model.Rule rule,
@@ -170,7 +176,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
             return this.doSwitch(initExpression);
         } else {
             // This is a call from the last created node
-            final Node lastNodeInLhs = toLhs(lastNodeInRhs);
+            final Node lastNodeInLhsTree = toLhs(lastNodeInRhs);
             final EClass lastNodeType = lastNodeInRhs.getType();
 
             final EStructuralFeature eStructuralFeature = lastNodeType
@@ -209,7 +215,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                     final Node targetNodeInRhs = rule.getMappings().getImage(
                             targetNodeInLhs, rule.getRhs());
                     final Edge newEdgeInLhs = lhs.getRule().createEdge(
-                            lastNodeInLhs, targetNodeInLhs, eRef);
+                            lastNodeInLhsTree, targetNodeInLhs, eRef);
                     final Edge newEdgeInRhs = rule.getMappings().getImage(
                             newEdgeInLhs, rule.getRhs());
                     lastCreatedEdge = newEdgeInRhs;
@@ -247,8 +253,8 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                             && !isInIndexingExp
                             && !elemToOrderNacElems.containsKey(lastNodeInRhs)) {
                         int counter = paramCounter++;
-                        String prevIndex = "i" + Integer.toString(counter);
-                        String currentIndex = "j" + Integer.toString(counter);
+                        prevIndex = "i" + Integer.toString(counter);
+                        currentIndex = "j" + Integer.toString(counter);
                         Parameter prevIndexParam = HF
                                 .createParameter(prevIndex);
                         rule.getParameters().add(prevIndexParam);
@@ -271,8 +277,10 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                                 prevIndex, currentIndex));
                         rule.getAttributeConditions().add(attCdt1);
 
-                        newEdgeInLhs.setIndex(currentIndex);
-                        newEdgeInRhs.setIndex(currentIndex);
+                        if (!inSortedBy) {
+                            newEdgeInLhs.setIndex(currentIndex);
+                            newEdgeInRhs.setIndex(currentIndex);
+                        }
 
                         NestedCondition nac = rule.getLhs().createNAC(
                                 "OrderedMatching");
@@ -280,7 +288,7 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                                 lastNodeType,
                                 "n" + Integer.toString(nodeCounter++));
                         MappingList nacMappings = nac.getMappings();
-                        nacMappings.add(lastNodeInLhs, lastNodeInNac);
+                        nacMappings.add(lastNodeInLhsTree, lastNodeInNac);
 
                         Node targetNodeInNac = HF.createNode(
                                 nac.getConclusion(), targetType,
@@ -288,7 +296,10 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
 
                         Edge edgeInNac = HF.createEdge(lastNodeInNac,
                                 targetNodeInNac, eRef);
-                        edgeInNac.setIndex(prevIndex);
+
+                        if (!inSortedBy) {
+                            edgeInNac.setIndex(prevIndex);
+                        }
 
                         addToNacOrderMap(lastNodeInRhs, lastNodeInNac);
                         addToNacOrderMap(targetNodeInRhs, targetNodeInNac);
@@ -310,9 +321,9 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                 final EAttribute eAtt = (EAttribute) eStructuralFeature;
                 String paramName;
                 // Check if parameter has already been read
-                if (lastNodeInLhs.getAttribute(eAtt) != null) {
+                if (lastNodeInLhsTree.getAttribute(eAtt) != null) {
                     // use existing parameter
-                    paramName = lastNodeInLhs.getAttribute(eAtt).getValue();
+                    paramName = lastNodeInLhsTree.getAttribute(eAtt).getValue();
                 } else {
                     // create new parameter
                     paramName = "p" + Integer.toString(paramCounter);
@@ -321,11 +332,15 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
                     param.setType(eAtt.getEType());
                     rule.getParameters().add(param);
 
-                    final Attribute lhsAtt = HF.createAttribute(lastNodeInLhs,
-                            eAtt, paramName);
-                    final Attribute rhsAtt = HF.createAttribute(lastNodeInRhs,
-                            eAtt, paramName);
-                    rule.getMappings().add(lhsAtt, rhsAtt);
+                    final Attribute lhsAtt = HF.createAttribute(
+                            lastNodeInLhsTree, eAtt, paramName);
+                    if (lhs.getNodes().contains(lastNodeInLhsTree)) {
+                        // If the node was at the root of the LHS tree (in the
+                        // LHS) we should map it to the RHS so it is preserved.
+                        final Attribute rhsAtt = HF.createAttribute(
+                                lastNodeInRhs, eAtt, paramName);
+                        rule.getMappings().add(lhsAtt, rhsAtt);
+                    }
                 }
 
                 attExpStack.push(paramName);
@@ -475,6 +490,15 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
     }
 
     @Override
+    public Node caseBooleanExp(BooleanExp object) {
+        if (object.isBooleanSymbol())
+            attExpStack.push("true");
+        else
+            attExpStack.push("false");
+        return super.caseBooleanExp(object);
+    }
+
+    @Override
     public Node caseIteratorExp(IteratorExp object) {
         final String op = object.getName();
         if ("collect".equals(op)) {
@@ -558,6 +582,35 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
             //
             // rule.getAttributeConditions().add(attCond);
 
+            return lastNode;
+        } else if ("sortedBy".equals(op)) {
+            inSortedBy = true;
+            final Node lastNode = this.doSwitch(object.getSource());
+            final VariableDeclaration iterator = object.getIterators().get(0);
+            varDeclToNode.put(iterator, lastNode);
+            this.doSwitch(object.getBody());
+            String currentAttVal = attExpStack.pop();
+
+            EcoreUtil.delete(rule.getParameter(currentAttVal));
+            lastNode.getAttributes().stream()
+                    .filter(a -> currentAttVal.equals(a.getValue()))
+                    .forEach(a -> a.setValue(currentIndex));
+
+            toLhs(lastNode).getAttributes().stream()
+                    .filter(a -> currentAttVal.equals(a.getValue()))
+                    .forEach(a -> a.setValue(currentIndex));
+
+            final List<Node> orderNacElems = getOrderNacElems(lastNode);
+            for (Node node : orderNacElems) {
+                varDeclToNode.put(iterator, node);
+                this.doSwitch(object.getBody());
+                String prevAttVal = this.attExpStack.pop();
+                EcoreUtil.delete(rule.getParameter(prevAttVal));
+                node.getAttributes().stream()
+                        .filter(a -> prevAttVal.equals(a.getValue()))
+                        .forEach(a -> a.setValue(prevIndex));
+            }
+            inSortedBy = false;
             return lastNode;
         } else {
             error("Iterator expression '{}' NYI", object.getName());
@@ -689,6 +742,15 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
 
     @Override
     public Node caseSequenceExp(SequenceExp object) {
+        return caseSequenceAndOrderedSetExp(object);
+    }
+
+    @Override
+    public Node caseOrderedSetExp(OrderedSetExp object) {
+        return caseSequenceAndOrderedSetExp(object);
+    }
+
+    public Node caseSequenceAndOrderedSetExp(CollectionExp object) {
         final EList<OclExpression> elements = object.getElements();
 
         final boolean isERef = this.atl2Henshin
@@ -831,9 +893,16 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
             return toRhs(rule.createNode(sourceEClass));
         } else if (!(object instanceof OperatorCallExp)
                 && !(object instanceof CollectionOperationCallExp)) {
-            Node lastNode = this.doSwitch(source);
-            EClass lastNodeType = lastNode != null ? lastNode.getType() : null;
-            final Helper helper = this.atl2Henshin.resolveHelper(lastNodeType,
+            // Parsing the source here creates duplicate elements because we
+            // parse it again in the inlinedExpression, so we shouldn't parse
+            // it. In that case we are not able to figure out the type of the
+            // source, which is OK because resolving helpers can work based only
+            // on names (i.e. it will not check for the context type of the
+            // helper).
+            // Node lastNode = this.doSwitch(source);
+            // EClass lastNodeType = lastNode != null ? lastNode.getType() :
+            // null;
+            final Helper helper = this.atl2Henshin.resolveHelper(null,
                     operationName, getAtlModule());
             if (helper != null) {
                 final OclExpression inlinedExpression = ATL2Henshin
@@ -967,13 +1036,16 @@ public class ResolveRuleBuilder extends OCLSwitch<Node> {
     }
 
     private <T extends GraphElement> T toLhs(T rhsElem) {
+        T res;
         if (rhsElem.getGraph().isLhs()) {
-            return rhsElem;
+            res = rhsElem;
         } else {
             final org.eclipse.emf.henshin.model.Rule containingRule = rhsElem
                     .getGraph().getRule();
-            return containingRule.getMappings().getOrigin(rhsElem);
+            res = containingRule.getMappings().getOrigin(rhsElem);
         }
+
+        return res != null ? res : rhsElem;
     }
 
     private <T extends GraphElement> T toRhs(T lhsElem) {

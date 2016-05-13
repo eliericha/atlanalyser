@@ -771,7 +771,7 @@
   <units xsi:type="henshin:SequentialUnit" xmi:id="_QN9GdbYKEeS_tKhwn1BahQ" name="Main" subUnits="_QN9Ga7YKEeS_tKhwn1BahQ _QN9GcbYKEeS_tKhwn1BahQ _QN9GdLYKEeS_tKhwn1BahQ"/>
   <units xsi:type="henshin:Rule" xmi:id="_SNbM0La1EeSJsZUtruaW-w" name="R1_Step1">
     <lhs xmi:id="_SNe3MLa1EeSJsZUtruaW-w" name="Lhs">
-      <nodes xmi:id="_VvVNULa1EeSJsZUtruaW-w" name="tr" outgoing="_ZNbE0La1EeSJsZUtruaW-w">
+      <nodes xmi:id="_VvVNULa1EeSJsZUtruaW-w" outgoing="_ZNbE0La1EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_Xu8UoLa1EeSJsZUtruaW-w" name="t1" incoming="_ZNbE0La1EeSJsZUtruaW-w">
@@ -782,7 +782,7 @@
       </edges>
     </lhs>
     <rhs xmi:id="_SNe3Mba1EeSJsZUtruaW-w" name="Rhs">
-      <nodes xmi:id="_VvV0YLa1EeSJsZUtruaW-w" name="tr" outgoing="_ZNbE0ba1EeSJsZUtruaW-w">
+      <nodes xmi:id="_VvV0YLa1EeSJsZUtruaW-w" outgoing="_ZNbE0ba1EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_Xu8Uoba1EeSJsZUtruaW-w" name="t1" incoming="_ZNbE0ba1EeSJsZUtruaW-w">
@@ -797,7 +797,7 @@
   </units>
   <units xsi:type="henshin:Rule" xmi:id="_BZ7lALa2EeSJsZUtruaW-w" name="R1_Step2">
     <lhs xmi:id="_BZ7lAba2EeSJsZUtruaW-w" name="Lhs">
-      <nodes xmi:id="_BZ7lAra2EeSJsZUtruaW-w" name="tr" outgoing="_BZ7lBLa2EeSJsZUtruaW-w _PDbgkLa2EeSJsZUtruaW-w">
+      <nodes xmi:id="_BZ7lAra2EeSJsZUtruaW-w" outgoing="_BZ7lBLa2EeSJsZUtruaW-w _PDbgkLa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_BZ7lA7a2EeSJsZUtruaW-w" name="t1" incoming="_BZ7lBLa2EeSJsZUtruaW-w">
@@ -820,7 +820,7 @@
       </edges>
     </lhs>
     <rhs xmi:id="_BZ7lBba2EeSJsZUtruaW-w" name="Rhs">
-      <nodes xmi:id="_BZ7lBra2EeSJsZUtruaW-w" name="tr" outgoing="_BZ7lCLa2EeSJsZUtruaW-w _PDbgkba2EeSJsZUtruaW-w">
+      <nodes xmi:id="_BZ7lBra2EeSJsZUtruaW-w" outgoing="_BZ7lCLa2EeSJsZUtruaW-w _PDbgkba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_BZ7lB7a2EeSJsZUtruaW-w" name="t1" incoming="_BZ7lCLa2EeSJsZUtruaW-w">
@@ -849,7 +849,7 @@
   </units>
   <units xsi:type="henshin:Rule" xmi:id="_pQOkoLa2EeSJsZUtruaW-w" name="R1_Step3">
     <lhs xmi:id="_pQOkoba2EeSJsZUtruaW-w" name="Lhs">
-      <nodes xmi:id="_pQOkora2EeSJsZUtruaW-w" name="tr" outgoing="_pQOkpra2EeSJsZUtruaW-w _pQOkp7a2EeSJsZUtruaW-w">
+      <nodes xmi:id="_pQOkora2EeSJsZUtruaW-w" outgoing="_pQOkpra2EeSJsZUtruaW-w _pQOkp7a2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_pQOko7a2EeSJsZUtruaW-w" name="t1" incoming="_pQOkpra2EeSJsZUtruaW-w">
@@ -861,7 +861,7 @@
       <nodes xmi:id="_pQOkpba2EeSJsZUtruaW-w" name="qNode" incoming="_pQOkqLa2EeSJsZUtruaW-w _v2uXgLa2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//B"/>
       </nodes>
-      <nodes xmi:id="_u8hZELa2EeSJsZUtruaW-w" outgoing="_v2uXgLa2EeSJsZUtruaW-w _zC5YkLa2EeSJsZUtruaW-w">
+      <nodes xmi:id="_u8hZELa2EeSJsZUtruaW-w" name="tr" outgoing="_v2uXgLa2EeSJsZUtruaW-w _zC5YkLa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace"/>
       </nodes>
       <nodes xmi:id="_x129sLa2EeSJsZUtruaW-w" name="rNode" incoming="_zC5YkLa2EeSJsZUtruaW-w">
@@ -876,15 +876,15 @@
       <edges xmi:id="_pQOkqLa2EeSJsZUtruaW-w" source="_pQOkpLa2EeSJsZUtruaW-w" target="_pQOkpba2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//A/refB"/>
       </edges>
-      <edges xmi:id="_v2uXgLa2EeSJsZUtruaW-w" source="_u8hZELa2EeSJsZUtruaW-w" target="_pQOkpba2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_v2uXgLa2EeSJsZUtruaW-w" source="_u8hZELa2EeSJsZUtruaW-w" target="_pQOkpba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/from"/>
       </edges>
-      <edges xmi:id="_zC5YkLa2EeSJsZUtruaW-w" source="_u8hZELa2EeSJsZUtruaW-w" target="_x129sLa2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_zC5YkLa2EeSJsZUtruaW-w" source="_u8hZELa2EeSJsZUtruaW-w" target="_x129sLa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/to"/>
       </edges>
     </lhs>
     <rhs xmi:id="_pQOkqba2EeSJsZUtruaW-w" name="Rhs">
-      <nodes xmi:id="_pQOkqra2EeSJsZUtruaW-w" name="tr" outgoing="_pQOkrra2EeSJsZUtruaW-w _pQOkr7a2EeSJsZUtruaW-w">
+      <nodes xmi:id="_pQOkqra2EeSJsZUtruaW-w" outgoing="_pQOkrra2EeSJsZUtruaW-w _pQOkr7a2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_pQOkq7a2EeSJsZUtruaW-w" name="t1" incoming="_pQOkrra2EeSJsZUtruaW-w">
@@ -896,7 +896,7 @@
       <nodes xmi:id="_pQOkrba2EeSJsZUtruaW-w" name="qNode" incoming="_pQOksLa2EeSJsZUtruaW-w _v2uXgba2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//B"/>
       </nodes>
-      <nodes xmi:id="_u8iAILa2EeSJsZUtruaW-w" outgoing="_v2uXgba2EeSJsZUtruaW-w _zC5Ykba2EeSJsZUtruaW-w">
+      <nodes xmi:id="_u8iAILa2EeSJsZUtruaW-w" name="tr" outgoing="_v2uXgba2EeSJsZUtruaW-w _zC5Ykba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace"/>
       </nodes>
       <nodes xmi:id="_x129sba2EeSJsZUtruaW-w" name="rNode" incoming="_zC5Ykba2EeSJsZUtruaW-w">
@@ -911,10 +911,10 @@
       <edges xmi:id="_pQOksLa2EeSJsZUtruaW-w" source="_pQOkrLa2EeSJsZUtruaW-w" target="_pQOkrba2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//A/refB"/>
       </edges>
-      <edges xmi:id="_v2uXgba2EeSJsZUtruaW-w" source="_u8iAILa2EeSJsZUtruaW-w" target="_pQOkrba2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_v2uXgba2EeSJsZUtruaW-w" source="_u8iAILa2EeSJsZUtruaW-w" target="_pQOkrba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/from"/>
       </edges>
-      <edges xmi:id="_zC5Ykba2EeSJsZUtruaW-w" source="_u8iAILa2EeSJsZUtruaW-w" target="_x129sba2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_zC5Ykba2EeSJsZUtruaW-w" source="_u8iAILa2EeSJsZUtruaW-w" target="_x129sba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/to"/>
       </edges>
     </rhs>
@@ -927,7 +927,7 @@
   </units>
   <units xsi:type="henshin:Rule" xmi:id="_5g-PQLa2EeSJsZUtruaW-w" name="R1_Step4">
     <lhs xmi:id="_5g-PQba2EeSJsZUtruaW-w" name="Lhs">
-      <nodes xmi:id="_5g-PQra2EeSJsZUtruaW-w" name="tr" outgoing="_5g-PSLa2EeSJsZUtruaW-w _5g-PSba2EeSJsZUtruaW-w">
+      <nodes xmi:id="_5g-PQra2EeSJsZUtruaW-w" outgoing="_5g-PSLa2EeSJsZUtruaW-w _5g-PSba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_5g-PQ7a2EeSJsZUtruaW-w" name="t1" incoming="_5g-PSLa2EeSJsZUtruaW-w">
@@ -939,7 +939,7 @@
       <nodes xmi:id="_5g-PRba2EeSJsZUtruaW-w" name="qNode" incoming="_5g-PSra2EeSJsZUtruaW-w _5g-PS7a2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//B"/>
       </nodes>
-      <nodes xmi:id="_5g-PRra2EeSJsZUtruaW-w" outgoing="_5g-PS7a2EeSJsZUtruaW-w _5g-PTLa2EeSJsZUtruaW-w">
+      <nodes xmi:id="_5g-PRra2EeSJsZUtruaW-w" name="tr" outgoing="_5g-PS7a2EeSJsZUtruaW-w _5g-PTLa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace"/>
       </nodes>
       <nodes xmi:id="_5g-PR7a2EeSJsZUtruaW-w" name="rNode" incoming="_5g-PTLa2EeSJsZUtruaW-w">
@@ -951,13 +951,13 @@
       <edges xmi:id="_5g-PSba2EeSJsZUtruaW-w" source="_5g-PQra2EeSJsZUtruaW-w" target="_5g-PRLa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace/s"/>
       </edges>
-      <edges xmi:id="_5g-PSra2EeSJsZUtruaW-w" source="_5g-PRLa2EeSJsZUtruaW-w" target="_5g-PRba2EeSJsZUtruaW-w" index="i">
+      <edges xmi:id="_5g-PSra2EeSJsZUtruaW-w" source="_5g-PRLa2EeSJsZUtruaW-w" target="_5g-PRba2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//A/refB"/>
       </edges>
-      <edges xmi:id="_5g-PS7a2EeSJsZUtruaW-w" source="_5g-PRra2EeSJsZUtruaW-w" target="_5g-PRba2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_5g-PS7a2EeSJsZUtruaW-w" source="_5g-PRra2EeSJsZUtruaW-w" target="_5g-PRba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/from"/>
       </edges>
-      <edges xmi:id="_5g-PTLa2EeSJsZUtruaW-w" source="_5g-PRra2EeSJsZUtruaW-w" target="_5g-PR7a2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_5g-PTLa2EeSJsZUtruaW-w" source="_5g-PRra2EeSJsZUtruaW-w" target="_5g-PR7a2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/to"/>
       </edges>
       <formula xsi:type="henshin:Not" xmi:id="_JE2z4La3EeSJsZUtruaW-w">
@@ -979,7 +979,7 @@
       </formula>
     </lhs>
     <rhs xmi:id="_5g-PTba2EeSJsZUtruaW-w" name="Rhs">
-      <nodes xmi:id="_5g-PTra2EeSJsZUtruaW-w" name="tr" outgoing="_5g-PVLa2EeSJsZUtruaW-w _5g-PVba2EeSJsZUtruaW-w">
+      <nodes xmi:id="_5g-PTra2EeSJsZUtruaW-w" outgoing="_5g-PVLa2EeSJsZUtruaW-w _5g-PVba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace"/>
       </nodes>
       <nodes xmi:id="_5g-PT7a2EeSJsZUtruaW-w" name="t1" incoming="_5g-PVLa2EeSJsZUtruaW-w" outgoing="_Nzj-sLa3EeSJsZUtruaW-w">
@@ -991,7 +991,7 @@
       <nodes xmi:id="_5g-PUba2EeSJsZUtruaW-w" name="qNode" incoming="_5g-PVra2EeSJsZUtruaW-w _5g-PV7a2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//B"/>
       </nodes>
-      <nodes xmi:id="_5g-PUra2EeSJsZUtruaW-w" outgoing="_5g-PV7a2EeSJsZUtruaW-w _5g-PWLa2EeSJsZUtruaW-w">
+      <nodes xmi:id="_5g-PUra2EeSJsZUtruaW-w" name="tr" outgoing="_5g-PV7a2EeSJsZUtruaW-w _5g-PWLa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace"/>
       </nodes>
       <nodes xmi:id="_5g-PU7a2EeSJsZUtruaW-w" name="rNode" incoming="_5g-PWLa2EeSJsZUtruaW-w _Nzj-sLa3EeSJsZUtruaW-w">
@@ -1003,13 +1003,13 @@
       <edges xmi:id="_5g-PVba2EeSJsZUtruaW-w" source="_5g-PTra2EeSJsZUtruaW-w" target="_5g-PULa2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//R1_Trace/s"/>
       </edges>
-      <edges xmi:id="_5g-PVra2EeSJsZUtruaW-w" source="_5g-PULa2EeSJsZUtruaW-w" target="_5g-PUba2EeSJsZUtruaW-w" index="i">
+      <edges xmi:id="_5g-PVra2EeSJsZUtruaW-w" source="_5g-PULa2EeSJsZUtruaW-w" target="_5g-PUba2EeSJsZUtruaW-w">
         <type href="../InputMM/in.ecore#//A/refB"/>
       </edges>
-      <edges xmi:id="_5g-PV7a2EeSJsZUtruaW-w" source="_5g-PUra2EeSJsZUtruaW-w" target="_5g-PUba2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_5g-PV7a2EeSJsZUtruaW-w" source="_5g-PUra2EeSJsZUtruaW-w" target="_5g-PUba2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/from"/>
       </edges>
-      <edges xmi:id="_5g-PWLa2EeSJsZUtruaW-w" source="_5g-PUra2EeSJsZUtruaW-w" target="_5g-PU7a2EeSJsZUtruaW-w" index="0">
+      <edges xmi:id="_5g-PWLa2EeSJsZUtruaW-w" source="_5g-PUra2EeSJsZUtruaW-w" target="_5g-PU7a2EeSJsZUtruaW-w">
         <type href="Test.traces.manual.ecore#//Trace/to"/>
       </edges>
       <edges xmi:id="_Nzj-sLa3EeSJsZUtruaW-w" source="_5g-PT7a2EeSJsZUtruaW-w" target="_5g-PU7a2EeSJsZUtruaW-w">

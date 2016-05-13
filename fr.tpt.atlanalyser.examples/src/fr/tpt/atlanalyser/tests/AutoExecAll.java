@@ -51,4 +51,9 @@ public class AutoExecAll extends GenericExecTest {
         return result;
     }
 
+    @Test
+    public void test() {
+
+    }
+
 }
