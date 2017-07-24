@@ -18,3 +18,18 @@ fr.tpt.atlanalyser.examples/src/fr/tpt/atlanalyser/tests. For example:
  * TestClass2RelationalExec.java : Execution of both ATL and AGT versions over
    the same set of models, and validation that the results are equivalent using
    EMFCompare.
+   
+Publications
+============
+
+ * E. Richa, E. Borde, and L. Pautet. [_Translation of ATL to AGT and application
+   to a code generator for Simulink_](https://link.springer.com/article/10.1007/s10270-017-0607-8).
+   Software & Systems Modeling, July 2017.
+
+ * E. Richa. [_Qualification of source code generators in the avionics domain :
+   automated testing of model transformation chains_](https://pastel.archives-ouvertes.fr/tel-01331877).
+   Télécom ParisTech, Dec 2015.
+
+ * E. Richa, E. Borde, and L. Pautet. [_Translating ATL Model Transformations to
+   Algebraic Graph Transformations_](https://link.springer.com/chapter/10.1007%2F978-3-319-21155-8_14).
+   ICMT 2015: Theory and Practice of Model Transformations, July 2015.
